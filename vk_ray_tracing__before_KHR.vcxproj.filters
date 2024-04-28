@@ -1,0 +1,339 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Projects\nvpro_core\nvp\perproject_globals.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\nvpro_core\nvvk\nsight_aftermath_vk.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\vk_raytracing_tutorial_KHR\common\obj_loader.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="hello_vulkan.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Raytrace.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ChunkConst.cpp">
+      <Filter>Core\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ComputeBuffer.cpp">
+      <Filter>Core\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ComputeShader.cpp">
+      <Filter>Core\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DisjointCommandDispatcher.cpp">
+      <Filter>Core\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DistanceCalculations.cpp">
+      <Filter>Core\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LoadComputeShaders.cpp">
+      <Filter>Core\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\nveQueues.cpp">
+      <Filter>Core\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QueueFamilyIndices.cpp">
+      <Filter>Core\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProductionPackage.cpp">
+      <Filter>Core\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SingleTimeCommands.cpp">
+      <Filter>Core\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpareFences.cpp">
+      <Filter>Core\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdafx.cpp">
+      <Filter>Core\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="EntityManager.cpp" />
+    <ClCompile Include="src\ModelManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Projects\nvpro_core\nvp\resources.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\vk_raytracing_tutorial_KHR\common\obj_loader.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\VulkanSDKB\Include\vulkan\vulkan_core.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\nvpro_core\third_party\glm\glm\glm.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\nvpro_core\third_party\tinygltf\tiny_gltf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\nvpro_core\third_party\tinygltf\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\nvpro_core\third_party\tinyobjloader\tiny_obj_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\nvpro_core\third_party\vma\include\vk_mem_alloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\nvpro_core\third_party\NVTX\c\include\nvtx3\nvToolsExt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Raytrace.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="AABBDef.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjStruct.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="hello_vulkan.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\host_device.h">
+      <Filter>Shader Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ChunkConst.h">
+      <Filter>Core\Const</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShaderPushConstants.h">
+      <Filter>Core\Const</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ComputeBuffer.h">
+      <Filter>Core\ShaderObjs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DescriptiveObject.h">
+      <Filter>Core\ShaderObjs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DisjointCommandDispatcher.h">
+      <Filter>Core\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SpareFences.h">
+      <Filter>Core\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QueueFamilyIndices.h">
+      <Filter>Core\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ProductionPackage.h">
+      <Filter>Core\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NveTypes.h">
+      <Filter>Core\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SingleTimeCommands.h">
+      <Filter>Core\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StoredComputeShaders.h">
+      <Filter>Core\ShaderObjs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\trace.h">
+      <Filter>Core\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stdafx.h">
+      <Filter>Core\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ReadShader.h">
+      <Filter>Core\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\QueueTypes.h">
+      <Filter>Core\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nveQueues.h">
+      <Filter>Core\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nve_staticQueue.h">
+      <Filter>Core\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nve_page.h">
+      <Filter>Core\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DistanceCalculation.h">
+      <Filter>Core\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PagedBinding.h">
+      <Filter>Core\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LoadComputeShaders.h">
+      <Filter>Core\Compute Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MonoidList.h">
+      <Filter>Core\Compute Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ComputeShader.h">
+      <Filter>Core\Compute Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FilePath.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityManager.h">
+      <Filter>Internal\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tlas.h">
+      <Filter>Core\Acceleration Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ModelManager.h">
+      <Filter>Internal\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Internal\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntityGPUStruct.h">
+      <Filter>Internal\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model.h">
+      <Filter>Internal\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ChunkVolume.h">
+      <Filter>Internal\Chunks</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Chunk.h">
+      <Filter>Internal\Chunks</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ChunkInterface.h">
+      <Filter>Internal\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ChunkManager.h">
+      <Filter>Internal\Managers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\frag_shader.frag">
+      <Filter>Shader Sources</Filter>
+    </None>
+    <None Include="shaders\passthrough.vert">
+      <Filter>Shader Sources</Filter>
+    </None>
+    <None Include="shaders\post.frag">
+      <Filter>Shader Sources</Filter>
+    </None>
+    <None Include="shaders\vert_shader.vert">
+      <Filter>Shader Sources</Filter>
+    </None>
+    <None Include="shaders\wavefront.glsl">
+      <Filter>Shader Sources</Filter>
+    </None>
+    <None Include="shaders\raycommon.glsl">
+      <Filter>Shader Headers</Filter>
+    </None>
+    <None Include="shaders\ChunkHeaderAlloc.glsl">
+      <Filter>Shader Sources\Voxels\Memory\Chunk Headers</Filter>
+    </None>
+    <None Include="shaders\VoxelBrickMemAlloc.glsl">
+      <Filter>Shader Sources\Voxels\Memory\VBrick Memory</Filter>
+    </None>
+    <None Include="shaders\VoxelBrickMemoryAllocator.comp">
+      <Filter>Shader Sources\Voxels\Memory\VBrick Memory</Filter>
+    </None>
+    <None Include="shaders\Helpers\ChunkHeaders.glsl">
+      <Filter>Shader Headers\Helpers</Filter>
+    </None>
+    <None Include="shaders\Helpers\GPUMemory.glsl">
+      <Filter>Shader Headers\Helpers</Filter>
+    </None>
+    <None Include="shaders\WriteNewChunkVolume.comp">
+      <Filter>Shader Sources\Voxels</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="D:\Projects\nvpro_core\nvp\resources.rc">
+      <Filter>Common</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{20B92255-616D-35CF-B0B5-C0B5EEE47D55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{D8163786-29E6-305C-A37F-9709B3DD4D97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Headers">
+      <UniqueIdentifier>{87BE6AC8-0C57-3251-B239-18F6063D265E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Sources">
+      <UniqueIdentifier>{C41FF5EC-507D-347B-9289-B68684E636CF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{4116A675-4BB1-3D20-9035-A814AB222C18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{3a77ad55-c99b-44e3-a522-88461f17ff5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Source">
+      <UniqueIdentifier>{0a9f1b0c-b9ec-4042-8e0f-d2c2e41189f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Const">
+      <UniqueIdentifier>{76ab291d-da94-438e-b1b7-9ede5cb44e8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\ShaderObjs">
+      <UniqueIdentifier>{da041f90-1021-46b7-b61a-a4f5141ef5f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Vulkan">
+      <UniqueIdentifier>{b5044c11-fffb-4ed9-8e67-6a59f7d7cbe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Utility">
+      <UniqueIdentifier>{3f413957-66ab-41df-84b1-8968311ac37a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Compute Shaders">
+      <UniqueIdentifier>{e11c0171-2041-4266-a30c-2d5c8c495039}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal">
+      <UniqueIdentifier>{2cd6783a-afab-4891-9928-92e7969a957f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\Managers">
+      <UniqueIdentifier>{e649fb93-68f0-4c71-98a0-42dc16602963}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Acceleration Structures">
+      <UniqueIdentifier>{2d449a4e-2729-466c-aa19-cc1563711357}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Sources\Voxels">
+      <UniqueIdentifier>{03132abf-eb54-445a-8c66-299454df0eda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Sources\Voxels\Memory">
+      <UniqueIdentifier>{f6b203b8-f0f1-41ae-885c-d62915346d21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Sources\Voxels\Memory\Chunk Headers">
+      <UniqueIdentifier>{d84aa54b-aabd-4bd2-bcb1-4d7531bfbb66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Sources\Voxels\Memory\VBrick Memory">
+      <UniqueIdentifier>{5d2eb7f9-3d8d-42c3-b176-4b49d18c758e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Headers\Helpers">
+      <UniqueIdentifier>{c897d371-27a1-4bab-bf8a-5754ca8521fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\Chunks">
+      <UniqueIdentifier>{c661261a-dd2f-495e-8dd9-081ea48bca19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\Entity">
+      <UniqueIdentifier>{28c62dd1-1673-4b4c-aa82-4dd4075a23a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\Interfaces">
+      <UniqueIdentifier>{bbc408f9-6031-41dc-88e0-753b524f25cf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <GLSLShader Include="shaders\raytrace.rchit">
+      <Filter>Shader Sources</Filter>
+    </GLSLShader>
+    <GLSLShader Include="shaders\raytrace.rgen">
+      <Filter>Shader Sources</Filter>
+    </GLSLShader>
+    <GLSLShader Include="shaders\raytrace.rint">
+      <Filter>Shader Sources</Filter>
+    </GLSLShader>
+    <GLSLShader Include="shaders\raytrace.rmiss">
+      <Filter>Shader Sources</Filter>
+    </GLSLShader>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+</Project>

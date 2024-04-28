@@ -1,0 +1,395 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{41C49C5D-396D-31A9-B4CA-C8BC4D1E5B37}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>Graveheart</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Projects\bin_x64\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vk_ray_tracing__before_KHR.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vk_ray_tracing__before_KHR</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Projects\bin_x64\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">vk_ray_tracing__before_KHR.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">vk_ray_tracing__before_KHR</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Projects\bin_x64\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">vk_ray_tracing__before_KHR.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">vk_ray_tracing__before_KHR</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Projects\bin_x64\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">vk_ray_tracing__before_KHR.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">vk_ray_tracing__before_KHR</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Projects\vk_raytracing_tutorial_KHR\ray_tracing__before;D:\Projects\nvpro_core;D:\Projects\nvpro_core\nvp;D:\VulkanSDKB\Include;D:\Projects\vk_raytracing_tutorial_KHR\common;D:\Projects\nvpro_core\third_party\glfw\include;D:\Projects\nvpro_core\third_party\imgui;D:\Projects\nvpro_core\third_party\implot;D:\Projects\nvpro_core\third_party\fmt\include;D:\Projects\nvpro_core\third_party\glm;D:\Projects\nvpro_core\third_party\stb;D:\Projects\nvpro_core\third_party\tinygltf;D:\Projects\nvpro_core\third_party\tinyobjloader;D:\Projects\nvpro_core\third_party\cgltf;D:\Projects\nvpro_core\third_party\vma\include;D:\Projects\nvpro_core\third_party\NVTX\c\include;D:\Projects\nvpro_core\third_party\dxh\include\directx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>26812;26451</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;RESOURCE_DIRECTORY="D:/Projects/nvpro_core/resources/";NOMINMAX;NVP_SUPPORTS_VULKANSDK;VK_ENABLE_BETA_EXTENSIONS;VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1;VK_USE_PLATFORM_WIN32_KHR;PROJECT_NAME="vk_ray_tracing__before_KHR";PROJECT_RELDIRECTORY="../../vk_raytracing_tutorial_KHR/ray_tracing__before/";PROJECT_DOWNLOAD_RELDIRECTORY="../../downloaded_resources/";GLM_FORCE_RADIANS;GLM_ENABLE_EXPERIMENTAL;GLM_FORCE_XYZW_ONLY;STBI_MSC_SECURE_CRT;VMA_VULKAN_VERSION=1002000;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;RESOURCE_DIRECTORY=\"D:/Projects/nvpro_core/resources/\";NOMINMAX;NVP_SUPPORTS_VULKANSDK;VK_ENABLE_BETA_EXTENSIONS;VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1;VK_USE_PLATFORM_WIN32_KHR;PROJECT_NAME=\"vk_ray_tracing__before_KHR\";PROJECT_RELDIRECTORY=\"../../vk_raytracing_tutorial_KHR/ray_tracing__before/\";PROJECT_DOWNLOAD_RELDIRECTORY=\"../../downloaded_resources/\";GLM_FORCE_RADIANS;GLM_ENABLE_EXPERIMENTAL;GLM_FORCE_XYZW_ONLY;STBI_MSC_SECURE_CRT;VMA_VULKAN_VERSION=1002000;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Projects\vk_raytracing_tutorial_KHR\ray_tracing__before;D:\Projects\nvpro_core;D:\Projects\nvpro_core\nvp;D:\VulkanSDKB\Include;D:\Projects\vk_raytracing_tutorial_KHR\common;D:\Projects\nvpro_core\third_party\glfw\include;D:\Projects\nvpro_core\third_party\imgui;D:\Projects\nvpro_core\third_party\implot;D:\Projects\nvpro_core\third_party\fmt\include;D:\Projects\nvpro_core\third_party\glm;D:\Projects\nvpro_core\third_party\stb;D:\Projects\nvpro_core\third_party\tinygltf;D:\Projects\nvpro_core\third_party\tinyobjloader;D:\Projects\nvpro_core\third_party\cgltf;D:\Projects\nvpro_core\third_party\vma\include;D:\Projects\nvpro_core\third_party\NVTX\c\include;D:\Projects\nvpro_core\third_party\dxh\include\directx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Projects\vk_raytracing_tutorial_KHR\ray_tracing__before;D:\Projects\nvpro_core;D:\Projects\nvpro_core\nvp;D:\VulkanSDKB\Include;D:\Projects\vk_raytracing_tutorial_KHR\common;D:\Projects\nvpro_core\third_party\glfw\include;D:\Projects\nvpro_core\third_party\imgui;D:\Projects\nvpro_core\third_party\implot;D:\Projects\nvpro_core\third_party\fmt\include;D:\Projects\nvpro_core\third_party\glm;D:\Projects\nvpro_core\third_party\stb;D:\Projects\nvpro_core\third_party\tinygltf;D:\Projects\nvpro_core\third_party\tinyobjloader;D:\Projects\nvpro_core\third_party\cgltf;D:\Projects\nvpro_core\third_party\vma\include;D:\Projects\nvpro_core\third_party\NVTX\c\include;D:\Projects\nvpro_core\third_party\dxh\include\directx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>D:\VulkanSDKB\Lib\vulkan-1.lib;D:\Projects\bin_x64\Debug\nvpro_core_vk.lib;D:\VulkanSDKB\Lib\vulkan-1.lib;..\nvpro_core\third_party\glfw\src\Debug\glfw3.lib;..\nvpro_core\third_party\Debug\imgui.lib;..\nvpro_core\third_party\Debug\implot.lib;..\nvpro_core\third_party\Debug\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Projects/bin_x64/Debug/vk_ray_tracing__before_KHR.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Projects/bin_x64/Debug/vk_ray_tracing__before_KHR.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Projects\vk_raytracing_tutorial_KHR\ray_tracing__before;D:\Projects\nvpro_core;D:\Projects\nvpro_core\nvp;D:\VulkanSDKB\Include;D:\Projects\vk_raytracing_tutorial_KHR\common;D:\Projects\nvpro_core\third_party\glfw\include;D:\Projects\nvpro_core\third_party\imgui;D:\Projects\nvpro_core\third_party\implot;D:\Projects\nvpro_core\third_party\fmt\include;D:\Projects\nvpro_core\third_party\glm;D:\Projects\nvpro_core\third_party\stb;D:\Projects\nvpro_core\third_party\tinygltf;D:\Projects\nvpro_core\third_party\tinyobjloader;D:\Projects\nvpro_core\third_party\cgltf;D:\Projects\nvpro_core\third_party\vma\include;D:\Projects\nvpro_core\third_party\NVTX\c\include;D:\Projects\nvpro_core\third_party\dxh\include\directx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DisableSpecificWarnings>26812;26451</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;RESOURCE_DIRECTORY="D:/Projects/nvpro_core/resources/";NOMINMAX;NVP_SUPPORTS_VULKANSDK;VK_ENABLE_BETA_EXTENSIONS;VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1;VK_USE_PLATFORM_WIN32_KHR;PROJECT_NAME="vk_ray_tracing__before_KHR";PROJECT_RELDIRECTORY="../../vk_raytracing_tutorial_KHR/ray_tracing__before/";PROJECT_DOWNLOAD_RELDIRECTORY="../../downloaded_resources/";GLM_FORCE_RADIANS;GLM_ENABLE_EXPERIMENTAL;GLM_FORCE_XYZW_ONLY;STBI_MSC_SECURE_CRT;VMA_VULKAN_VERSION=1002000;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;RESOURCE_DIRECTORY=\"D:/Projects/nvpro_core/resources/\";NOMINMAX;NVP_SUPPORTS_VULKANSDK;VK_ENABLE_BETA_EXTENSIONS;VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1;VK_USE_PLATFORM_WIN32_KHR;PROJECT_NAME=\"vk_ray_tracing__before_KHR\";PROJECT_RELDIRECTORY=\"../../vk_raytracing_tutorial_KHR/ray_tracing__before/\";PROJECT_DOWNLOAD_RELDIRECTORY=\"../../downloaded_resources/\";GLM_FORCE_RADIANS;GLM_ENABLE_EXPERIMENTAL;GLM_FORCE_XYZW_ONLY;STBI_MSC_SECURE_CRT;VMA_VULKAN_VERSION=1002000;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Projects\vk_raytracing_tutorial_KHR\ray_tracing__before;D:\Projects\nvpro_core;D:\Projects\nvpro_core\nvp;D:\VulkanSDKB\Include;D:\Projects\vk_raytracing_tutorial_KHR\common;D:\Projects\nvpro_core\third_party\glfw\include;D:\Projects\nvpro_core\third_party\imgui;D:\Projects\nvpro_core\third_party\implot;D:\Projects\nvpro_core\third_party\fmt\include;D:\Projects\nvpro_core\third_party\glm;D:\Projects\nvpro_core\third_party\stb;D:\Projects\nvpro_core\third_party\tinygltf;D:\Projects\nvpro_core\third_party\tinyobjloader;D:\Projects\nvpro_core\third_party\cgltf;D:\Projects\nvpro_core\third_party\vma\include;D:\Projects\nvpro_core\third_party\NVTX\c\include;D:\Projects\nvpro_core\third_party\dxh\include\directx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Projects\vk_raytracing_tutorial_KHR\ray_tracing__before;D:\Projects\nvpro_core;D:\Projects\nvpro_core\nvp;D:\VulkanSDKB\Include;D:\Projects\vk_raytracing_tutorial_KHR\common;D:\Projects\nvpro_core\third_party\glfw\include;D:\Projects\nvpro_core\third_party\imgui;D:\Projects\nvpro_core\third_party\implot;D:\Projects\nvpro_core\third_party\fmt\include;D:\Projects\nvpro_core\third_party\glm;D:\Projects\nvpro_core\third_party\stb;D:\Projects\nvpro_core\third_party\tinygltf;D:\Projects\nvpro_core\third_party\tinyobjloader;D:\Projects\nvpro_core\third_party\cgltf;D:\Projects\nvpro_core\third_party\vma\include;D:\Projects\nvpro_core\third_party\NVTX\c\include;D:\Projects\nvpro_core\third_party\dxh\include\directx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>D:\VulkanSDKB\Lib\vulkan-1.lib;D:\Projects\bin_x64\Release\nvpro_core_vk.lib;D:\VulkanSDKB\Lib\vulkan-1.lib;..\nvpro_core\third_party\glfw\src\Release\glfw3.lib;..\nvpro_core\third_party\Release\imgui.lib;..\nvpro_core\third_party\Release\implot.lib;..\nvpro_core\third_party\Release\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Projects/bin_x64/Release/vk_ray_tracing__before_KHR.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Projects/bin_x64/Release/vk_ray_tracing__before_KHR.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Projects\vk_raytracing_tutorial_KHR\ray_tracing__before;D:\Projects\nvpro_core;D:\Projects\nvpro_core\nvp;D:\VulkanSDKB\Include;D:\Projects\vk_raytracing_tutorial_KHR\common;D:\Projects\nvpro_core\third_party\glfw\include;D:\Projects\nvpro_core\third_party\imgui;D:\Projects\nvpro_core\third_party\implot;D:\Projects\nvpro_core\third_party\fmt\include;D:\Projects\nvpro_core\third_party\glm;D:\Projects\nvpro_core\third_party\stb;D:\Projects\nvpro_core\third_party\tinygltf;D:\Projects\nvpro_core\third_party\tinyobjloader;D:\Projects\nvpro_core\third_party\cgltf;D:\Projects\nvpro_core\third_party\vma\include;D:\Projects\nvpro_core\third_party\NVTX\c\include;D:\Projects\nvpro_core\third_party\dxh\include\directx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DisableSpecificWarnings>26812;26451</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;RESOURCE_DIRECTORY="D:/Projects/nvpro_core/resources/";NOMINMAX;NVP_SUPPORTS_VULKANSDK;VK_ENABLE_BETA_EXTENSIONS;VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1;VK_USE_PLATFORM_WIN32_KHR;PROJECT_NAME="vk_ray_tracing__before_KHR";PROJECT_RELDIRECTORY="../../vk_raytracing_tutorial_KHR/ray_tracing__before/";PROJECT_DOWNLOAD_RELDIRECTORY="../../downloaded_resources/";GLM_FORCE_RADIANS;GLM_ENABLE_EXPERIMENTAL;GLM_FORCE_XYZW_ONLY;STBI_MSC_SECURE_CRT;VMA_VULKAN_VERSION=1002000;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;RESOURCE_DIRECTORY=\"D:/Projects/nvpro_core/resources/\";NOMINMAX;NVP_SUPPORTS_VULKANSDK;VK_ENABLE_BETA_EXTENSIONS;VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1;VK_USE_PLATFORM_WIN32_KHR;PROJECT_NAME=\"vk_ray_tracing__before_KHR\";PROJECT_RELDIRECTORY=\"../../vk_raytracing_tutorial_KHR/ray_tracing__before/\";PROJECT_DOWNLOAD_RELDIRECTORY=\"../../downloaded_resources/\";GLM_FORCE_RADIANS;GLM_ENABLE_EXPERIMENTAL;GLM_FORCE_XYZW_ONLY;STBI_MSC_SECURE_CRT;VMA_VULKAN_VERSION=1002000;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Projects\vk_raytracing_tutorial_KHR\ray_tracing__before;D:\Projects\nvpro_core;D:\Projects\nvpro_core\nvp;D:\VulkanSDKB\Include;D:\Projects\vk_raytracing_tutorial_KHR\common;D:\Projects\nvpro_core\third_party\glfw\include;D:\Projects\nvpro_core\third_party\imgui;D:\Projects\nvpro_core\third_party\implot;D:\Projects\nvpro_core\third_party\fmt\include;D:\Projects\nvpro_core\third_party\glm;D:\Projects\nvpro_core\third_party\stb;D:\Projects\nvpro_core\third_party\tinygltf;D:\Projects\nvpro_core\third_party\tinyobjloader;D:\Projects\nvpro_core\third_party\cgltf;D:\Projects\nvpro_core\third_party\vma\include;D:\Projects\nvpro_core\third_party\NVTX\c\include;D:\Projects\nvpro_core\third_party\dxh\include\directx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Projects\vk_raytracing_tutorial_KHR\ray_tracing__before;D:\Projects\nvpro_core;D:\Projects\nvpro_core\nvp;D:\VulkanSDKB\Include;D:\Projects\vk_raytracing_tutorial_KHR\common;D:\Projects\nvpro_core\third_party\glfw\include;D:\Projects\nvpro_core\third_party\imgui;D:\Projects\nvpro_core\third_party\implot;D:\Projects\nvpro_core\third_party\fmt\include;D:\Projects\nvpro_core\third_party\glm;D:\Projects\nvpro_core\third_party\stb;D:\Projects\nvpro_core\third_party\tinygltf;D:\Projects\nvpro_core\third_party\tinyobjloader;D:\Projects\nvpro_core\third_party\cgltf;D:\Projects\nvpro_core\third_party\vma\include;D:\Projects\nvpro_core\third_party\NVTX\c\include;D:\Projects\nvpro_core\third_party\dxh\include\directx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>D:\VulkanSDKB\Lib\vulkan-1.lib;D:\Projects\bin_x64\MinSizeRel\nvpro_core_vk.lib;D:\VulkanSDKB\Lib\vulkan-1.lib;..\nvpro_core\third_party\glfw\src\MinSizeRel\glfw3.lib;..\nvpro_core\third_party\MinSizeRel\imgui.lib;..\nvpro_core\third_party\MinSizeRel\implot.lib;..\nvpro_core\third_party\MinSizeRel\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Projects/bin_x64/MinSizeRel/vk_ray_tracing__before_KHR.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Projects/bin_x64/MinSizeRel/vk_ray_tracing__before_KHR.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Projects\vk_raytracing_tutorial_KHR\ray_tracing__before;D:\Projects\nvpro_core;D:\Projects\nvpro_core\nvp;D:\VulkanSDKB\Include;D:\Projects\vk_raytracing_tutorial_KHR\common;D:\Projects\nvpro_core\third_party\glfw\include;D:\Projects\nvpro_core\third_party\imgui;D:\Projects\nvpro_core\third_party\implot;D:\Projects\nvpro_core\third_party\fmt\include;D:\Projects\nvpro_core\third_party\glm;D:\Projects\nvpro_core\third_party\stb;D:\Projects\nvpro_core\third_party\tinygltf;D:\Projects\nvpro_core\third_party\tinyobjloader;D:\Projects\nvpro_core\third_party\cgltf;D:\Projects\nvpro_core\third_party\vma\include;D:\Projects\nvpro_core\third_party\NVTX\c\include;D:\Projects\nvpro_core\third_party\dxh\include\directx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>26812;26451</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;RESOURCE_DIRECTORY="D:/Projects/nvpro_core/resources/";NOMINMAX;NVP_SUPPORTS_VULKANSDK;VK_ENABLE_BETA_EXTENSIONS;VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1;VK_USE_PLATFORM_WIN32_KHR;PROJECT_NAME="vk_ray_tracing__before_KHR";PROJECT_RELDIRECTORY="../../vk_raytracing_tutorial_KHR/ray_tracing__before/";PROJECT_DOWNLOAD_RELDIRECTORY="../../downloaded_resources/";GLM_FORCE_RADIANS;GLM_ENABLE_EXPERIMENTAL;GLM_FORCE_XYZW_ONLY;STBI_MSC_SECURE_CRT;VMA_VULKAN_VERSION=1002000;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;RESOURCE_DIRECTORY=\"D:/Projects/nvpro_core/resources/\";NOMINMAX;NVP_SUPPORTS_VULKANSDK;VK_ENABLE_BETA_EXTENSIONS;VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1;VK_USE_PLATFORM_WIN32_KHR;PROJECT_NAME=\"vk_ray_tracing__before_KHR\";PROJECT_RELDIRECTORY=\"../../vk_raytracing_tutorial_KHR/ray_tracing__before/\";PROJECT_DOWNLOAD_RELDIRECTORY=\"../../downloaded_resources/\";GLM_FORCE_RADIANS;GLM_ENABLE_EXPERIMENTAL;GLM_FORCE_XYZW_ONLY;STBI_MSC_SECURE_CRT;VMA_VULKAN_VERSION=1002000;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Projects\vk_raytracing_tutorial_KHR\ray_tracing__before;D:\Projects\nvpro_core;D:\Projects\nvpro_core\nvp;D:\VulkanSDKB\Include;D:\Projects\vk_raytracing_tutorial_KHR\common;D:\Projects\nvpro_core\third_party\glfw\include;D:\Projects\nvpro_core\third_party\imgui;D:\Projects\nvpro_core\third_party\implot;D:\Projects\nvpro_core\third_party\fmt\include;D:\Projects\nvpro_core\third_party\glm;D:\Projects\nvpro_core\third_party\stb;D:\Projects\nvpro_core\third_party\tinygltf;D:\Projects\nvpro_core\third_party\tinyobjloader;D:\Projects\nvpro_core\third_party\cgltf;D:\Projects\nvpro_core\third_party\vma\include;D:\Projects\nvpro_core\third_party\NVTX\c\include;D:\Projects\nvpro_core\third_party\dxh\include\directx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Projects\vk_raytracing_tutorial_KHR\ray_tracing__before;D:\Projects\nvpro_core;D:\Projects\nvpro_core\nvp;D:\VulkanSDKB\Include;D:\Projects\vk_raytracing_tutorial_KHR\common;D:\Projects\nvpro_core\third_party\glfw\include;D:\Projects\nvpro_core\third_party\imgui;D:\Projects\nvpro_core\third_party\implot;D:\Projects\nvpro_core\third_party\fmt\include;D:\Projects\nvpro_core\third_party\glm;D:\Projects\nvpro_core\third_party\stb;D:\Projects\nvpro_core\third_party\tinygltf;D:\Projects\nvpro_core\third_party\tinyobjloader;D:\Projects\nvpro_core\third_party\cgltf;D:\Projects\nvpro_core\third_party\vma\include;D:\Projects\nvpro_core\third_party\NVTX\c\include;D:\Projects\nvpro_core\third_party\dxh\include\directx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>D:\VulkanSDKB\Lib\vulkan-1.lib;D:\Projects\bin_x64\RelWithDebInfo\nvpro_core_vk.lib;D:\VulkanSDKB\Lib\vulkan-1.lib;..\nvpro_core\third_party\glfw\src\RelWithDebInfo\glfw3.lib;..\nvpro_core\third_party\RelWithDebInfo\imgui.lib;..\nvpro_core\third_party\RelWithDebInfo\implot.lib;..\nvpro_core\third_party\RelWithDebInfo\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Projects/bin_x64/RelWithDebInfo/vk_ray_tracing__before_KHR.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Projects/bin_x64/RelWithDebInfo/vk_ray_tracing__before_KHR.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="EntityManager.cpp" />
+    <ClCompile Include="hello_vulkan.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Raytrace.cpp" />
+    <ClCompile Include="src\ChunkConst.cpp" />
+    <ClCompile Include="src\ComputeBuffer.cpp" />
+    <ClCompile Include="src\ComputeShader.cpp" />
+    <ClCompile Include="src\DisjointCommandDispatcher.cpp" />
+    <ClCompile Include="src\DistanceCalculations.cpp" />
+    <ClCompile Include="src\LoadComputeShaders.cpp" />
+    <ClCompile Include="src\ModelManager.cpp" />
+    <ClCompile Include="src\nveQueues.cpp" />
+    <ClCompile Include="src\ProductionPackage.cpp" />
+    <ClCompile Include="src\QueueFamilyIndices.cpp" />
+    <ClCompile Include="src\SingleTimeCommands.cpp" />
+    <ClCompile Include="src\SpareFences.cpp" />
+    <ClCompile Include="src\stdafx.cpp" />
+    <ClInclude Include="AABBDef.h" />
+    <ClInclude Include="D:\Projects\nvpro_core\nvp\resources.h" />
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityManager.h" />
+    <ClInclude Include="hello_vulkan.h" />
+    <ClInclude Include="ObjStruct.h" />
+    <ClInclude Include="Raytrace.h" />
+    <ClInclude Include="shaders\host_device.h" />
+    <ClInclude Include="src\Chunk.h" />
+    <ClInclude Include="src\ChunkConst.h" />
+    <ClInclude Include="src\ChunkInterface.h" />
+    <ClInclude Include="src\ChunkManager.h" />
+    <ClInclude Include="src\ChunkVolume.h" />
+    <ClInclude Include="src\ComputeBuffer.h" />
+    <ClInclude Include="src\ComputeShader.h" />
+    <ClInclude Include="src\DescriptiveObject.h" />
+    <ClInclude Include="src\DisjointCommandDispatcher.h" />
+    <ClInclude Include="src\DistanceCalculation.h" />
+    <ClInclude Include="src\EntityGPUStruct.h" />
+    <ClInclude Include="src\FilePath.h" />
+    <ClInclude Include="src\LoadComputeShaders.h" />
+    <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\ModelManager.h" />
+    <ClInclude Include="src\MonoidList.h" />
+    <ClInclude Include="src\nveQueues.h" />
+    <ClInclude Include="src\NveTypes.h" />
+    <ClInclude Include="src\nve_page.h" />
+    <ClInclude Include="src\nve_staticQueue.h" />
+    <ClInclude Include="src\PagedBinding.h" />
+    <ClInclude Include="src\ProductionPackage.h" />
+    <ClInclude Include="src\QueueFamilyIndices.h" />
+    <ClInclude Include="src\QueueTypes.h" />
+    <ClInclude Include="src\ReadShader.h" />
+    <ClInclude Include="src\ShaderPushConstants.h" />
+    <ClInclude Include="src\SingleTimeCommands.h" />
+    <ClInclude Include="src\SpareFences.h" />
+    <ClInclude Include="src\stdafx.h" />
+    <ClInclude Include="src\StoredComputeShaders.h" />
+    <ClInclude Include="src\Tlas.h" />
+    <ClInclude Include="src\trace.h" />
+    <None Include="shaders\ChunkHeaderAlloc.glsl" />
+    <None Include="shaders\frag_shader.frag" />
+    <None Include="shaders\Helpers\ChunkHeaders.glsl" />
+    <None Include="shaders\Helpers\GPUMemory.glsl" />
+    <None Include="shaders\passthrough.vert" />
+    <None Include="shaders\post.frag" />
+    <None Include="shaders\raycommon.glsl" />
+    <None Include="shaders\vert_shader.vert" />
+    <None Include="shaders\VoxelBrickMemAlloc.glsl" />
+    <None Include="shaders\VoxelBrickMemoryAllocator.comp" />
+    <None Include="shaders\wavefront.glsl" />
+    <None Include="shaders\WriteNewChunkVolume.comp" />
+    <ResourceCompile Include="D:\Projects\nvpro_core\nvp\resources.rc" />
+    <ClCompile Include="D:\Projects\nvpro_core\nvp\perproject_globals.cpp" />
+    <ClCompile Include="D:\Projects\nvpro_core\nvvk\nsight_aftermath_vk.cpp" />
+    <ClCompile Include="D:\Projects\vk_raytracing_tutorial_KHR\common\obj_loader.cpp" />
+    <ClInclude Include="D:\Projects\vk_raytracing_tutorial_KHR\common\obj_loader.h" />
+    <ClInclude Include="D:\VulkanSDKB\Include\vulkan\vulkan_core.h" />
+    <ClInclude Include="D:\Projects\nvpro_core\third_party\glm\glm\glm.hpp" />
+    <ClInclude Include="D:\Projects\nvpro_core\third_party\tinygltf\tiny_gltf.h" />
+    <ClInclude Include="D:\Projects\nvpro_core\third_party\tinygltf\json.hpp" />
+    <ClInclude Include="D:\Projects\nvpro_core\third_party\tinyobjloader\tiny_obj_loader.h" />
+    <ClInclude Include="D:\Projects\nvpro_core\third_party\vma\include\vk_mem_alloc.h" />
+    <ClInclude Include="D:\Projects\nvpro_core\third_party\NVTX\c\include\nvtx3\nvToolsExt.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:\Projects\vk_raytracing_tutorial_KHR\ZERO_CHECK.vcxproj">
+      <Project>{1034FF7D-147D-320A-BAD1-3AC6B0768036}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\vk_raytracing_tutorial_KHR\nvpro_core\third_party\fmt.vcxproj">
+      <Project>{3165A9C1-C85A-3440-8B31-3F1B2737453E}</Project>
+      <Name>fmt</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\vk_raytracing_tutorial_KHR\nvpro_core\third_party\glfw\src\glfw.vcxproj">
+      <Project>{3AC3CA08-CE27-3DB0-BF67-EF6A3F724CE4}</Project>
+      <Name>glfw</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\vk_raytracing_tutorial_KHR\nvpro_core\third_party\imgui.vcxproj">
+      <Project>{034CD293-7535-3269-A649-4C34C476C225}</Project>
+      <Name>imgui</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\vk_raytracing_tutorial_KHR\nvpro_core\third_party\implot.vcxproj">
+      <Project>{89174614-432B-3CA1-B949-8724858C792A}</Project>
+      <Name>implot</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\vk_raytracing_tutorial_KHR\nvpro_core\nvpro_core.vcxproj">
+      <Project>{7205419E-9B96-3CD7-BA2E-1C28DF3A177C}</Project>
+      <Name>nvpro_core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <GLSLShader Include="shaders\raytrace.rchit" />
+    <GLSLShader Include="shaders\raytrace.rgen" />
+    <GLSLShader Include="shaders\raytrace.rint" />
+    <GLSLShader Include="shaders\raytrace.rmiss" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="dxc.targets" />
+  </ImportGroup>
+</Project>

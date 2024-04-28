@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <!-- Include definitions from dxc.xml, which defines the GLSLShader item. -->
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)dxc.xml" />
+    <!-- Hook up GLSLShader items to be built by the GLSL target. -->
+    <AvailableItemName Include="GLSLShader">
+      <Targets>DXC</Targets>
+    </AvailableItemName>
+  </ItemGroup>
+
+  <Target
+    Name="DXC"
+    Condition="'@(GLSLShader)' != ''"
+		BeforeTargets="ClCompile">
+		<Message Importance="High" Text="Building shaders!!!" />
+		<!-- Setup metadata for custom build tool -->
+		<ItemGroup>
+		  <GLSLShader>
+			<Message>%(Filename)%(Extension)</Message>
+			<Command>
+
+			echo %VK_SDK_PATH%\Bin\glslangValidator.exe -g --target-env vulkan1.2 -o $(SolutionDir)/spv/%(Filename)%(Extension).spv  $(SolutionDir)shaders\%(Filename)%(Extension)
+		  %VK_SDK_PATH%\Bin\glslangValidator.exe -g --target-env vulkan1.2 -o $(SolutionDir)/spv/%(Filename)%(Extension).spv  $(SolutionDir)shaders\%(Filename)%(Extension)
+
+			</Command>
+			<Outputs>$(SolutionDir)/spv/%(Filename)%(Extension).spv;</Outputs>
+		  </GLSLShader>
+		</ItemGroup>
+
+		<!-- Compile by forwarding to the Custom Build Tool infrastructure -->
+		<CustomBuild Sources="@(GLSLShader)" />
+  </Target>
+</Project>

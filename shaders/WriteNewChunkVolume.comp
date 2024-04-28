@@ -1,0 +1,29 @@
+#version 450
+#extension GL_KHR_vulkan_glsl : enable
+#extension GL_EXT_nonuniform_qualifier : enable
+
+#include "Helpers/ChunkHeaders.glsl"
+
+
+layout(set = 0, binding = 0)  buffer  ChunkHeadersN{
+    ChunkHeader[] ChunkHeaders;
+};
+
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout (push_constant) uniform constant
+{
+ ivec3 position;
+ int ptrInMem;
+};
+
+
+void main()
+{
+    ChunkHeaders[ptrInMem].position = position;
+
+    for (int i = 0; i < 64; i++){
+        ChunkHeaders[ptrInMem].ptrs[i] = MAXUINT;
+    }
+}
