@@ -58,6 +58,8 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="src\ModelManager.cpp" />
+    <ClCompile Include="src\ChunkManager.cpp" />
+    <ClCompile Include="src\ChunkInterface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Projects\nvpro_core\nvp\resources.h">

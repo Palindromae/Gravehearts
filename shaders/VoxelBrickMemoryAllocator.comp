@@ -40,6 +40,8 @@ layout (push_constant) uniform constant
     int chunkID;
     int mipsUnderOne;
     int noiseSize;
+    ivec3 ChunkPosition;
+    int bitsPerAxii;
 };
 
 struct NodeExpansion{
@@ -97,13 +99,16 @@ void main()
 
     vec3 pos;
 
+    int headerPtrIndex;
+
     if (isHeader){
-        pos = ChunkHeaders[chunkID].position;
+        headerPtrIndex = GetIndexFromPos(ChunkHeaders[chunkID].position, ChunkPosition, bitsPerAxii);
+        pos = vec3(0);
     } else {
         pos = decode_pos(parent_node.position);
     }
     
-    NodeExpansion expansion = ExpandNode(pos, quality);
+    NodeExpansion expansion = ExpandNode(pos + ChunkPosition, quality);
    
    int leaf = (1-min(quality - 1,1)) * leaf_value;
 
@@ -112,7 +117,7 @@ void main()
         
         if (isHeader){
             // If it is at the max quality, this is the root, set the header.
-            ChunkHeaders[chunkID].ptr = const_value + expansion.blockValue & ptr_mask;
+            ChunkHeaders[chunkID].ptrs[headerPtrIndex] = const_value + expansion.blockValue & ptr_mask;
         } else {
             // is a leaf and constant
             GPUMemory[parent_node.mempos]     = const_value + leaf; // 32 bit is 1
@@ -139,7 +144,7 @@ void main()
 
     int index = atomicAdd(toNodes[0].position, 8);
     float size = pow(2,quality+mipsUnderOne);
-    ChunkHeader header = ChunkHeaders[chunkID];
+  
     
    
    // Hash data to try to spread the memory accesses evenly
@@ -148,11 +153,10 @@ void main()
 
     // Set the data 
     if (isHeader){
-      ChunkHeaders[chunkID].ptr = memindex & ptr_mask;
+      ChunkHeaders[chunkID].ptrs[headerPtrIndex] = memindex & ptr_mask;
     } else {
       GPUMemory[parent_node.mempos] = memindex & ptr_mask; // 30^2-1 32nd bit is 0
     }
-    pos += header.position;
 
 
     UnexpandedNode newNode;

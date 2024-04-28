@@ -11,3 +11,11 @@ struct ChunkHeader{
 
 const int NoChunks = 3125000; //50mb/16bytes 
 
+int GetIndexFromPos(ivec3 volume_pos, ivec3 pos, int BitsPerAxii){
+	pos -= volume_pos;
+	int index = pos.x;
+	index += y << BitsPerAxii;
+	index += z << BitsPerAxii;
+
+	return index;
+}

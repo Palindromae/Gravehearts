@@ -274,6 +274,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Raytrace.cpp" />
     <ClCompile Include="src\ChunkConst.cpp" />
+    <ClCompile Include="src\ChunkInterface.cpp" />
+    <ClCompile Include="src\ChunkManager.cpp" />
     <ClCompile Include="src\ComputeBuffer.cpp" />
     <ClCompile Include="src\ComputeShader.cpp" />
     <ClCompile Include="src\DisjointCommandDispatcher.cpp" />
