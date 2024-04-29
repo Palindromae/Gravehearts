@@ -5,12 +5,15 @@
     <PropertyPageSchema Include="$(MSBuildThisFileDirectory)dxc.xml" />
     <!-- Hook up GLSLShader items to be built by the GLSL target. -->
     <AvailableItemName Include="GLSLShader">
-      <Targets>DXC</Targets>
+      <Targets>
+	  GLSL,
+	  IGLSL
+	  </Targets>
     </AvailableItemName>
   </ItemGroup>
 
   <Target
-    Name="DXC"
+    Name="GLSL"
     Condition="'@(GLSLShader)' != ''"
 		BeforeTargets="ClCompile">
 		<Message Importance="High" Text="Building shaders!!!" />
@@ -31,4 +34,27 @@
 		<!-- Compile by forwarding to the Custom Build Tool infrastructure -->
 		<CustomBuild Sources="@(GLSLShader)" />
   </Target>
+  
+    <Target
+    Name="IGLSL"
+    Condition="'@(IGLSLShader)' != ''"
+		BeforeTargets="ClCompile">
+		<Message Importance="High" Text="Building Interpreted shaders!!!" />
+		<!-- Setup metadata for custom build tool -->
+		<ItemGroup>
+		  <IGLSLShader>
+			<Message>%(Filename)%(Extension)</Message>
+			<Command>
+			python $(SolutionDir)ShaderWorker\ShaderInserter.py $(SolutionDir)shaders\%(Filename)%(Extension)
+	        echo %VK_SDK_PATH%\Bin\glslangValidator.exe -g --target-env vulkan1.2 -o $(SolutionDir)/spv/%(Filename)%(Extension).spv  $(SolutionDir)ShaderWorker\TEMP\%(Filename)%(Extension)
+			%VK_SDK_PATH%\Bin\glslangValidator.exe -g --target-env vulkan1.2 -o $(SolutionDir)/spv/%(Filename)%(Extension).spv  $(SolutionDir)ShaderWorker\TEMP\%(Filename)%(Extension)
+			</Command>
+			<Outputs>$(SolutionDir)/spv/%(Filename)%(Extension).spv;</Outputs>
+		  </IGLSLShader>
+		</ItemGroup>
+
+		<!-- Compile by forwarding to the Custom Build Tool infrastructure -->
+		<CustomBuild Sources="@(IGLSLShader)" />
+  </Target>
+  
 </Project>

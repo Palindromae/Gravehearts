@@ -1,5 +1,6 @@
 #pragma once
 #define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/hash.hpp"
 #include "ChunkVolume.h"
 #include "ComputeBuffer.h"
 #include <queue>
@@ -20,7 +21,7 @@ class ChunkManager {
 
 	int GetChunkVolumeID();
 
-	int returnChunkVolumeID(int ID);
+	void returnChunkVolumeID(int ID);
 public:
 
 	ChunkManager(nve::ProductionPackage* context);

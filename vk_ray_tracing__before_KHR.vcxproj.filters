@@ -226,15 +226,6 @@
     <None Include="shaders\raycommon.glsl">
       <Filter>Shader Headers</Filter>
     </None>
-    <None Include="shaders\ChunkHeaderAlloc.glsl">
-      <Filter>Shader Sources\Voxels\Memory\Chunk Headers</Filter>
-    </None>
-    <None Include="shaders\VoxelBrickMemAlloc.glsl">
-      <Filter>Shader Sources\Voxels\Memory\VBrick Memory</Filter>
-    </None>
-    <None Include="shaders\VoxelBrickMemoryAllocator.comp">
-      <Filter>Shader Sources\Voxels\Memory\VBrick Memory</Filter>
-    </None>
     <None Include="shaders\Helpers\ChunkHeaders.glsl">
       <Filter>Shader Headers\Helpers</Filter>
     </None>
@@ -243,6 +234,12 @@
     </None>
     <None Include="shaders\WriteNewChunkVolume.comp">
       <Filter>Shader Sources\Voxels</Filter>
+    </None>
+    <None Include="shaders\Inserts\ChunkHeaderAlloc.glsl">
+      <Filter>Shader Sources\Voxels\Memory\Chunk Headers</Filter>
+    </None>
+    <None Include="shaders\Inserts\VoxelBrickMemAlloc.glsl">
+      <Filter>Shader Sources\Voxels\Memory\VBrick Memory</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -337,5 +334,10 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <IGLSLShader Include="shaders\VoxelBrickMemoryAllocator.comp">
+      <Filter>Shader Sources\Voxels\Memory\VBrick Memory</Filter>
+    </IGLSLShader>
   </ItemGroup>
 </Project>

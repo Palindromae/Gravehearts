@@ -892,7 +892,7 @@ void DisjointCommandDispatcher::copyBufferToImage(VkBuffer buffer, VkImage image
 //
 //
 //	VkFence* fence = DisjointCommandDispatcher::dispatcher->Fences->get();
-//	nve::Shaders::Shaders[nve::Shaders::CopyWorldToBuffer]->dispatch(1, 1, ceil(wc.count / 16.0),
+//	Shaders::Shaders[Shaders::CopyWorldToBuffer]->dispatch(1, 1, ceil(wc.count / 16.0),
 //		sizeof(WriteUpdatesToBufferConst), &wc, fence,
 //		MonoidList(3).bind(modifications)->bind(limitsb)->bind(buffer)->render());
 //

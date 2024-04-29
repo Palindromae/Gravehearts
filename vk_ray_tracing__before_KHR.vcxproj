@@ -129,6 +129,13 @@
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
+    <PreBuildEvent>
+      <Command>if not exist "$(SolutionDir)ShaderWorker\TEMP\Helpers\" mkdir "$(SolutionDir)ShaderWorker\TEMP\Helpers"
+copy $(ProjectDir)shaders\Helpers\* "$(SolutionDir)ShaderWorker\TEMP\Helpers\"
+copy $(ProjectDir)shaders\wavefront.glsl "$(SolutionDir)ShaderWorker\TEMP\"
+copy $(ProjectDir)shaders\host_device.h "$(SolutionDir)ShaderWorker\TEMP\"
+copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -328,16 +335,18 @@
     <ClInclude Include="src\StoredComputeShaders.h" />
     <ClInclude Include="src\Tlas.h" />
     <ClInclude Include="src\trace.h" />
-    <None Include="shaders\ChunkHeaderAlloc.glsl" />
     <None Include="shaders\frag_shader.frag" />
     <None Include="shaders\Helpers\ChunkHeaders.glsl" />
     <None Include="shaders\Helpers\GPUMemory.glsl" />
+    <None Include="shaders\Inserts\ChunkHeaderAlloc.glsl" />
+    <None Include="shaders\Inserts\VoxelBrickMemAlloc.glsl" />
     <None Include="shaders\passthrough.vert" />
     <None Include="shaders\post.frag" />
     <None Include="shaders\raycommon.glsl" />
     <None Include="shaders\vert_shader.vert" />
-    <None Include="shaders\VoxelBrickMemAlloc.glsl" />
-    <None Include="shaders\VoxelBrickMemoryAllocator.comp" />
+    <IGLSLShader Include="shaders\VoxelBrickMemoryAllocator.comp">
+      <FileType>Document</FileType>
+    </IGLSLShader>
     <None Include="shaders\wavefront.glsl" />
     <None Include="shaders\WriteNewChunkVolume.comp" />
     <ResourceCompile Include="D:\Projects\nvpro_core\nvp\resources.rc" />

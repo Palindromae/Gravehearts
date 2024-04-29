@@ -1,6 +1,7 @@
 #version 450
 #extension GL_KHR_vulkan_glsl : enable
 #extension GL_EXT_nonuniform_qualifier : enable
+#extension GL_GOOGLE_include_directive : enable
 
 #include "raycommon.glsl"
 #include "Helpers/ChunkHeaders.glsl"
@@ -50,7 +51,7 @@ struct NodeExpansion{
 };
 
 //--#Insert ChunkHeaderAlloc.glsl
-//#Insert GPUMemoryAlloc.glsl
+//#Insert VoxelBrickMemAlloc.glsl
 //#Insert GPUVoxelAlloc.glsl
 
 NodeExpansion ExpandNode(vec3 position, int quality)

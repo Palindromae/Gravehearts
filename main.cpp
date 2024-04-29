@@ -43,6 +43,7 @@
 #include "EntityManager.h"
 #include "Entity.h"
 #include "src/ModelManager.h"
+#include  "src/ChunkInterface.h"
 
 //////////////////////////////////////////////////////////////////////////
 #define UNUSED(x) (void)(x)
@@ -189,10 +190,12 @@ int main(int argc, char** argv)
       throw std::runtime_error("failed to create command pool!");
   }
 
+  // Initiate Nve
+
   new DisjointCommandDispatcher(&vkctx.m_device, &commandPool, &vkctx.m_queueGCT.queue, &vkctx.m_queueT.queue, &vkctx.m_queueC.queue, &vkctx.m_physicalDevice, &surface, &helloVk.m_alloc);
+  new ChunkInterface();
 
-
-  nve::Shaders::LoadComputeShaders::LoadComputeShaders(&vkctx.m_device);
+  Shaders::LoadComputeShaders::LoadComputeShaders(&vkctx.m_device);
 
 
   new ModelManager();
@@ -201,6 +204,8 @@ int main(int argc, char** argv)
   Entity* entity = new Entity(glm::vec3(5), 0);
   Entity* entity3 = new Entity(glm::vec3(1,2,3), 0);
   Entity* entity4 = new Entity(glm::vec3(5,-3,1), 0);
+
+  ChunkInterface::instance->CreateChunk(ChunkID(0));
 
 
   helloVk.updateDescriptorSet();

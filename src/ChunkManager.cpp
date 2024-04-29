@@ -61,6 +61,6 @@ int ChunkManager::GetChunkVolumeID() {
 	return CurrentPtrMax++;
 }
 
-int ChunkManager::returnChunkVolumeID(int ID) {
+void ChunkManager::returnChunkVolumeID(int ID) {
 	reusePTR.push(ID);
 }

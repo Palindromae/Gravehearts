@@ -7,4 +7,14 @@
   <FileExtension Name=".rint" ContentType="GLSLShader" />
   <FileExtension Name=".rmiss" ContentType="GLSLShader" />
   <FileExtension Name=".rchit" ContentType="GLSLShader" />
+  <FileExtension Name=".comp" ContentType="GLSLShader" />
+  
+  
+  <ItemType Name="IGLSLShader" DisplayName="Interpreted GLSL Shader" />
+  <ContentType Name="IGLSLShader" ItemType="IGLSLShader" DisplayName="GLSL Shader" />
+  <FileExtension Name=".irgen" ContentType="IGLSLShader" />
+  <FileExtension Name=".irint" ContentType="IGLSLShader" />
+  <FileExtension Name=".irmiss" ContentType="IGLSLShader" />
+  <FileExtension Name=".irchit" ContentType="IGLSLShader" />
+  <FileExtension Name=".icomp" ContentType="IGLSLShader" />
 </ProjectSchemaDefinitions>

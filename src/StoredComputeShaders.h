@@ -55,7 +55,6 @@ namespace Shaders
 		DownscaleOctree, 
 		VacantChunkGenerator,
 		WriteNewChunkVolume,
-		WriteNewChunkVolume,
 
 		// SVO
 		ChunkNodeAllocator,

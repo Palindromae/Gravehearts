@@ -3,7 +3,7 @@
 #include "ShaderPushConstants.h"
 #include "ComputeBuffer.h"
 #include "StoredComputeShaders.h"
-namespace nve::Shaders
+namespace Shaders
 {
 	//WARNING DO NOT MODIFY THIS FURTHER
 

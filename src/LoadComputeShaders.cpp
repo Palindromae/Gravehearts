@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "LoadComputeShaders.h"
 #include "ChunkConst.h"
-namespace nve::Shaders{
+namespace Shaders{
 	const ComputeShader** Shaders;
 	constexpr auto ComputeShaderPath = "shaders/ComputeShaders";
 
