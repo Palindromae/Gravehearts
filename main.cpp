@@ -126,7 +126,7 @@ int main(int argc, char** argv)
 
   // Requesting Vulkan extensions and layers
   nvvk::ContextCreateInfo contextInfo;
-  contextInfo.setVersion(1, 2);                       // Using Vulkan 1.2
+  contextInfo.setVersion(1, 3);                       // Using Vulkan 1.3
   for(uint32_t ext_id = 0; ext_id < count; ext_id++)  // Adding required extensions (surface, win32, linux, ..)
     contextInfo.addInstanceExtension(reqExtensions[ext_id]);
   contextInfo.addInstanceLayer("VK_LAYER_LUNARG_monitor", true);              // FPS in titlebar
@@ -139,7 +139,8 @@ int main(int argc, char** argv)
   VkPhysicalDeviceRayTracingPipelineFeaturesKHR rtPipelineFeature{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR};
   contextInfo.addDeviceExtension(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME, false, &rtPipelineFeature);  // To use vkCmdTraceRaysKHR
   contextInfo.addDeviceExtension(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);  // Required by ray tracing pipeline
-
+  contextInfo.addDeviceExtension(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);  
+  contextInfo.addDeviceExtension(VK_KHR_MAINTENANCE_4_EXTENSION_NAME);  
   // Creating Vulkan base application
   nvvk::Context vkctx{};
   vkctx.initInstance(contextInfo);
@@ -205,8 +206,10 @@ int main(int argc, char** argv)
   Entity* entity3 = new Entity(glm::vec3(1,2,3), 0);
   Entity* entity4 = new Entity(glm::vec3(5,-3,1), 0);
 
-  ChunkInterface::instance->CreateChunk(ChunkID(0));
+  ChunkVolume* chunkVolume = ChunkInterface::instance->CreateChunk(ChunkID(0));
 
+  ChunkInterface::instance->CheckChunkArr();
+  ChunkInterface::instance->TestGeneration(chunkVolume, ChunkID(0));
 
   helloVk.updateDescriptorSet();
   helloVk.createPostDescriptor();

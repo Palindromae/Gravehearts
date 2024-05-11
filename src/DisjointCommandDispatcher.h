@@ -29,6 +29,7 @@ public:
 	static inline  DisjointCommandDispatcher* dispatcher;
 	PFN_vkCmdTraceRaysKHR Handle_vkCmdTraceRaysKHR{};
 	PFN_vkCmdBuildAccelerationStructuresKHR Handle_vkCmdBuildAccelerationStructuresKHR{};
+	PFN_vkCmdBeginRenderingKHR Handle_vkCmdBeginRenderingKHR{};
 	nvvk::ResourceAllocatorDma* m_alloc;
 
 	SpareFence* Fences;
@@ -54,6 +55,7 @@ public:
 		Handle_vkCmdTraceRaysKHR					   = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(vkGetDeviceProcAddr(*device, "vkCmdTraceRaysKHR"));
 		Handle_vkDestroyAccelerationStructureKHR       = reinterpret_cast<PFN_vkDestroyAccelerationStructureKHR>(vkGetDeviceProcAddr(*device, "vkDestroyAccelerationStructureKHR"));
 		Handle_vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(vkGetDeviceProcAddr(*device, "vkGetAccelerationStructureDeviceAddressKHR"));
+		Handle_vkCmdBeginRenderingKHR = reinterpret_cast<PFN_vkCmdBeginRenderingKHR>(vkGetDeviceProcAddr(*device, "vkCmdBeginRenderingKHR"));
 	}
 
 	void createFence(VkFence* fence, VkFenceCreateFlagBits flag = VkFenceCreateFlagBits(0));

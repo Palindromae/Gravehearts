@@ -3,7 +3,7 @@
 #include "ChunkConst.h"
 namespace Shaders{
 	const ComputeShader** Shaders;
-	constexpr auto ComputeShaderPath = "shaders/ComputeShaders";
+	constexpr auto ComputeShaderPath = "spv";
 
 	LoadComputeShaders::LoadComputeShaders(VkDevice* device) {
 
@@ -18,14 +18,15 @@ namespace Shaders{
 		auto SamplerImageImage = ComputeBuffer::generateBasicDescriptorSet({ { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,0 },{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 },{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 } });
 		auto SingleBuffer = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
 		auto BufferBuffer = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
-		auto BufferBufferSparseImage = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::World::Environment::MaxVariableMipsForSparseImages } });
-		auto SparseImage = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::World::Environment::MaxVariableMipsForSparseImages} });
-		auto SparseImageBuffer = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::World::Environment::MaxVariableMipsForSparseImages}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
-		auto SparseImageBufferBuffer = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::World::Environment::MaxVariableMipsForSparseImages}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
-		auto SparseSparseBufferBuffer = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::World::Environment::MaxVariableMipsForSparseImages},{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::World::Environment::MaxVariableMipsForSparseImages}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
-		auto SparseSparseBuffer = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::World::Environment::MaxVariableMipsForSparseImages},{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::World::Environment::MaxVariableMipsForSparseImages}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
+		auto Buffer3 = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
+		auto BufferBufferSparseImage = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::Chunks::MaxVariableMipsForSparseImages } });
+		auto SparseImage = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::Chunks::MaxVariableMipsForSparseImages} });
+		auto SparseImageBuffer = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::Chunks::MaxVariableMipsForSparseImages}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
+		auto SparseImageBufferBuffer = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::Chunks::MaxVariableMipsForSparseImages}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
+		auto SparseSparseBufferBuffer = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::Chunks::MaxVariableMipsForSparseImages},{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::Chunks::MaxVariableMipsForSparseImages}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
+		auto SparseSparseBuffer = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::Chunks::MaxVariableMipsForSparseImages},{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::Chunks::MaxVariableMipsForSparseImages}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
 
-		auto Buffer5Image1 = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0},{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 } });
+		auto Buffer5 = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
 		auto Buffer4Image1Buffer = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0},{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 }, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
 
 
@@ -37,8 +38,8 @@ namespace Shaders{
 		auto AverageImage         = ComputeBuffer::generateBasicDescriptorSet({ { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,0 }, { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,0 } });
 		auto DepthOfField		  = ComputeBuffer::generateBasicDescriptorSet({ { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 }, { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 }, { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 }, { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 },  { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 }, { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,0 } }); // { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 }
 		auto DepthOfFieldStart    = ComputeBuffer::generateBasicDescriptorSet({ { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 }, { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 }, { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 }, { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 }, { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,0 } });
-		auto VoxelOctree          = ComputeBuffer::generateBasicDescriptorSet({ { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::World::Environment::MaxVariableMipsForSparseImages}, {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::World::Environment::MaxVariableMipsForSparseImages} });
-		auto InitialScan          = ComputeBuffer::generateBasicDescriptorSet({ { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::World::Environment::MaxVariableMipsForSparseImages}, {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::World::Environment::MaxVariableMipsForSparseImages}, { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,0 }, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0},{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0},{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
+		auto VoxelOctree          = ComputeBuffer::generateBasicDescriptorSet({ { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::Chunks::MaxVariableMipsForSparseImages}, {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::Chunks::MaxVariableMipsForSparseImages} });
+		auto InitialScan          = ComputeBuffer::generateBasicDescriptorSet({ { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::Chunks::MaxVariableMipsForSparseImages}, {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::Chunks::MaxVariableMipsForSparseImages}, { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,0 }, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0},{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0},{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
 	///	loadShader("CopyWorldToBuffer.comp.spv", Shaders::CopyWorldToBuffer, sizeof(CopyWorldToBufferConstants), CopyWorldToBuffer, device);
 
 		// Tools
@@ -86,11 +87,13 @@ namespace Shaders{
 		loadShader("UpdateChunkMappingBulk.comp.spv", Shaders::UpdateChunkMappingBulk, sizeof(glm::ivec2),                    BufferBuffer,	  	 device);
 		loadShader("DownscaleOctree.comp.spv",        Shaders::DownscaleOctree,        sizeof(DownscaleOctreeConstants),      SparseSparseBuffer, device);
 		loadShader("VacantChunkGenerator.comp.spv",   Shaders::VacantChunkGenerator,   sizeof(VacantChunkGeneratorConstants), SparseImage,		 device);*/
+		loadShader("WriteNewChunkVolume.comp.spv",   Shaders::WriteNewChunkVolume,   sizeof(glm::ivec4), SingleBuffer,		 device);
 
 		// SVO
 	/*	loadShader("ChunkNodeAllocator.comp.spv",		   Shaders::ChunkNodeAllocator,           sizeof(ChunkNodeAllocatorConstants),   Buffer5Image1,       device);
-		loadShader("OverworldBrickSetter.comp.spv",		   Shaders::OverworldBrickSetter,         sizeof(OverworldBrickSetterConstants), Buffer4Image1Buffer, device);
-		loadShader("CopyListToVoxelBrickInDirect.comp.spv", Shaders::CopyListToVoxelBrickInDirect, sizeof(glm::ivec4),				     BufferBuffer,        device);*/
+		loadShader("OverworldBrickSetter.comp.spv",		   Shaders::OverworldBrickSetter,         sizeof(OverworldBrickSetterConstants), Buffer4Image1Buffer, device);*/
+		loadShader("CopyListToVoxelBrickIndirect.comp.spv", Shaders::CopyListToVoxelBrickInDirect, sizeof(int),                               Buffer3,      device);
+		loadShader("VoxelBrickMemoryAllocator.comp.spv",    Shaders::VoxelBrickMemoryAllocator,    sizeof(nve::Chunks::TEMP_ALLOCATOR_CONST), Buffer5,      device);
 
 		// Terrain Generation
 	/*	loadShader("OverworldHeightMap.comp.spv",   Shaders::OverworldHeightMap,    sizeof(OverworldNoiseSetterConstants), BufferBuffer,            device);

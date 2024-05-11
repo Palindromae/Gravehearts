@@ -1,23 +1,26 @@
 // #include "Helpers/GPUMemory.glsl"
-// GPUMemory (ints)
+// GPUMemory (VoxelBrick)
 
+// WARNING THIS CANNOT BE RAN WITHIN A LOCAL THREAD!
+// IF ONE LOCAL THREAD WAITS ON ANOUTHER IT DEADLOCKS
 
-void MutexChapter(int chapterIndex){
+void MutexChapter(uint chapterIndex){
 
-	int obtained = 1;
+	uint obtained = 1;
 		do {
-			obtained = atomicCompSwap(GPUMemory[chapterIndex],0,1);
+			obtained = atomicCompSwap(GPUMemory[chapterIndex].ptrs[0],0,1);
 		}
 	while (obtained == 1);
 }
 
-void ReleaseChapter(int chapterIndex){
-	GPUMemory[chapterIndex] = 0;
+void ReleaseChapter(uint chapterIndex){
+	GPUMemory[chapterIndex].ptrs[0] = 0;
 }
 
-int attemptToObtainChapterPage(int chapter){
+// Memory condition isnt guaranteed for anything except for the mask
+uint attemptToObtainChapterPage(uint chapter){
 
-	int chapterIndex = chapter * chapter_size;
+	uint chapterIndex = chapter * chapter_size;
 
 	bool allowed = false;
 	int counted = 0;
@@ -26,7 +29,7 @@ int attemptToObtainChapterPage(int chapter){
 		// Try to find a chapter with memory avalible
 		do {
 		
-			if(GPUMemory[chapterIndex] != 2) // Found a valid chapter
+			if(GPUMemory[chapterIndex].ptrs[0] != 2) // Found a valid chapter
 				break;
 
 			counted++;
@@ -42,12 +45,15 @@ int attemptToObtainChapterPage(int chapter){
 		// Wait until chapter is secured
 		MutexChapter(chapterIndex);
 
-	 if(GPUMemory[chapterIndex] != 2)
+	 // Validate the chapter has space left
+	 if(GPUMemory[chapterIndex].ptrs[0] == 2)
 	 {
 		ReleaseChapter(chapterIndex);
-		break;
+		continue;
 	 }
 
+	 // Chapter is secured and valid so exit out of loop
+	 break;
 
 	} while (counted < chapters); 
 
@@ -57,33 +63,63 @@ int attemptToObtainChapterPage(int chapter){
 
 	 // SECURED DO NOT RETURN WITHOUT UNFLAGGING
 
-	 int offset = GPUMemory[chapterIndex + 1] + header_size;
+	 uint offset = GPUMemory[chapterIndex].ptrs[1] + header_size;
 
 
 	 // Memory obtained, now merge lists to head
-	 int secured_chapter = chapterIndex + offset;
+	 uint secured_chapter = chapterIndex + offset;
 
-	 int nextOffset = GPUMemory[secured_chapter]; // offset > 1 Offset has built in + 2 to account of header
+	 uint nextOffset = GPUMemory[secured_chapter].ptrs[1]; // offset > 1 
 
 	 if(nextOffset == 0){
-		nextOffset = offset + page_size;
+		nextOffset = offset;
 	 }
 
 
 	 // Out of Memory ||  OOM
 	 if(nextOffset >= chapter_size){
-		GPUMemory[chapterIndex]     = 2;
-		GPUMemory[chapterIndex + 1] = 0;
+		GPUMemory[chapterIndex].ptrs[0] = 2;
+		GPUMemory[chapterIndex].ptrs[1] = 0;
 	 } else {
 	    // SET NEXT MEMORY
-		GPUMemory[chapterIndex + 1] = nextOffset;
-		GPUMemory[chapterIndex]     = 0;
+		GPUMemory[chapterIndex].ptrs[1] = nextOffset;
+		ReleaseChapter(chapterIndex);
 	 }
 	 // UNSECURED FINE TO RETURN
 
 
-	 GPUMemory[secured_chapter]   = 0;
-	 GPUMemory[secured_chapter+1] = 0;
+	 //GPUMemory[secured_chapter].ptrs[0] = 0; Probably not required? Mask should prevent reads
+	// GPUMemory[secured_chapter].ptrs[1] = 0;
+	 GPUMemory[secured_chapter].mask    = 0;
 
 	 return secured_chapter;
+}
+
+void FreeChapterPage(uint page_index)
+{
+	uint chapterIndex = page_index / chapter_size;
+
+
+	// Secured Return
+	MutexChapter(chapterIndex);
+     
+	// Alter the chapters to be added to linked list
+
+	// Bind the current list to the page
+	//GPUMemory[page_index].ptrs[0] = 0; // Shouldnt be required
+	GPUMemory[page_index].ptrs[1] = GPUMemory[chapterIndex].ptrs[1]; // set offset to the previous next page.
+
+	//Bind the page to the header
+	GPUMemory[chapterIndex].ptrs[1] = page_index - 1;
+
+	//Unsecured
+	ReleaseChapter(chapterIndex);
+}
+
+void CleanNodeAndReturn(uint page_index, uint parent_node, uint indexInParent){
+	
+	//GPUMemory[parent_node].ptrs[indexInParent]  = 0; Might not be needed, the mask should prevent it being read
+	GPUMemory[parent_node].mask &= ~(1<<indexInParent); // Create a bit mask of all ones excet the target e.g. 1110111
+
+	FreeChapterPage(page_index);
 }

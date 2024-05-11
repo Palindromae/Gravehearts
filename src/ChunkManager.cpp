@@ -4,7 +4,7 @@ ChunkManager::ChunkManager(nve::ProductionPackage* context) : context(context) {
 	ChunkVolumes = new ComputeBuffer(ComputeBufferInfo(sizeof(ChunkVolumeGPU), maxVolumes));
 }
 
-Chunk* ChunkManager::CreateChunk(ChunkID position) {
+ChunkVolume* ChunkManager::CreateChunk(ChunkID position) {
 
 	ChunkID VolumePosition = ChunkVolume::ChunkToVolumeID(position);
 	ChunkVolume* volume;
@@ -21,12 +21,9 @@ Chunk* ChunkManager::CreateChunk(ChunkID position) {
 		Shaders::Shaders[Shaders::WriteNewChunkVolume]->dispatch(context, 1, 1, 1, sizeof(glm::ivec4), &memWrite, MonoidList(1).bind(ChunkVolumes)->render());
 	}
 
+	volume->GetChunkToBeInitiated(position);
 
-
-
-	Chunk* chunk = volume->GetChunkToBeInitiated(position);
-
-	return chunk;
+	return volume;
 }
 
 void ChunkManager::DeleteChunk(ChunkID position) {

@@ -178,3 +178,32 @@ VkCommandBuffer ComputeShader::dispatchIndirect(nve::ProductionPackage* context,
 
 
 
+ void ComputeShader::inlineDispatch(const VkCommandBuffer& commandBuffer, const int x, const int y, const int z, const int pushSize, const void* pushConstants, const std::vector<VkDescriptorSet>& buffers) const
+ {
+	 vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipe);
+
+	 vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipelineLayout, 0, buffers.size(), buffers.data(), 0, nullptr);
+
+	 vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, pushSize, pushConstants);
+	 
+	 vkCmdEndRendering(commandBuffer);
+
+	 vkCmdDispatch(commandBuffer, x, y, z);
+ }
+
+ void ComputeShader::inlineIndirect(const VkCommandBuffer& commandBuffer, const ComputeBuffer* buffer, const int offset, const int pushSize, const void* pushConstants, const std::vector<VkDescriptorSet>& buffers) const
+ {
+
+		 vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipe);
+
+		 vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipelineLayout, 0, buffers.size(), buffers.data(), 0, nullptr);
+
+		 vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, pushSize, pushConstants);
+
+		 vkCmdEndRendering(commandBuffer);
+
+		 vkCmdDispatchIndirect(commandBuffer, buffer->buffer, offset);
+ }
+
+
+

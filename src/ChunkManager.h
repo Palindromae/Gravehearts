@@ -9,11 +9,10 @@
 
 class ChunkManager {
 
-	ComputeBuffer* ChunkVolumes{};
 
 	int CurrentPtrMax = 0;
 	std::queue<int> reusePTR{};
-	inline static int maxVolumes = 25000; //3125000
+	inline static int maxVolumes = ceil(3125000.0 / NoChunksPerVolume);
 
 	std::unordered_map<ChunkID, ChunkVolume*> ChunkVolume_Map{};
 
@@ -23,11 +22,22 @@ class ChunkManager {
 
 	void returnChunkVolumeID(int ID);
 public:
+	ComputeBuffer* ChunkVolumes{};
 
 	ChunkManager(nve::ProductionPackage* context);
 
 	
-	Chunk* CreateChunk(ChunkID position);
+	ChunkVolume* CreateChunk(ChunkID position);
 
 	void DeleteChunk(ChunkID position);
+
+	void checkChunkArr() {
+		int amount = ChunkVolume_Map.size();
+
+		ChunkVolumeGPU* data = (ChunkVolumeGPU*)malloc(sizeof(ChunkVolumeGPU) * amount);
+
+		ChunkVolumes->readBufferData(data,0, sizeof(ChunkVolumeGPU) * amount, context);
+
+		int a = 0;
+	}
 };

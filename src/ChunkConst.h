@@ -2,13 +2,19 @@
 #include <glm/glm.hpp>
 #include <algorithm>
 #include <vulkan/vulkan_core.h>
+#include "../shaders/ChunkGPUConst.h"
+namespace nve::Chunks {
 
-namespace nve::World::Environment {
+	struct TEMP_ALLOCATOR_CONST {
+		ivec3 ChunkPosition;
+		int quality;
+		int chunkID;
+		int noiseSize;
+	};
 
 	static const bool CenterChunks = true;
-	static const glm::vec3 chunk_dimensions = { 32,32,32 };
+
 	static const glm::vec3 chunk_scaler = { 1,1,1 };
-	static const glm::ivec3 chunk_dimensions_int = { 32,32,32 };
 	
 	static const int max_network_updates= 1000;
 
@@ -39,7 +45,7 @@ namespace nve::World::Environment {
 	static const int LargeChunksPerLayer = LargeChunksOnHorizontalPerLayer* LargeChunksOnVerticalPerLayer;
 
 	static float greatestResolution = 1 / 8.0f;
-	static float greatestZoom = 8.0f;
+
 
 	static float WorldSizedTextureMaxResolution = 1;
 	static float WorldSizedTextureMinZoom =(float)1.0/ WorldSizedTextureMaxResolution;
@@ -53,7 +59,6 @@ namespace nve::World::Environment {
 	static int maxMipSize = 32;
 	static int maxRenderableMipSize = 4;
 	static int maxNumberOfWorldMips = log2(maxMipSize / greatestResolution);
-	static int MipsUnderOne = log2(greatestResolution);
 	static int MaxRenderDistance = maxMipSize * RenderDistanceScale;
 
 	static int WorldHeight = 256;

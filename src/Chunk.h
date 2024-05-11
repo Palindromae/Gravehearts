@@ -10,7 +10,7 @@ struct Chunk {
 
 	}
 
-	void DeleteChunk() {
+	void VoidChunk() {
 		quality = 0xFF;
 	}
 };

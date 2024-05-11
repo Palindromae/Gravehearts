@@ -1,0 +1,71 @@
+/*
+ * Copyright (c) 2019-2021, NVIDIA CORPORATION.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * SPDX-FileCopyrightText: Copyright (c) 2019-2021 NVIDIA CORPORATION
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#version 460
+#extension GL_EXT_ray_tracing : require
+#extension GL_EXT_nonuniform_qualifier : enable
+#extension GL_EXT_scalar_block_layout : enable
+#extension GL_GOOGLE_include_directive : enable
+#extension GL_EXT_shader_explicit_arithmetic_types_int64 : require
+#extension GL_EXT_buffer_reference2 : require
+
+#include "raycommon.glsl"
+#include "wavefront.glsl"
+#include "ChunkGPUConst.h"
+#include "VoxelBrick.h"
+
+#include "Helpers/ChunkHeaders.glsl"
+#include "Helpers/Rays.glsl"
+#include "Helpers/RayMasks.glsl"
+
+
+hitAttributeEXT RayHit hit;
+
+layout(set = 0, binding = 0)  buffer  ChunkHeadersN{
+    ChunkHeader[] ChunkHeaders;
+};
+
+layout(set = 1, binding = 0)  buffer  GPUMemoryN{
+    VoxelBrick[] GPUMemory;
+};
+
+
+
+uint ptr_stack[MaxQuality];
+ivec3 SVOPosition;
+// X is starts at bit 0
+// Y starts at bit 2
+// Z starts at bit 4, staggering is intentional allowing for individual qualities to be picked out and merged
+uint current_childPtr;
+
+//#Insert SVORaytracer.glsl
+
+
+
+void main()
+{
+
+  Ray ray;
+  ray.position    = gl_WorldRayOriginEXT;
+  ray.direction = gl_WorldRayDirectionEXT;
+
+
+  if(Raytrace(ray, gl_InstanceCustomIndexEXT, gl_GeometryIndexEXT, hit))
+    reportIntersectionEXT(hit._distance,1);
+}

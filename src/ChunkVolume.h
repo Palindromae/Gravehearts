@@ -1,10 +1,8 @@
 #pragma once
 #include "Chunk.h"
+#include "../shaders/ChunkGPUConst.h"
 
-constexpr int NoChunksPerAxii = 5; //set ChunkVolumeGPU and chunk Header before changing and no masks and No Chunks Volumes Total
-constexpr float NoChunksPerAxii_inv = 1/(float)NoChunksPerAxii;
-constexpr int NoChunksPerVolume = NoChunksPerAxii * NoChunksPerAxii * NoChunksPerAxii;
-constexpr int BitsPerAxii = 3;
+constexpr float NoChunksPerAxii_inv = 1 / (float)NoChunksPerAxii;
 
 // Defines a region of chunks
 struct ChunkVolume {
@@ -27,15 +25,21 @@ struct ChunkVolume {
 				for (size_t z = 0; z < NoChunksPerAxii; z++)
 				{
 
-					chunks[index(x, y, z)] = Chunk(ZeroedChunk);
+					chunks[ChunkHeaderIndex(glm::ivec3(x, y, z))] = Chunk(ZeroedChunk);
 				}
 			}
 		}
 
-		masks = new uint64_t[2];
+		masks = new uint64_t[8];
 
 		masks[0] = 0;
 		masks[1] = 0;
+		masks[2] = 0;
+		masks[3] = 0;
+		masks[4] = 0;
+		masks[5] = 0;
+		masks[6] = 0;
+		masks[7] = 0;
 	}
 
 
@@ -46,46 +50,38 @@ struct ChunkVolume {
 	}
 
 	Chunk* GetChunk(ChunkID pos) {
-		ChunkID rel_pos = pos - position;
-		return &chunks[index(rel_pos.x, rel_pos.y, rel_pos.z)];
+		return &chunks[GetChunkVolumeIndexFromPos(position, pos)];
 	}
 	// Call this if the chunk is being initated
 	Chunk* GetChunkToBeInitiated(ChunkID pos) {
-		ChunkID rel_pos = pos - position;
 
-		uint32_t id = index(rel_pos.x, rel_pos.y, rel_pos.z);
+		uint32_t id = GetChunkVolumeIndexFromPos(position, pos);
 
 		Chunk* chunk = &chunks[id];
 		int maskID = id / 64;
-		masks[maskID] |= uint64_t(1) << (maskID % 64);
+		masks[maskID] |= uint64_t(1) << (id % 64);
 		return chunk;
 	}
 
-	int index(int x, int y, int z) {
 
-		int index = x;
-		index += y << BitsPerAxii;
-		index += z << BitsPerAxii;
-
-		return index;
-	}
 
 	void DeleteChunk(ChunkID ID) {
-		ID = ID - position;
-		chunks[index(ID.x, ID.y, ID.z)].DeleteChunk();
+		chunks[GetChunkVolumeIndexFromPos(position, ID)].VoidChunk();
 	}
 
 	bool ValidateIsVolumeEmpty() {
 
-		uint64_t processedMask = masks[0] & masks[1];
+		uint64_t processedMask = masks[0] | masks[1] | masks[2] | masks[3] | masks[4] | masks[5] | masks[7];
 
-		return processedMask == UINT64_MAX;
+		return processedMask == 0;
 	}
+
+private:
 
 };
 
 struct ChunkVolumeGPU {
-	glm::vec3 pos;
+	glm::ivec3 pos;
 private:
-	int dataPtr[125]; // Not CPU set
+	int dataPtr[NoChunksPerVolume]; // Not CPU set
 };

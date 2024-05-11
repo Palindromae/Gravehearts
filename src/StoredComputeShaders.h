@@ -57,7 +57,7 @@ namespace Shaders
 		WriteNewChunkVolume,
 
 		// SVO
-		ChunkNodeAllocator,
+		VoxelBrickMemoryAllocator,
 		OverworldBrickSetter,
 		CopyListToVoxelBrickInDirect,
 

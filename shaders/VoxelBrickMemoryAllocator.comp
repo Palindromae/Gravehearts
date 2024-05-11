@@ -1,117 +1,126 @@
-#version 450
-#extension GL_KHR_vulkan_glsl : enable
+#version 460
 #extension GL_EXT_nonuniform_qualifier : enable
-#extension GL_GOOGLE_include_directive : enable
+#extension GL_ARB_shading_language_include  : enable
+#extension GL_EXT_shader_explicit_arithmetic_types_int64 : require
+#extension GL_EXT_shader_atomic_int64 : require
 
-#include "raycommon.glsl"
+#include "ChunkGPUConst.h"
+#include "VoxelBrick.h"
+
+
+
 #include "Helpers/ChunkHeaders.glsl"
 #include "Helpers/GPUMemory.glsl"
-
 
 
 layout(set = 0, binding = 0)  buffer  ChunkHeadersN{
     ChunkHeader[] ChunkHeaders;
 };
 
+
 layout(set = 1, binding = 0)  buffer  GPUMemoryN{
-    int[] GPUMemory;
+    VoxelBrick[] GPUMemory;
 };
 
-layout(set = 2, binding = 0)  buffer  fromN{
+
+layout(set = 2, binding = 0)  buffer  GPUVoxelMutexesN{
+    int[] GPUVoxelMutexes;
+};
+
+
+layout(set = 3, binding = 0)  buffer  fromN{
     UnexpandedNode[] fromNodes;
 };
 
-layout(set = 3, binding = 0)  buffer  toN{
+layout(set = 4, binding = 0)  buffer  toN{
     UnexpandedNode[] toNodes;
 };
 
 
-layout(set = 4, binding = 0)  buffer  GPUVoxelMutexesN{
-    int[] GPUVoxelMutexes;
-};
-
-layout(set = 5, binding = 0, r16ui) uniform uimage3D GPUVoxelMemory;
-
-layout (local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 layout (push_constant) uniform constant
 {
-    int quality;
-    int maxQuality; // lowest quality (0) is the id of the node that is 1m size with 1/8th size voxels in its bricks
-    int chunkID;
-    int mipsUnderOne;
-    int noiseSize;
     ivec3 ChunkPosition;
-    int bitsPerAxii;
+    int quality;
+    int chunkID;
+    int noiseSize;
 };
 
 struct NodeExpansion{
-    int blockValue;
+    uint blockValue;
     int shouldKeepGoing;
 };
 
 //--#Insert ChunkHeaderAlloc.glsl
 //#Insert VoxelBrickMemAlloc.glsl
-//#Insert GPUVoxelAlloc.glsl
 
 NodeExpansion ExpandNode(vec3 position, int quality)
 {
-    int heightmap_value = 0;
-    float size = pow(2,quality+mipsUnderOne);
+    int heightmap_value = 5;
+    float size = QualityToSize(quality);
    
     NodeExpansion expansion;
     expansion.blockValue = 0;
     expansion.shouldKeepGoing = 0;
 
     int noiseMeasures = int(min(size / noiseSize, 1));
-    float minSize = pow(2,mipsUnderOne);
+    float minSize = QualityToSize(MipsUnderOne);
 
     if (quality == 0)
         return expansion;
 
     // Heightmap verification 
-    for (int x = 0; x < noiseMeasures; x++)
+    for (int x = 0; x <= noiseMeasures; x++)
     {
-        for(int y = 0; y < noiseMeasures; y++)
+        for(int y = 0; y <= noiseMeasures; y++)
         {
-            expansion.blockValue = int(position.y<heightmap_value);
+            expansion.blockValue = uint(position.y<heightmap_value);
             // size - minSize makes sure that the highest smallest block is being referenced
-            expansion.shouldKeepGoing |= int((position.y + size - minSize) > heightmap_value);
+            bool isAccepted = (position.y + size - minSize) > heightmap_value;
+            isAccepted = isAccepted && (heightmap_value>(0 + position.y));
+            expansion.shouldKeepGoing |= int(isAccepted);
         }
     }
 
     return expansion;
 }
 
+uint SetBitForMask(int index, uint blockValue){
+    return uint(blockValue>0) <<index;
+}
 
 void main()
 {
-    uvec3 threads = gl_GlobalInvocationID;
+    int nodeID = int(gl_GlobalInvocationID.x)/64;
+    int local_id = int(gl_GlobalInvocationID.x) & 63; // fast modulo
 
-    int count = fromNodes[0].position;
-    bool isHeader = maxQuality == quality;
-    if (!(isHeader && threads.x == 0))
+    int count = fromNodes[0].position * 64;
+    bool isHeader = MaxQuality == quality;
+    if (!(isHeader && gl_GlobalInvocationID.x == 0))
     {
-        if (threads.x >= count)
+        if (gl_GlobalInvocationID.x >= count)
             return;
     }
   
-    UnexpandedNode parent_node = fromNodes[threads.x+1];
+    UnexpandedNode parent_node = fromNodes[nodeID+1];
+    float size = QualityToSize(quality);
 
     vec3 pos;
 
     int headerPtrIndex;
 
     if (isHeader){
-        headerPtrIndex = GetIndexFromPos(ChunkHeaders[chunkID].position, ChunkPosition, bitsPerAxii);
+        headerPtrIndex = GetChunkVolumeIndexFromPos(ChunkHeaders[chunkID].position, ChunkPosition);
         pos = vec3(0);
     } else {
-        pos = decode_pos(parent_node.position);
+        pos = decode_pos(parent_node.position) + decode_local_ID(local_id, size);
+
     }
     
     NodeExpansion expansion = ExpandNode(pos + ChunkPosition, quality);
    
-   int leaf = (1-min(quality - 1,1)) * leaf_value;
+   int leaf = (1-min(quality,1)) * 1;
 
     if(expansion.shouldKeepGoing == 0){
         // This node should be set to a constant block value
@@ -121,75 +130,50 @@ void main()
             ChunkHeaders[chunkID].ptrs[headerPtrIndex] = const_value + expansion.blockValue & ptr_mask;
         } else {
             // is a leaf and constant
-            GPUMemory[parent_node.mempos]     = const_value + leaf; // 32 bit is 1
-            GPUMemory[parent_node.mempos + 1] = expansion.blockValue; // set constant blockid
+            GPUMemory[parent_node.mempos].ptrs[local_id] = const_value + expansion.blockValue; // 32 bit is 1 //  + leaf No marking leaves
+            GPUMemory[parent_node.mempos].mask = atomicOr(GPUMemory[parent_node.mempos].mask, SetBitForMask(local_id, expansion.blockValue));
         }
         
         return;
     }
 
-    int chapter_hash = positionalHash(ChunkHeaders[chunkID].position);
-    chapter_hash = CombinePositionalAndIDHash(int(threads.x), chapter_hash);
-    chapter_hash = getChapterID(chapter_hash);
-
-    int brick_mem = attemptToObtainVoxelChapter(chapter_hash);
-    GPUMemory[parent_node.mempos + 1] = brick_mem;
   
 
-    if(leaf == leaf_value)
+    if(leaf == 1)
     {
         // this is a leaf
-        GPUMemory[parent_node.mempos] = leaf;
+        GPUMemory[parent_node.mempos].ptrs[local_id] = const_value + expansion.blockValue; // We dont mark leaves right now + leaf
         return;
     }
 
-    int index = atomicAdd(toNodes[0].position, 8);
-    float size = pow(2,quality+mipsUnderOne);
+    // This node needs to be expanded
+
+    int index = atomicAdd(toNodes[0].position, 1) + 1;
+    float next_size = QualityToSize(quality-1);
   
-    
-   
+    // Fetch new memory
+    uint chapter_hash = positionalHash(ChunkHeaders[chunkID].position);
+    chapter_hash = CombinePositionalAndIDHash(gl_GlobalInvocationID.x, chapter_hash);
+    chapter_hash = getChapterID(chapter_hash);
+
    // Hash data to try to spread the memory accesses evenly
-    int memindex = attemptToObtainChapterPage(chapter_hash);
+    uint memindex = attemptToObtainChapterPage(chapter_hash);
 
 
     // Set the data 
     if (isHeader){
       ChunkHeaders[chunkID].ptrs[headerPtrIndex] = memindex & ptr_mask;
     } else {
-      GPUMemory[parent_node.mempos] = memindex & ptr_mask; // 30^2-1 32nd bit is 0
+      GPUMemory[parent_node.mempos].ptrs[local_id] = memindex & ptr_mask; // 30^2-1 32nd bit is 0
+      GPUMemory[parent_node.mempos].blockID = expansion.blockValue; // set the block ID of the node for dynamic LOD
+      GPUMemory[parent_node.mempos].mask = atomicOr(GPUMemory[parent_node.mempos].mask, 1); //SetBitForMask(local_id, expansion.blockValue) Only reason to decend is if there is a block
+
     }
 
-
+    // Create base node to be expanded in the next cycle
     UnexpandedNode newNode;
-    newNode.position = encode_pos(pos + leaf + vec3(1,0,0) * size);
-    newNode.mempos = memindex + 0;
-    toNodes[index + 0] = newNode;
-
-    newNode.position = encode_pos(pos + leaf + vec3(0,1,0) * size);
-    newNode.mempos = memindex + 1;
-    toNodes[index + 1] = newNode;
-
-    newNode.position = encode_pos(pos + leaf + vec3(0,0,1) * size);
-    newNode.mempos = memindex + 2;
-    toNodes[index + 2] = newNode;
-
-    newNode.position = encode_pos(pos + leaf + vec3(1,0,1) * size);
-    newNode.mempos = memindex + 3;
-    toNodes[index + 3] = newNode;
-
-    newNode.position = encode_pos(pos + leaf + vec3(1,1,0) * size);
-    newNode.mempos = memindex + 4;
-    toNodes[index + 4] = newNode;
-
-    newNode.position = encode_pos(pos + leaf + vec3(0,1,1) * size);
-    newNode.mempos = memindex + 5;
-    toNodes[index + 5] = newNode;
-
-    newNode.position = encode_pos(pos + leaf + vec3(1,1,1) * size);
-    newNode.mempos = memindex + 6;
-    toNodes[index + 6] = newNode;
-
+    newNode.mempos = memindex;
     newNode.position = encode_pos(pos);
-    newNode.mempos = memindex + 7;
-    toNodes[index + 7] = newNode;
+    toNodes[index] = newNode;
+
 }

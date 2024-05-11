@@ -25,6 +25,7 @@
 #include "nvvk/memallocator_dma_vk.hpp"
 #include "nvvk/resourceallocator_vk.hpp"
 #include "shaders/host_device.h"
+#include "shaders/brick.h"
 #include "ObjStruct.h"
 #include "Raytrace.h"
 
