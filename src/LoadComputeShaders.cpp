@@ -87,7 +87,8 @@ namespace Shaders{
 		loadShader("UpdateChunkMappingBulk.comp.spv", Shaders::UpdateChunkMappingBulk, sizeof(glm::ivec2),                    BufferBuffer,	  	 device);
 		loadShader("DownscaleOctree.comp.spv",        Shaders::DownscaleOctree,        sizeof(DownscaleOctreeConstants),      SparseSparseBuffer, device);
 		loadShader("VacantChunkGenerator.comp.spv",   Shaders::VacantChunkGenerator,   sizeof(VacantChunkGeneratorConstants), SparseImage,		 device);*/
-		loadShader("WriteNewChunkVolume.comp.spv",   Shaders::WriteNewChunkVolume,   sizeof(glm::ivec4), SingleBuffer,		 device);
+		loadShader("WriteNewChunkVolume.comp.spv",   Shaders::WriteNewChunkVolume,   sizeof(CreateChunkConst), BufferBuffer,		 device);
+		loadShader("UpdateChunkInVolume.comp.spv",   Shaders::UpdateChunkVolume,     sizeof(CreateChunkConst), BufferBuffer,		 device);
 
 		// SVO
 	/*	loadShader("ChunkNodeAllocator.comp.spv",		   Shaders::ChunkNodeAllocator,           sizeof(ChunkNodeAllocatorConstants),   Buffer5Image1,       device);

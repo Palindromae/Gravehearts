@@ -7,6 +7,7 @@ class Tlas {
 	ComputeBuffer* instanceBuffer{};
 	ComputeBuffer* accelerationBuffer{};
 
+    VkDeviceSize buffer_size = 0;
     nvvk::Buffer TlasBuffer;
     nve::ProductionPackage* context{};
 
@@ -45,7 +46,8 @@ public:
     void BuildTLAS()
     {
 
- 
+        if (acceleration_structure != nullptr)
+            CommandDispatcher->DestroyAccelerationStructure(acceleration_structure);
 
 
         VkBufferDeviceAddressInfo info{ VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO, nullptr, instanceBuffer->buffer};
@@ -73,13 +75,19 @@ public:
 
         CommandDispatcher->GetAccelerationStructureInfo(&TlasGeometryInfo, count, sinfo);
   
+        if (buffer_size < sinfo.accelerationStructureSize) {
 
-        TlasBuffer = CommandDispatcher->m_alloc->createBuffer(sinfo.accelerationStructureSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR
-            | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT);
+            if(TlasBuffer.buffer != nullptr)
+                CommandDispatcher->m_alloc->destroy(TlasBuffer);
+
+            TlasBuffer = CommandDispatcher->m_alloc->createBuffer(sinfo.accelerationStructureSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR
+                | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT);
+        
+            buffer_size = sinfo.accelerationStructureSize;
+        }
 
         auto ScrapMemory = CommandDispatcher->m_alloc->createBuffer(sinfo.buildScratchSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT
             | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT);
-
 
         VkBufferDeviceAddressInfo device_info{ VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO, nullptr, ScrapMemory.buffer };
         TlasGeometryInfo.scratchData.deviceAddress = CommandDispatcher->GetBufferDeviceAddress(device_info);
@@ -109,6 +117,9 @@ public:
         CommandDispatcher->endSingleTimeCommands(context, cmd, true);
 
         CommandDispatcher->m_alloc->finalizeAndReleaseStaging();
+
+        CommandDispatcher->m_alloc->destroy(ScrapMemory);
+
     }
  
 };

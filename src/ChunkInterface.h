@@ -66,5 +66,9 @@ public:
 		free(data);
 	}
 
+	void RebuildGPUStructures() {
+		chunkManager->UpdateGPUStructure();
+	}
+
 	void TestGeneration(ChunkVolume*& volume, glm::vec3 position);
 };

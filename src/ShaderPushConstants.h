@@ -1,6 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
-
+#include "vulkan/vulkan_core.h"
 //#pragma pack(push,1)
 
 //vec3 must be padded with an extra float
@@ -438,21 +438,21 @@ struct UpdateChunkMappingsStruct {
 };
 
 
-struct DownscaleOctreeConstants {
-	glm::ivec3 gran;
-	int PACKING2;
-	glm::ivec3 chunkDimensions;
-	int PACKING3;
-	int ChunkID;
-	int mipToStartOctree;
-	int mipToEndOctree;
-	int BlockBitHighest; //all block bits set to 1
-	int BlocksBits;      //number of block bits
-	int OctreeBitHighest;//all octree bits set to 1
-
-	int DetailMips;
-	float DimensionScale;
-};
+//struct DownscaleOctreeConstants {
+//	glm::ivec3 gran;
+//	int PACKING2;
+//	glm::ivec3 chunkDimensions;
+//	int PACKING3;
+//	int ChunkID;
+//	int mipToStartOctree;
+//	int mipToEndOctree;
+//	int BlockBitHighest; //all block bits set to 1
+//	int BlocksBits;      //number of block bits
+//	int OctreeBitHighest;//all octree bits set to 1
+//
+//	int DetailMips;
+//	float DimensionScale;
+//};
 
 struct VacantChunkGeneratorConstants {
 	glm::ivec3 gran;
@@ -502,4 +502,10 @@ struct HeaderUpdate {
 	glm::vec3 pos{};
 	int lowestIndex{};
 	int NumberPerAxii;
+};
+
+struct CreateChunkConst {
+	glm::ivec3 position;
+	int ptrInMem;
+	VkAccelerationStructureInstanceKHR instance;
 };

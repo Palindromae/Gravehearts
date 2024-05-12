@@ -27,11 +27,11 @@
 
 #include "raycommon.glsl"
 #include "wavefront.glsl"
-
+#include "Helpers/Rays.glsl"
 hitAttributeEXT RayHit hit;
 
 // clang-format off
-layout(location = 0) rayPayloadInEXT hitPayload prd;
+layout(location = 0) rayPayloadInEXT RayHit prd;
 //layout(location = 1) rayPayloadEXT bool isShadowed;
 
 
@@ -51,9 +51,7 @@ layout(push_constant) uniform _PushConstantRay { PushConstantRay pcRay; };
 void main()
 {
   vec3 worldPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-
-  
   
   //prd.hitValue = vec3(1,1,attribs.z/4.0);
-  prd.hitValue = attribs;
+  prd = hit;
 }

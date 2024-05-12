@@ -363,6 +363,8 @@ void Raytrace::createRaytracePipeline(VkDescriptorSetLayout& sceneDescLayout)
     eMiss,
     eClosestHit,
     eIntersect,
+    //eIntersectChunk,
+   // eClosestHitChunk,
     eShaderGroupCount
   };
 
@@ -387,14 +389,12 @@ void Raytrace::createRaytracePipeline(VkDescriptorSetLayout& sceneDescLayout)
   stage.module = nvvk::createShaderModule(m_device, nvh::loadFile("spv/raytrace.rchit.spv", true, defaultSearchPaths, true));
   stage.stage         = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
   stages[eClosestHit] = stage;
-  // Hit Group - Closest Hit
-  //stage.module = nvvk::createShaderModule(m_device, nvh::loadFile("spv/raytrace.rahit.spv", true, defaultSearchPaths, true));
-  //stage.stage     = VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
-  //stages[eAnyHit] = stage;
+
+
   // Hit Group - 1
-  //stage.module = nvvk::createShaderModule(m_device, nvh::loadFile("spv/raytrace2.rchit.spv", true, defaultSearchPaths, true));
-  //stage.stage          = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
-  //stages[eClosestHit1] = stage;
+  stage.module = nvvk::createShaderModule(m_device, nvh::loadFile("spv/ChunkTrace.rchit.spv", true, defaultSearchPaths, true));
+  stage.stage          = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+  //stages[eClosestHitChunk] = stage;
   // Hit
   //stage.module = nvvk::createShaderModule(m_device, nvh::loadFile("spv/raytrace2.rahit.spv", true, defaultSearchPaths, true));
   //stage.stage      = VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
@@ -403,6 +403,12 @@ void Raytrace::createRaytracePipeline(VkDescriptorSetLayout& sceneDescLayout)
   stage.module = nvvk::createShaderModule(m_device, nvh::loadFile("spv/raytrace.rint.spv", true, defaultSearchPaths, true));
   stage.stage        = VK_SHADER_STAGE_INTERSECTION_BIT_KHR;
   stages[eIntersect] = stage;
+
+  // Hit Group - Closest Hit
+  stage.module = nvvk::createShaderModule(m_device, nvh::loadFile("spv/ChunkTrace.rint.spv", true, defaultSearchPaths, true));
+  stage.stage = VK_SHADER_STAGE_INTERSECTION_BIT_KHR;
+ // stages[eIntersectChunk] = stage;
+
 
   // Call0
   //stage.module = nvvk::createShaderModule(m_device, nvh::loadFile("spv/light_point.rcall.spv", true, defaultSearchPaths, true));
@@ -440,12 +446,6 @@ void Raytrace::createRaytracePipeline(VkDescriptorSetLayout& sceneDescLayout)
   //group.generalShader = eMiss2;
   //m_rtShaderGroups.push_back(group);
 
-  // closest hit shader
-  //group.type             = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR;
-  //group.generalShader    = VK_SHADER_UNUSED_KHR;
-  //group.closestHitShader = eClosestHit;
-  //group.anyHitShader     = eAnyHit;
-  //m_rtShaderGroups.push_back(group);
 
   // closest hit shader
   group.type               = VK_RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_KHR;
@@ -454,6 +454,14 @@ void Raytrace::createRaytracePipeline(VkDescriptorSetLayout& sceneDescLayout)
   group.anyHitShader       = VK_SHADER_UNUSED_KHR;
   group.intersectionShader = eIntersect;
   m_rtShaderGroups.push_back(group);
+
+  // closest hit shader
+  group.type               = VK_RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_KHR;
+  group.generalShader      = VK_SHADER_UNUSED_KHR;
+//  group.closestHitShader   = eClosestHitChunk;
+  group.anyHitShader       = VK_SHADER_UNUSED_KHR;
+ // group.intersectionShader = eIntersectChunk;
+  //m_rtShaderGroups.push_back(group);
 
   // Callable shaders
   //group.type               = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;

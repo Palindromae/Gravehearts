@@ -9,7 +9,7 @@ class ModelManager {
 	nvvk::Buffer               BlasBuffer;
 	std::vector<Model> StaticModels{};
 	std::vector<VkDeviceAddress> BlasPtr{};
-	VkDeviceAddress BlasBufferAddress;
+	//VkDeviceAddress BlasBufferAddress;
 	std::vector<VkAccelerationStructureKHR> BlasModels{};
 
 public:

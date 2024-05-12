@@ -260,6 +260,8 @@ void ComputeBuffer::setBufferData(const void* dataArray, VkDeviceSize dstOffset,
 			DisjointCommandDispatcher::dispatcher->copyDataToBuffer(stagingBuffer, stagingBufferMemory, buffer, dstOffset, computebufferinfo.bufferSize - offset, context, fence);
 		}
 	}
+
+
 }
 /// <summary>
 ///  

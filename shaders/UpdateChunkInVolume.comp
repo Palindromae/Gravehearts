@@ -32,7 +32,8 @@ layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 layout (push_constant) uniform constant
 {
- ivec3 position;
+ ivec2 Destroy;
+ int chunkPtr;
  int ptrInMem;
  Artificial_VkAccelerationStructureInstanceKHR instance;
 };
@@ -40,11 +41,12 @@ layout (push_constant) uniform constant
 
 void main()
 {
-    ChunkHeaders[ptrInMem].position = position;
+    // Chunk is invalid
+    if(Destroy.x == 1)
+        ChunkHeaders[ptrInMem].ptrs[chunkPtr] = MAXUINT;
+    
+    //Volume is invalid
+    if(Destroy.y == 1)
+        instances[ptrInMem] = instance;
 
-    for (int i = 0; i < NoChunksPtrs; i++){
-        ChunkHeaders[ptrInMem].ptrs[i] = MAXUINT;
-    }
-
-    instances[ptrInMem] = instance;
 }

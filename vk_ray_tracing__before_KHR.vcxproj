@@ -361,11 +361,12 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
       <FileType>Document</FileType>
     </IGLSLShader>
     <None Include="shaders\wavefront.glsl" />
-    <IGLSLShader Include="shaders\ChunkTrace.rint">
+    <GLSLShader Include="shaders\ChunkTrace.rint">
       <FileType>Document</FileType>
-    </IGLSLShader>
+    </GLSLShader>
     <GLSLShader Include="shaders\ChunkTrace.rchit" />
     <GLSLShader Include="shaders\CopyListToVoxelBrickIndirect.comp" />
+    <GLSLShader Include="shaders\UpdateChunkInVolume.comp" />
     <GLSLShader Include="shaders\WriteNewChunkVolume.comp">
       <FileType>Document</FileType>
     </GLSLShader>

@@ -290,6 +290,7 @@ int main(int argc, char** argv)
 
     EntityManager::instance->UpdateBuffer();
     EntityManager::instance->BuildTlas();
+    ChunkInterface::instance->RebuildGPUStructures();
 
 
 

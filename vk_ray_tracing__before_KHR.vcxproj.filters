@@ -365,13 +365,19 @@
     <GLSLShader Include="shaders\raytrace.rmiss">
       <Filter>Shader Sources</Filter>
     </GLSLShader>
-    <GLSLShader Include="shaders\WriteNewChunkVolume.comp">
-      <Filter>Shader Sources\Voxels</Filter>
-    </GLSLShader>
     <GLSLShader Include="shaders\CopyListToVoxelBrickIndirect.comp">
       <Filter>Shader Sources\Voxels\Memory\VBrick Memory</Filter>
     </GLSLShader>
     <GLSLShader Include="shaders\ChunkTrace.rchit">
+      <Filter>Shader Sources\Voxels\Chunks</Filter>
+    </GLSLShader>
+    <GLSLShader Include="shaders\WriteNewChunkVolume.comp">
+      <Filter>Shader Sources\Voxels\Chunks</Filter>
+    </GLSLShader>
+    <GLSLShader Include="shaders\UpdateChunkInVolume.comp">
+      <Filter>Shader Sources\Voxels\Chunks</Filter>
+    </GLSLShader>
+    <GLSLShader Include="shaders\ChunkTrace.rint">
       <Filter>Shader Sources\Voxels\Chunks</Filter>
     </GLSLShader>
   </ItemGroup>
@@ -381,9 +387,6 @@
   <ItemGroup>
     <IGLSLShader Include="shaders\VoxelBrickMemoryAllocator.comp">
       <Filter>Shader Sources\Voxels\Memory\VBrick Memory</Filter>
-    </IGLSLShader>
-    <IGLSLShader Include="shaders\ChunkTrace.rint">
-      <Filter>Shader Sources\Voxels\Chunks</Filter>
     </IGLSLShader>
   </ItemGroup>
 </Project>

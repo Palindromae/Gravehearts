@@ -27,45 +27,61 @@
 
 #include "raycommon.glsl"
 #include "wavefront.glsl"
-#include "ChunkGPUConst.h"
-#include "VoxelBrick.h"
 
-#include "Helpers/ChunkHeaders.glsl"
-#include "Helpers/Rays.glsl"
-#include "Helpers/RayMasks.glsl"
-
-
-hitAttributeEXT RayHit hit;
-
-layout(set = 0, binding = 0)  buffer  ChunkHeadersN{
-    ChunkHeader[] ChunkHeaders;
+struct Ray
+{
+  vec3 origin;
+  vec3 direction;
 };
+layout(set = 1, binding = eEntities, scalar) buffer allEntities_
+{
+  Entity i[];
+}
+allEntities;
 
-layout(set = 1, binding = 0)  buffer  GPUMemoryN{
-    VoxelBrick[] GPUMemory;
-};
+layout(set = 1, binding = eModels, scalar) buffer allModel_
+{
+  Model i[];
+}
+allModels;
 
-
-
-uint ptr_stack[MaxQuality];
-ivec3 SVOPosition;
-// X is starts at bit 0
-// Y starts at bit 2
-// Z starts at bit 4, staggering is intentional allowing for individual qualities to be picked out and merged
-uint current_childPtr;
-
-//#Insert SVORaytracer.glsl
+hitAttributeEXT vec3 attribs;
 
 
+
+float hitSphere(const Sphere s, const Ray r)
+{
+  vec3  oc           = r.origin - s.center;
+  float a            = dot(r.direction, r.direction);
+  float b            = 2.0 * dot(oc, r.direction);
+  float c            = dot(oc, oc) - s.radius * s.radius;
+  float discriminant = b * b - 4 * a * c;
+  if(discriminant < 0)
+  {
+    return -1.0;
+  }
+  else
+  {
+    return (-b - sqrt(discriminant)) / (2.0 * a);
+  }
+}
 
 void main()
 {
-
-  Ray ray;
-  ray.position    = gl_WorldRayOriginEXT;
+//gl_PrimitiveID for sub geometry
+    Entity entity = allEntities.i[gl_InstanceCustomIndexEXT];
+    Model impl = allModels.i[entity.model];
+      Ray ray;
+  ray.origin    = gl_WorldRayOriginEXT;
   ray.direction = gl_WorldRayDirectionEXT;
 
-
-  if(Raytrace(ray, gl_InstanceCustomIndexEXT, gl_GeometryIndexEXT, hit))
-    reportIntersectionEXT(hit._distance,1);
+    Sphere sphere;
+    sphere.center = (impl.AABB.MAX + impl.AABB.MIN) * 0.5;
+    sphere.radius = impl.AABB.MAX.y - sphere.center.y;
+    sphere.center += entity.position;
+    // Sphere intersection
+   float tHit = hitSphere(sphere, ray);
+  attribs = vec3(sphere.center/20.0);
+  if(tHit>0)
+    reportIntersectionEXT(tHit,1);
 }

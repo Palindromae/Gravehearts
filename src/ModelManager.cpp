@@ -56,7 +56,7 @@ void ModelManager::BuildModelBLAS()
 		VkAccelerationStructureGeometryAabbsDataKHR aabbsData{};
 		aabbsData.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_AABBS_DATA_KHR;
 		aabbsData.data.deviceAddress = CommandDispatcher->GetBufferDeviceAddress(b_info);
-		aabbsData.stride = sizeof(AABBDef);
+		aabbsData.stride = sizeof(Model);
 
 
 		VkAccelerationStructureGeometryKHR geometry = {};
@@ -95,19 +95,23 @@ void ModelManager::BuildModelBLAS()
 	VkBufferDeviceAddressInfo BlasBuffer_getinfo{};
 	BlasBuffer_getinfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
 	BlasBuffer_getinfo.buffer = BlasBuffer.buffer;
-	BlasBufferAddress = CommandDispatcher->GetBufferDeviceAddress(BlasBuffer_getinfo);
+	//BlasBufferAddress = CommandDispatcher->GetBufferDeviceAddress(BlasBuffer_getinfo);
 
 	std::vector<VkAccelerationStructureBuildRangeInfoKHR*> buildRanges{};
 	VkAccelerationStructureBuildRangeInfoKHR ranges{};
 	ranges.primitiveCount = 1;
-	for (size_t i = 0; i < StaticModels.size(); i++)
+
+	int offset = 0;
+	for (size_t i = 0; i < StaticModels.size(); i++) // THis is probably WRONG
 	{
 		VkAccelerationStructureCreateInfoKHR createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
 		createInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
 		createInfo.size = BLASSize[i];  // Initial size, will be determined by the build operation
-		createInfo.offset = 0;
+		createInfo.offset = offset;
 		createInfo.buffer = BlasBuffer.buffer;
+
+		offset += createInfo.size;
 
 		VkAccelerationStructureKHR ModelBlas{};
 		CommandDispatcher->CreateAccelerationStructure(&createInfo, ModelBlas);

@@ -6,6 +6,8 @@
 #include <queue>
 #include "StoredComputeShaders.h"
 #include "MonoidList.h"
+#include "Tlas.h"
+#include "ShaderPushConstants.h"
 
 class ChunkManager {
 
@@ -21,6 +23,17 @@ class ChunkManager {
 	int GetChunkVolumeID();
 
 	void returnChunkVolumeID(int ID);
+	void CreateChunkBlas();
+
+	Tlas ChunkTlas{};
+	nvvk::Buffer               BlasBuffer;
+	ComputeBuffer*             instanceBuffer{};
+	VkAccelerationStructureKHR ChunkBlas{};
+
+	int MajorChange;
+
+	CreateChunkConst createConsts{};
+	CreateChunkConst nullConsts{};
 public:
 	ComputeBuffer* ChunkVolumes{};
 
@@ -30,6 +43,8 @@ public:
 	ChunkVolume* CreateChunk(ChunkID position);
 
 	void DeleteChunk(ChunkID position);
+
+	void UpdateGPUStructure();
 
 	void checkChunkArr() {
 		int amount = ChunkVolume_Map.size();

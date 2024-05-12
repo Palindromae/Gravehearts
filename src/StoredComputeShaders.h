@@ -55,6 +55,7 @@ namespace Shaders
 		DownscaleOctree, 
 		VacantChunkGenerator,
 		WriteNewChunkVolume,
+		UpdateChunkVolume,
 
 		// SVO
 		VoxelBrickMemoryAllocator,
