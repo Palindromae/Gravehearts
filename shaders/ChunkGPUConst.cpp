@@ -9,7 +9,7 @@ int ChunkHeaderIndex(ivec3 pos)
 {
 	int index = pos.x;
 	index += pos.y << BitsPerAxii;
-	index += pos.z << BitsPerAxii;
+	index += pos.z << (BitsPerAxii * 2);
 	return index;
 }
 

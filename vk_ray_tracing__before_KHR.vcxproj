@@ -352,6 +352,7 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <None Include="shaders\Helpers\Rays.glsl" />
     <None Include="shaders\Inserts\ChunkHeaderAlloc.glsl" />
     <None Include="shaders\Inserts\SVORaytracer.glsl" />
+    <None Include="shaders\Inserts\VolumeTracer.glsl" />
     <None Include="shaders\Inserts\VoxelBrickMemAlloc.glsl" />
     <None Include="shaders\passthrough.vert" />
     <None Include="shaders\post.frag" />
@@ -361,9 +362,9 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
       <FileType>Document</FileType>
     </IGLSLShader>
     <None Include="shaders\wavefront.glsl" />
-    <GLSLShader Include="shaders\ChunkTrace.rint">
+    <IGLSLShader Include="shaders\ChunkTrace.rint">
       <FileType>Document</FileType>
-    </GLSLShader>
+    </IGLSLShader>
     <GLSLShader Include="shaders\ChunkTrace.rchit" />
     <GLSLShader Include="shaders\CopyListToVoxelBrickIndirect.comp" />
     <GLSLShader Include="shaders\UpdateChunkInVolume.comp" />

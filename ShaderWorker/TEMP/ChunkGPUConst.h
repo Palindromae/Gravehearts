@@ -43,9 +43,21 @@ float QualityToSizePtr(float quality) {
 int ChunkHeaderIndex(ivec3 pos) {
 	int index = pos.x;
 	index += pos.y << BitsPerAxii;
-	index += pos.z << BitsPerAxii;
+	index += pos.z << (BitsPerAxii * 2);
 
 	return index;
+}
+
+ivec3 GetHeaderOffset(uint index) {
+	ivec3 position;
+
+	int idx = int(index);
+
+	position.x = idx & (NoChunksPerAxii - 1);
+	position.y = (idx >>BitsPerAxii) & (NoChunksPerAxii - 1);
+	position.z = (idx >> BitsPerAxii * 2) & (NoChunksPerAxii - 1);
+
+	return position;
 }
 
 int GetChunkVolumeIndexFromPos(ivec3 volume_pos, ivec3 pos) {
@@ -60,7 +72,7 @@ int GetVoxelBrickIndex(vec3 position, vec3 parent_position, float scale) {
 
 	int index = n_pos.x;
 	index += n_pos.y << BitsPerAxii;
-	index += n_pos.z << BitsPerAxii;
+	index += n_pos.z << (BitsPerAxii*2);
 
 	return index;
 }

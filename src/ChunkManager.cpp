@@ -1,9 +1,12 @@
 #include "ChunkManager.h"
 #include "../AABBDef.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include "ModelManager.h"
 
 ChunkManager::ChunkManager(nve::ProductionPackage* context) : context(context) {
 	ChunkVolumes = new ComputeBuffer(ComputeBufferInfo(sizeof(ChunkVolumeGPU), maxVolumes));
+
+	CreateChunkBlas();
 
 	ChunkTlas.setup();
 	ChunkTlas.SetupInstanceBuffer(maxVolumes);
@@ -13,14 +16,19 @@ void ChunkManager::CreateChunkBlas()
 {
 
 	AABBDef* chunks = (AABBDef*)malloc(sizeof(AABBDef) * NoChunksPerVolume);
-
+	std::vector<int> indexes{};
+	std::vector<AABBDef> datas{};
 	for (size_t x = 0; x < NoChunksPerAxii; x++)
 	{
 		for (size_t y = 0; y < NoChunksPerAxii; y++)
 		{
 			for (size_t z = 0; z < NoChunksPerAxii; z++)
 			{
-				chunks[ChunkHeaderIndex({ x,y,z })] = AABBDef({ glm::ivec3( x,y,z)*chunk_dimensions_int,  glm::ivec3(x,y,z) * chunk_dimensions_int + chunk_dimensions_int });
+				int index = ChunkHeaderIndex({ x,y,z });
+				chunks[index] = AABBDef({ glm::ivec3( x,y,z)*chunk_dimensions_int,  glm::ivec3(x,y,z) * chunk_dimensions_int + chunk_dimensions_int });
+				
+				datas.push_back(chunks[index]);
+				indexes.push_back(index);
 			}
 		}
 	}
@@ -39,7 +47,7 @@ void ChunkManager::CreateChunkBlas()
 
 
 	VkDeviceSize ScratchBuildSize = 0;
-	int BufferSize = 0;
+	VkDeviceSize accelerationStructureSize = 0;
 
 
 	VkBufferDeviceAddressInfo b_info{};
@@ -67,15 +75,14 @@ void ChunkManager::CreateChunkBlas()
 	blasCreateInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
 
 	VkAccelerationStructureBuildSizesInfoKHR info{ VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR };
-	CommandDispatcher->GetAccelerationStructureInfo(&blasCreateInfo, 1, info);
-	ScratchBuildSize = std::max(info.buildScratchSize, ScratchBuildSize);
-
-
+	CommandDispatcher->GetAccelerationStructureInfo(&blasCreateInfo, NoChunksPerVolume, info);
+	ScratchBuildSize = info.buildScratchSize;
+	accelerationStructureSize = info.accelerationStructureSize ;
 
 	auto ScrapBuffer = CommandDispatcher->m_alloc->createBuffer(ScratchBuildSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT
 		| VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT);
 
-	BlasBuffer = CommandDispatcher->m_alloc->createBuffer(BufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR
+	BlasBuffer = CommandDispatcher->m_alloc->createBuffer(accelerationStructureSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR
 		| VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT);
 
 	VkBufferDeviceAddressInfo BlasBuffer_getinfo{};
@@ -87,7 +94,7 @@ void ChunkManager::CreateChunkBlas()
 	VkAccelerationStructureCreateInfoKHR createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
 	createInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-	createInfo.size = info.accelerationStructureSize;  // Initial size, will be determined by the build operation
+	createInfo.size = accelerationStructureSize;  // Initial size, will be determined by the build operation
 	createInfo.offset = 0;
 	createInfo.buffer = BlasBuffer.buffer;
 
@@ -101,10 +108,12 @@ void ChunkManager::CreateChunkBlas()
 
 	VkAccelerationStructureBuildRangeInfoKHR ranges{};
 	ranges.primitiveOffset = 0;
-	ranges.primitiveCount = NoChunksPerVolume;
+	ranges.primitiveCount = 1;
 
 	VkAccelerationStructureDeviceAddressInfoKHR addressInfo{ VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR };
 	addressInfo.accelerationStructure = ChunkBlas;
+
+	buildRanges.push_back(&ranges);
 
 	auto cmd = CommandDispatcher->beginSingleTimeCommands(context);
 
@@ -114,14 +123,8 @@ void ChunkManager::CreateChunkBlas()
 
 	CommandDispatcher->m_alloc->finalizeAndReleaseStaging();
 
-	for (size_t i = 0; i < buildRanges.size(); i++)
-	{
-		delete buildRanges[i];
-	}
 
 	delete instanceBuffer;
-
-
 
 
 
@@ -164,11 +167,15 @@ ChunkVolume* ChunkManager::CreateChunk(ChunkID position) {
 		createConsts.ptrInMem = volume->StoragePtr;
 		createConsts.instance.instanceCustomIndex = volume->StoragePtr;
 
-		glm::mat4 mat = glm::translate(glm::mat4(1), glm::vec3(position) * chunk_dimensions);
+		glm::mat4 mat = glm::translate(glm::mat4(1), glm::vec3(VolumePosition) * (glm::vec3(NoChunksPerAxii) * chunk_dimensions));
 		createConsts.instance.transform = nvvk::toTransformMatrixKHR(mat);
 
-
+		
 		Shaders::Shaders[Shaders::WriteNewChunkVolume]->dispatch(context, 1, 1, 1, sizeof(createConsts), &createConsts, MonoidList(1).bind(ChunkVolumes)->bind(ChunkTlas.GetInstanceBuffer())->render());
+		//VkAccelerationStructureInstanceKHR data{};
+
+		//ChunkTlas.GetInstanceBuffer()->readBufferData(&data, 0, 64, context);
+
 		MajorChange = 1;
 	}
 

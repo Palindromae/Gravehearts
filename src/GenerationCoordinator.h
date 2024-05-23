@@ -13,7 +13,7 @@ public:
 
     GenerationCoordinator();
 
-    void BuildChunkTest(uint32_t chunkID, ChunkID chunk_pos);
+    void BuildChunkTest(uint32_t volumeID, ChunkID chunk_pos);
 };
 
 /*

@@ -43,7 +43,7 @@ layout (push_constant) uniform constant
 {
     ivec3 ChunkPosition;
     int quality;
-    int chunkID;
+    int volumeID;
     int noiseSize;
 };
 
@@ -57,7 +57,7 @@ struct NodeExpansion{
 
 NodeExpansion ExpandNode(vec3 position, int quality)
 {
-    int heightmap_value = 5;
+    int heightmap_value = 4;
     float size = QualityToSize(quality);
    
     NodeExpansion expansion;
@@ -65,7 +65,7 @@ NodeExpansion ExpandNode(vec3 position, int quality)
     expansion.shouldKeepGoing = 0;
 
     int noiseMeasures = int(min(size / noiseSize, 1));
-    float minSize = QualityToSize(MipsUnderOne);
+    float minSize = QualityToSizePtr(MipsUnderOne);
 
     if (quality == 0)
         return expansion;
@@ -86,8 +86,8 @@ NodeExpansion ExpandNode(vec3 position, int quality)
     return expansion;
 }
 
-uint SetBitForMask(int index, uint blockValue){
-    return uint(blockValue>0) <<index;
+uint64_t SetBitForMask(int index, uint blockValue){
+    return uint64_t(blockValue>0) <<index;
 }
 
 void main()
@@ -111,7 +111,7 @@ void main()
     int headerPtrIndex;
 
     if (isHeader){
-        headerPtrIndex = GetChunkVolumeIndexFromPos(ChunkHeaders[chunkID].position, ChunkPosition);
+        headerPtrIndex = GetChunkVolumeIndexFromPos(ChunkHeaders[volumeID].position, ChunkPosition);
         pos = vec3(0);
     } else {
         pos = decode_pos(parent_node.position) + decode_local_ID(local_id, size);
@@ -127,11 +127,11 @@ void main()
         
         if (isHeader){
             // If it is at the max quality, this is the root, set the header.
-            ChunkHeaders[chunkID].ptrs[headerPtrIndex] = const_value + expansion.blockValue & ptr_mask;
+            ChunkHeaders[volumeID].ptrs[headerPtrIndex] = const_value + expansion.blockValue & ptr_mask;
         } else {
             // is a leaf and constant
             GPUMemory[parent_node.mempos].ptrs[local_id] = const_value + expansion.blockValue; // 32 bit is 1 //  + leaf No marking leaves
-            GPUMemory[parent_node.mempos].mask = atomicOr(GPUMemory[parent_node.mempos].mask, SetBitForMask(local_id, expansion.blockValue));
+            atomicOr(GPUMemory[parent_node.mempos].mask, SetBitForMask(local_id, expansion.blockValue));
         }
         
         return;
@@ -143,6 +143,7 @@ void main()
     {
         // this is a leaf
         GPUMemory[parent_node.mempos].ptrs[local_id] = const_value + expansion.blockValue; // We dont mark leaves right now + leaf
+        atomicOr(GPUMemory[parent_node.mempos].mask, SetBitForMask(local_id, expansion.blockValue));
         return;
     }
 
@@ -152,7 +153,7 @@ void main()
     float next_size = QualityToSize(quality-1);
   
     // Fetch new memory
-    uint chapter_hash = positionalHash(ChunkHeaders[chunkID].position);
+    uint chapter_hash = positionalHash(ChunkHeaders[volumeID].position);
     chapter_hash = CombinePositionalAndIDHash(gl_GlobalInvocationID.x, chapter_hash);
     chapter_hash = getChapterID(chapter_hash);
 
@@ -162,11 +163,11 @@ void main()
 
     // Set the data 
     if (isHeader){
-      ChunkHeaders[chunkID].ptrs[headerPtrIndex] = memindex & ptr_mask;
+      ChunkHeaders[volumeID].ptrs[headerPtrIndex] = memindex & ptr_mask;
     } else {
       GPUMemory[parent_node.mempos].ptrs[local_id] = memindex & ptr_mask; // 30^2-1 32nd bit is 0
       GPUMemory[parent_node.mempos].blockID = expansion.blockValue; // set the block ID of the node for dynamic LOD
-      GPUMemory[parent_node.mempos].mask = atomicOr(GPUMemory[parent_node.mempos].mask, 1); //SetBitForMask(local_id, expansion.blockValue) Only reason to decend is if there is a block
+      atomicOr(GPUMemory[parent_node.mempos].mask, 1UL<<local_id); //SetBitForMask(local_id, expansion.blockValue) Only reason to decend is if there is a block
 
     }
 

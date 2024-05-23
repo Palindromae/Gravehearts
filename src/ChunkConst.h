@@ -8,7 +8,7 @@ namespace nve::Chunks {
 	struct TEMP_ALLOCATOR_CONST {
 		ivec3 ChunkPosition;
 		int quality;
-		int chunkID;
+		int volumeID;
 		int noiseSize;
 	};
 

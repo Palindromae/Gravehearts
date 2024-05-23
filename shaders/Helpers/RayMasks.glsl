@@ -1734,11 +1734,11 @@ uint64_t RayMasks[1728]=
 };
 
 
-uint64_t GetMask(uint pos_index, vec3 signed_direction){
+uint64_t GetMask(uint pos_index, vec3 sign_direction){
 // -1 0 1, Three values per axii, max direction value of 26(27 values)
 	pos_index *= 27;
 	// Reorganise from {-1,0,1} -> {0,1,2} for mathematical reasons
-	ivec3 s_dir = ivec3(signed_direction) + ivec3(1);
+	ivec3 s_dir = ivec3(sign_direction) + ivec3(1);
 	// Calculate new index
 	pos_index += s_dir.x + s_dir.y* 3 + s_dir.z *3 * 3;
 

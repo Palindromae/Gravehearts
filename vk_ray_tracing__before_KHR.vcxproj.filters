@@ -269,6 +269,9 @@
     <None Include="shaders\Helpers\RayMasks.glsl">
       <Filter>Shader Headers\Helpers</Filter>
     </None>
+    <None Include="shaders\Inserts\VolumeTracer.glsl">
+      <Filter>Shader Sources\Voxels\Raytracer</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="D:\Projects\nvpro_core\nvp\resources.rc">
@@ -377,9 +380,6 @@
     <GLSLShader Include="shaders\UpdateChunkInVolume.comp">
       <Filter>Shader Sources\Voxels\Chunks</Filter>
     </GLSLShader>
-    <GLSLShader Include="shaders\ChunkTrace.rint">
-      <Filter>Shader Sources\Voxels\Chunks</Filter>
-    </GLSLShader>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />
@@ -387,6 +387,9 @@
   <ItemGroup>
     <IGLSLShader Include="shaders\VoxelBrickMemoryAllocator.comp">
       <Filter>Shader Sources\Voxels\Memory\VBrick Memory</Filter>
+    </IGLSLShader>
+    <IGLSLShader Include="shaders\ChunkTrace.rint">
+      <Filter>Shader Sources\Voxels\Chunks</Filter>
     </IGLSLShader>
   </ItemGroup>
 </Project>

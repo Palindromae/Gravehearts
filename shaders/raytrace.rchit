@@ -34,8 +34,6 @@ hitAttributeEXT vec3 attribs;
 layout(location = 0) rayPayloadInEXT hitPayload prd;
 //layout(location = 1) rayPayloadEXT bool isShadowed;
 
-layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-
 
 //layout(buffer_reference, scalar) buffer Vertices {Vertex v[]; }; // Positions of an object
 //layout(buffer_reference, scalar) buffer Indices {uint i[]; }; // Triangle indices

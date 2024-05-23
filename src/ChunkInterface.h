@@ -27,6 +27,7 @@ public:
 		ChunkGPUMemory = new ComputeBuffer(ComputeBufferInfo(sizeof(VoxelBrick),nve::GPUMemory::TotalMemory / sizeof(VoxelBrick)));
 		ChunkGPUMemoryMutexes = new ComputeBuffer(ComputeBufferInfo(sizeof(int), nve::GPUMemory::chapters));
 		
+		chunkManager->ChunkTlas.BuildTLAS();
 	}
 
 	~ChunkInterface() {
@@ -60,8 +61,17 @@ public:
 		{
 			mem.push_back(data[i]);
 		}
+
+		ChunkGPUMemory->readBufferData(data, sizeof(VoxelBrick) * 29408, sizeof(VoxelBrick) * length, context);
+		std::vector<VoxelBrick> memB{};
+		for (size_t i = 0; i < length; i++)
+		{
+			memB.push_back(data[i]);
+		}
+
+
+
 		CheckChunkArr();
-		
 		int a = 0;
 		free(data);
 	}
@@ -70,5 +80,16 @@ public:
 		chunkManager->UpdateGPUStructure();
 	}
 
+	Tlas* GetChunkTlas() {
+		return &chunkManager->ChunkTlas;
+	}
+
 	void TestGeneration(ChunkVolume*& volume, glm::vec3 position);
+
+	ComputeBuffer* GetGPUMemory() {
+		return ChunkGPUMemory;
+	}
+	ComputeBuffer* GetChunkHeaders() {
+		return chunkManager->ChunkVolumes;
+	}
 };

@@ -23,7 +23,7 @@ layout(set = 0, binding = 0)  buffer  ChunkHeadersN{
     ChunkHeader[] ChunkHeaders;
 };
 
-layout(set = 0, binding = 0)  buffer  InstancesN{
+layout(set = 1, binding = 0)  buffer  InstancesN{
     Artificial_VkAccelerationStructureInstanceKHR[] instances;
 };
 

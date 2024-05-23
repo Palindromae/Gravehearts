@@ -68,6 +68,10 @@ float hitSphere(const Sphere s, const Ray r)
 
 void main()
 {
+
+
+    reportIntersectionEXT(1,1);
+return;
 //gl_PrimitiveID for sub geometry
     Entity entity = allEntities.i[gl_InstanceCustomIndexEXT];
     Model impl = allModels.i[entity.model];

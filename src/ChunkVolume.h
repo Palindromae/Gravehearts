@@ -45,7 +45,7 @@ struct ChunkVolume {
 
 	static ChunkID ChunkToVolumeID(ChunkID ID) {
 
-		ID *= NoChunksPerAxii_inv;
+		ID = ID >> BitsPerAxii;
 		return ID;
 	}
 

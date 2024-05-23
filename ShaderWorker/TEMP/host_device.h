@@ -49,8 +49,11 @@ START_BINDING(SceneBindings)
 END_BINDING();
 
 START_BINDING(RtxBindings)
-  eTlas     = 0,  // Top-level acceleration structure
-  eOutImage = 1   // Ray tracer output image
+  eTlasEntities = 0,  // Top-level acceleration structure
+  eTlasChunks   = 1,  // Top-level acceleration structure
+  eChunkHeaders = 2,  // Chunk Headers
+  eChunkMemory  = 3,  // Chunk Memory
+  eOutImage     = 4   // Ray tracer output image
 END_BINDING();
 // clang-format on
 

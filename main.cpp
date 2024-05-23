@@ -207,9 +207,28 @@ int main(int argc, char** argv)
   Entity* entity4 = new Entity(glm::vec3(5,-3,1), 0);
 
   ChunkVolume* chunkVolume = ChunkInterface::instance->CreateChunk(ChunkID(0));
+  ChunkVolume* chunkVolumeB = ChunkInterface::instance->CreateChunk(ChunkID(4));
 
   ChunkInterface::instance->CheckChunkArr();
-  ChunkInterface::instance->TestGeneration(chunkVolume, ChunkID(0));
+
+
+  for (size_t x = 0; x < 4; x++)
+  {
+      for (size_t z = 0; z < 4; z++)
+      {
+          ChunkInterface::instance->TestGeneration(chunkVolume, ChunkID(x,0,z));
+
+      }
+  }
+
+  for (size_t x = 0; x < 4; x++)
+  {
+      for (size_t z = 0; z < 4; z++)
+      {
+          ChunkInterface::instance->TestGeneration(chunkVolumeB, ChunkID(x+4,0,z + 4));
+
+      }
+  }
 
   helloVk.updateDescriptorSet();
   helloVk.createPostDescriptor();

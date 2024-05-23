@@ -5,6 +5,7 @@
 #include <obj_loader.h>
 #include "AABBDef.h"
 #include "EntityManager.h"
+#include "src/ChunkInterface.h"
 
 void Raytrace::setup(const VkDevice& device, const VkPhysicalDevice& physicalDevice, nvvk::ResourceAllocator* allocator, uint32_t queueFamily)
 {
@@ -51,10 +52,18 @@ void Raytrace::updateRtDescriptorSetPerFrame()
   VkWriteDescriptorSetAccelerationStructureKHR descASInfo{ VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR };
   descASInfo.accelerationStructureCount = 1;
   descASInfo.pAccelerationStructures = &tlas;
-  VkWriteDescriptorSet  was = m_rtDescSetLayoutBind.makeWrite(m_rtDescSet, RtxBindings::eTlas, &descASInfo);
+
+  VkAccelerationStructureKHR tlasB = ChunkInterface::instance->GetChunkTlas()->acceleration_structure;
+  VkWriteDescriptorSetAccelerationStructureKHR descASInfoB{ VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR };
+  descASInfoB.accelerationStructureCount = 1;
+  descASInfoB.pAccelerationStructures = &tlasB;
+
+  VkWriteDescriptorSet  was = m_rtDescSetLayoutBind.makeWrite(m_rtDescSet, RtxBindings::eTlasEntities, &descASInfo);
+  VkWriteDescriptorSet  twas = m_rtDescSetLayoutBind.makeWrite(m_rtDescSet, RtxBindings::eTlasChunks, &descASInfoB);
 
   std::vector<VkWriteDescriptorSet> writes{};
   writes.push_back(was);
+  writes.push_back(twas);
   vkUpdateDescriptorSets(m_device, writes.size(), writes.data(), 0, nullptr);
 }
 
@@ -363,8 +372,8 @@ void Raytrace::createRaytracePipeline(VkDescriptorSetLayout& sceneDescLayout)
     eMiss,
     eClosestHit,
     eIntersect,
-    //eIntersectChunk,
-   // eClosestHitChunk,
+    eIntersectChunk,
+    eClosestHitChunk,
     eShaderGroupCount
   };
 
@@ -394,7 +403,7 @@ void Raytrace::createRaytracePipeline(VkDescriptorSetLayout& sceneDescLayout)
   // Hit Group - 1
   stage.module = nvvk::createShaderModule(m_device, nvh::loadFile("spv/ChunkTrace.rchit.spv", true, defaultSearchPaths, true));
   stage.stage          = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
-  //stages[eClosestHitChunk] = stage;
+  stages[eClosestHitChunk] = stage;
   // Hit
   //stage.module = nvvk::createShaderModule(m_device, nvh::loadFile("spv/raytrace2.rahit.spv", true, defaultSearchPaths, true));
   //stage.stage      = VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
@@ -407,7 +416,7 @@ void Raytrace::createRaytracePipeline(VkDescriptorSetLayout& sceneDescLayout)
   // Hit Group - Closest Hit
   stage.module = nvvk::createShaderModule(m_device, nvh::loadFile("spv/ChunkTrace.rint.spv", true, defaultSearchPaths, true));
   stage.stage = VK_SHADER_STAGE_INTERSECTION_BIT_KHR;
- // stages[eIntersectChunk] = stage;
+  stages[eIntersectChunk] = stage;
 
 
   // Call0
@@ -458,10 +467,10 @@ void Raytrace::createRaytracePipeline(VkDescriptorSetLayout& sceneDescLayout)
   // closest hit shader
   group.type               = VK_RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_KHR;
   group.generalShader      = VK_SHADER_UNUSED_KHR;
-//  group.closestHitShader   = eClosestHitChunk;
+  group.closestHitShader   = eClosestHitChunk;
   group.anyHitShader       = VK_SHADER_UNUSED_KHR;
- // group.intersectionShader = eIntersectChunk;
-  //m_rtShaderGroups.push_back(group);
+  group.intersectionShader = eIntersectChunk;
+  m_rtShaderGroups.push_back(group);
 
   // Callable shaders
   //group.type               = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
@@ -519,8 +528,14 @@ void Raytrace::createRtDescriptorSet(const VkImageView& outputImage)
 {
   using vkDSLB = VkDescriptorSetLayoutBinding;
 
-  m_rtDescSetLayoutBind.addBinding(RtxBindings::eTlas, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1,
-                                   VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR);  // TLAS
+  m_rtDescSetLayoutBind.addBinding(RtxBindings::eTlasEntities, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1,
+                                   VK_SHADER_STAGE_RAYGEN_BIT_KHR);  // TLAS
+  m_rtDescSetLayoutBind.addBinding(RtxBindings::eTlasChunks, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1,
+                                   VK_SHADER_STAGE_RAYGEN_BIT_KHR);  // TLAS
+
+  m_rtDescSetLayoutBind.addBinding(RtxBindings::eChunkHeaders, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_INTERSECTION_BIT_KHR);  // Chunk Headers
+  m_rtDescSetLayoutBind.addBinding(RtxBindings::eChunkMemory,  VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_INTERSECTION_BIT_KHR);  // Chunk Memory
+
   m_rtDescSetLayoutBind.addBinding(RtxBindings::eOutImage, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_RAYGEN_BIT_KHR);  // Output image
 
   m_rtDescPool      = m_rtDescSetLayoutBind.createPool(m_device);
@@ -535,16 +550,32 @@ void Raytrace::createRtDescriptorSet(const VkImageView& outputImage)
   // VkAccelerationStructureKHR tlas = m_rtBuilder.getAccelerationStructure();
   EntityManager::instance->UpdateBuffer();
   EntityManager::instance->BuildTlas();
+
+
   VkAccelerationStructureKHR tlas = EntityManager::instance->EntityTlas.acceleration_structure;
   VkWriteDescriptorSetAccelerationStructureKHR descASInfo{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR};
   descASInfo.accelerationStructureCount = 1;
-  //descASInfo.pAccelerationStructures    = &Tlas_obj.acceleration_structure;
   descASInfo.pAccelerationStructures = &tlas;
+  
+  VkAccelerationStructureKHR tlasB = ChunkInterface::instance->GetChunkTlas()->acceleration_structure;
+  VkWriteDescriptorSetAccelerationStructureKHR descASInfoB{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR};
+  descASInfoB.accelerationStructureCount = 1;
+  descASInfoB.pAccelerationStructures = &tlasB;
+
+
+
   VkDescriptorImageInfo imageInfo{{}, outputImage, VK_IMAGE_LAYOUT_GENERAL};
 
+  VkDescriptorBufferInfo bufferInfoHeaders{ ChunkInterface::instance->GetChunkHeaders()->buffer,0,VK_WHOLE_SIZE };
+  VkDescriptorBufferInfo bufferInfoGPUMemory{ ChunkInterface::instance->GetGPUMemory()->buffer,0,VK_WHOLE_SIZE };
 
   std::vector<VkWriteDescriptorSet> writes;
-  writes.emplace_back(m_rtDescSetLayoutBind.makeWrite(m_rtDescSet, RtxBindings::eTlas, &descASInfo));
+  writes.emplace_back(m_rtDescSetLayoutBind.makeWrite(m_rtDescSet, RtxBindings::eTlasEntities, &descASInfo));
+  writes.emplace_back(m_rtDescSetLayoutBind.makeWrite(m_rtDescSet, RtxBindings::eTlasChunks, &descASInfoB));
+
+  writes.emplace_back(m_rtDescSetLayoutBind.makeWrite(m_rtDescSet, RtxBindings::eChunkHeaders, &bufferInfoHeaders));
+  writes.emplace_back(m_rtDescSetLayoutBind.makeWrite(m_rtDescSet, RtxBindings::eChunkMemory, &bufferInfoGPUMemory));
+
   writes.emplace_back(m_rtDescSetLayoutBind.makeWrite(m_rtDescSet, RtxBindings::eOutImage, &imageInfo));
   vkUpdateDescriptorSets(m_device, static_cast<uint32_t>(writes.size()), writes.data(), 0, nullptr);
 }

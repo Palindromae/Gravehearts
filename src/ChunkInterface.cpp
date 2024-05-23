@@ -26,6 +26,5 @@ MonoidList* ChunkInterface::BindChunkMemory(MonoidList* list) {
 
 void ChunkInterface::TestGeneration(ChunkVolume*& volume, glm::vec3 position)
 {
-	uint32_t index = GetChunkVolumeIndexFromPos(volume->position, position);
-	WorldGeneration->BuildChunkTest(index,position);
+	WorldGeneration->BuildChunkTest(volume->StoragePtr,position);
 }

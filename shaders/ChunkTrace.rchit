@@ -28,10 +28,10 @@
 #include "raycommon.glsl"
 #include "wavefront.glsl"
 #include "Helpers/Rays.glsl"
-hitAttributeEXT RayHit hit;
+hitAttributeEXT vec3 attribs;
 
 // clang-format off
-layout(location = 0) rayPayloadInEXT RayHit prd;
+layout(location = 0) rayPayloadInEXT hitPayload prd;
 //layout(location = 1) rayPayloadEXT bool isShadowed;
 
 
@@ -52,6 +52,6 @@ void main()
 {
   vec3 worldPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
   
-  //prd.hitValue = vec3(1,1,attribs.z/4.0);
-  prd = hit;
+  prd.hitValue = attribs;
+  //prd = hit;
 }

@@ -25,7 +25,6 @@ class ChunkManager {
 	void returnChunkVolumeID(int ID);
 	void CreateChunkBlas();
 
-	Tlas ChunkTlas{};
 	nvvk::Buffer               BlasBuffer;
 	ComputeBuffer*             instanceBuffer{};
 	VkAccelerationStructureKHR ChunkBlas{};
@@ -35,6 +34,7 @@ class ChunkManager {
 	CreateChunkConst createConsts{};
 	CreateChunkConst nullConsts{};
 public:
+	Tlas ChunkTlas{};
 	ComputeBuffer* ChunkVolumes{};
 
 	ChunkManager(nve::ProductionPackage* context);

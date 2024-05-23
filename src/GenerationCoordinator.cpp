@@ -16,9 +16,9 @@ GenerationCoordinator::GenerationCoordinator() {
     IndirectBuffer  = new ComputeBuffer(info);
 }
 
-void GenerationCoordinator::BuildChunkTest(uint32_t chunkID, ChunkID chunk_pos) {
+void GenerationCoordinator::BuildChunkTest(uint32_t volumeID, ChunkID chunk_pos) {
     nve::Chunks::TEMP_ALLOCATOR_CONST temp{};
-    temp.chunkID = chunkID;
+    temp.volumeID = volumeID;
     temp.ChunkPosition = chunk_pos;
     temp.noiseSize = 1;
     temp.quality = MaxQuality;
