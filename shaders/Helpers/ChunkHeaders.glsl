@@ -12,6 +12,7 @@ const int NoChunksPtrs = 512;
 const uint MAXUINT = 0xffffffff;
 struct ChunkHeader{
 	ivec3 position;
+	int PADDING;
 	uint ptrs[NoChunksPtrs];
 };
 

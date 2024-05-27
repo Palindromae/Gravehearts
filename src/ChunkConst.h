@@ -9,7 +9,6 @@ namespace nve::Chunks {
 		ivec3 ChunkPosition;
 		int quality;
 		int volumeID;
-		int noiseSize;
 	};
 
 	static const bool CenterChunks = true;

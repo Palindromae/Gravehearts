@@ -17,7 +17,6 @@ struct TracingPackage{
     vec3 s01;
 };
 
-/*
 ivec3 sign11(vec3 vec){
   
   ivec3 v = ivec3(-1);
@@ -40,7 +39,6 @@ TracingPackage CreateTracingPackage(Ray ray){
     package.s_dir = sign11(ray.direction);
     package.inv_dir = 1/ray.direction;
     package.s01 = max(package.s_dir, 0.);
-
+                
     return package;
 }
-*/

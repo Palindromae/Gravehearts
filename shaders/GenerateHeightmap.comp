@@ -1,0 +1,48 @@
+#version 450
+#extension GL_KHR_vulkan_glsl : enable
+#extension GL_EXT_nonuniform_qualifier : enable
+#extension GL_GOOGLE_include_directive : enable
+
+#include "ChunkGPUConst.h"
+#include "ChunkGenerationConst.h"
+
+
+#include "Helpers/Simplex.glsl"
+
+layout(set = 0, binding = 0)  buffer  heightMapN{
+  float[] heightmap_world;
+};
+
+
+layout (push_constant) uniform constant
+{
+	ivec3 chunk_position;
+};
+
+#include "Helpers/ChunkIndexing.glsl"
+
+float GatherHeightmap(int octave, vec2 position){
+	
+	return reformat01(snoise(position * heightmap_octaves[octave].frequency + heightmap_octaves[octave].offset)) * heightmap_octaves[octave].amplitude;
+}
+layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+void main(){
+	
+	// correctly center the heightmap
+	ivec2 noisePosition = ivec2(gl_GlobalInvocationID.xy);
+
+	if(any(greaterThan(noisePosition,heightmap_dimensions)))
+        return;
+
+	noisePosition -= ivec2(heightmap_dimension_padding);
+
+
+	ivec2 position = noisePosition * heightmap_noiseSize + chunk_position.xz * chunk_dimensions_int.xz;
+
+
+	float height = SEA_LEVEL;
+	height += GatherHeightmap(0, position);
+
+	heightmap_world[CalculateHeightmapIndex(noisePosition)] = height;
+}

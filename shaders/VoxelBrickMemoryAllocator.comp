@@ -6,8 +6,7 @@
 
 #include "ChunkGPUConst.h"
 #include "VoxelBrick.h"
-
-
+#include "ChunkGenerationConst.h"
 
 #include "Helpers/ChunkHeaders.glsl"
 #include "Helpers/GPUMemory.glsl"
@@ -36,6 +35,13 @@ layout(set = 4, binding = 0)  buffer  toN{
     UnexpandedNode[] toNodes;
 };
 
+layout(set = 5, binding = 0)  buffer  heightmapN{
+    float[] heightmap_world;
+};
+
+
+#include "Helpers/ChunkIndexing.glsl"
+
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
@@ -44,7 +50,6 @@ layout (push_constant) uniform constant
     ivec3 ChunkPosition;
     int quality;
     int volumeID;
-    int noiseSize;
 };
 
 struct NodeExpansion{
@@ -55,16 +60,16 @@ struct NodeExpansion{
 //--#Insert ChunkHeaderAlloc.glsl
 //#Insert VoxelBrickMemAlloc.glsl
 
-NodeExpansion ExpandNode(vec3 position, int quality)
+NodeExpansion ExpandNode(vec3 position, vec3 chunkposition, int quality)
 {
-    int heightmap_value = 4;
+    float heightmap_value = 5;
     float size = QualityToSize(quality);
    
     NodeExpansion expansion;
     expansion.blockValue = 0;
     expansion.shouldKeepGoing = 0;
 
-    int noiseMeasures = int(min(size / noiseSize, 1));
+    int noiseMeasures = int(min(size / heightmap_noiseSize, 1));
     float minSize = QualityToSizePtr(MipsUnderOne);
 
     if (quality == 0)
@@ -75,6 +80,10 @@ NodeExpansion ExpandNode(vec3 position, int quality)
     {
         for(int y = 0; y <= noiseMeasures; y++)
         {
+            
+            // retrieve value
+            heightmap_value = heightmap_world[ChunkPositionToHeightmapIndex(position,ivec2(x,y))];
+
             expansion.blockValue = uint(position.y<heightmap_value);
             // size - minSize makes sure that the highest smallest block is being referenced
             bool isAccepted = (position.y + size - minSize) > heightmap_value;
@@ -118,7 +127,7 @@ void main()
 
     }
     
-    NodeExpansion expansion = ExpandNode(pos + ChunkPosition, quality);
+    NodeExpansion expansion = ExpandNode(pos, ChunkPosition, quality);
    
    int leaf = (1-min(quality,1)) * 1;
 

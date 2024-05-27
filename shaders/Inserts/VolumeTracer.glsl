@@ -1,8 +1,8 @@
 
-vec3 hitAABB(const vec3 volumePosition, const vec3 invDir, const Ray r)
+vec3 hitAABBVolume(const vec3 volumePosition, const vec3 invDir, const Ray r)
 {
 
-   if(all(lessThan(r.position, volumePosition + chunk_dimensions)) && all(greaterThan(r.position, volumePosition))){
+   if(all(lessThan(r.position, volumePosition + chunk_dimensions * NoChunksPerAxii)) && all(greaterThanEqual(r.position, volumePosition))){
     return r.position;
    }
  
@@ -22,7 +22,7 @@ vec3 hitAABB(const vec3 volumePosition, const vec3 invDir, const Ray r)
 
 vec3 GetEntry(int volumeID, const vec3 invDir, const Ray r){
     ChunkHeader header = ChunkHeaders[volumeID];
-    return hitAABB(header.position*chunk_dimensions, invDir,  r);
+    return hitAABBVolume(header.position * chunk_dimensions, invDir,  r);
 }
 
 bool TraceNext(Ray r, inout vec3 position, const TracingPackage tracing_info, out int NextIndex){
@@ -41,7 +41,7 @@ bool TraceNext(Ray r, inout vec3 position, const TracingPackage tracing_info, ou
     position += 1/32.0 * tracing_info.s_dir * mask;
 
 
-    NextIndex = ChunkHeaderIndex(ivec3(position));
+    NextIndex = ChunkHeaderIndex(ivec3(position/chunk_dimensions));
        
     return !(position[index] <0 || position[index]>=chunk_dimensions.x * NoChunksPerAxii);
 
@@ -66,8 +66,7 @@ bool TraceNext(Ray r, inout vec3 position, const TracingPackage tracing_info, ou
     position += 1/32.0 * tracing_info.s_dir * mask;
 
 
-    NextIndex = ChunkHeaderIndex(ivec3(position));
-       
+    index = ChunkHeaderIndex(ivec3(position/chunk_dimensions));
 
     mask = min(min(tMax.x, tMax.y),tMax.z) * r.direction;
     return !(position[index] <0 || position[index]>=chunk_dimensions.x * NoChunksPerAxii);

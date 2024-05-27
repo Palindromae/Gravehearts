@@ -4,8 +4,12 @@
 #include "RenderPassGenerator.h"
 #include "../shaders/IndirectWorkGroups.h"
 #include "ManualRenderPass.h"
+#include "../shaders/ChunkGenerationConst.h"
 GenerationCoordinator::GenerationCoordinator() {
 
+
+
+   
     int length = 83333;
     context = new nve::ProductionPackage(QueueType::Graphics);
     UnexpandedNodeA = new ComputeBuffer(ComputeBufferInfo(sizeof(nve::GPUMemory::UnexpandedNode), length));
@@ -14,15 +18,17 @@ GenerationCoordinator::GenerationCoordinator() {
     auto info = ComputeBufferInfo(sizeof(IndirectWorkGroups), 1);
     info.usage |= VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT;
     IndirectBuffer  = new ComputeBuffer(info);
+
+    // Heightmap
+    int heightmapLength = heightmap_dimensions.x * heightmap_dimensions.y;
+    HeightmapData = new ComputeBuffer(ComputeBufferInfo(sizeof(float), heightmapLength));
 }
 
 void GenerationCoordinator::BuildChunkTest(uint32_t volumeID, ChunkID chunk_pos) {
     nve::Chunks::TEMP_ALLOCATOR_CONST temp{};
     temp.volumeID = volumeID;
     temp.ChunkPosition = chunk_pos;
-    temp.noiseSize = 1;
     temp.quality = MaxQuality;
-
 
 
     std::vector< nve::Chunks::TEMP_ALLOCATOR_CONST> temp_const{};
@@ -30,19 +36,29 @@ void GenerationCoordinator::BuildChunkTest(uint32_t volumeID, ChunkID chunk_pos)
 
     nve::ManualRenderPass pass = nve::ManualRenderPass(context);
 
+    // Create padded heightmap data
+    pass.InlineShaderDispatch(Shaders::GenerateHeightMap, ceil(heightmap_dimensions.x / 8.0), ceil(heightmap_dimensions.y / 8.0), 1, sizeof(chunk_pos), &chunk_pos, MonoidList(1).bind(HeightmapData)->render());
+
+    // Insert barrier before using data
+    pass.InsertMemoryBarrier(VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, VK_ACCESS_SHADER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT);
+
+
+
     MonoidList allocA = MonoidList(5);
     ChunkInterface::instance->BindChunkMemory( //1
         ChunkInterface::instance->BindChunkHeader(&allocA)) //0
 
         ->bind(UnexpandedNodeA) // 2
-        ->bind(UnexpandedNodeB); // 3
+        ->bind(UnexpandedNodeB) // 3
+        ->bind(HeightmapData);  // 4
 
     MonoidList allocB = MonoidList(5);
     ChunkInterface::instance->BindChunkMemory( //1
         ChunkInterface::instance->BindChunkHeader(&allocB)) //0
 
         ->bind(UnexpandedNodeB) // 2
-        ->bind(UnexpandedNodeA); // 3
+        ->bind(UnexpandedNodeA) // 3
+        ->bind(HeightmapData); // 4
 
 
     int brickIndirectPtr = 0;
@@ -70,6 +86,10 @@ void GenerationCoordinator::BuildChunkTest(uint32_t volumeID, ChunkID chunk_pos)
   
    
     pass.execute();
+
+
+
+
 
     //int nodesToCheck = 100;
 

@@ -18,6 +18,14 @@ struct Artificial_VkAccelerationStructureInstanceKHR{
 };
 
 
+struct HeightmapOctaves {
+
+	vec2 Offset;
+	float amplitude;
+	float frequency;
+
+};
+
 
 layout(set = 0, binding = 0)  buffer  ChunkHeadersN{
     ChunkHeader[] ChunkHeaders;
@@ -47,4 +55,5 @@ void main()
     }
 
     instances[ptrInMem] = instance;
+
 }

@@ -3,10 +3,10 @@
 #include <corecrt_malloc.h>
 #include <exception>
 #include <queue>
-#include "src/ComputeBuffer.h"
-#include "src/ProductionPackage.h"
-#include "src/Tlas.h"
-#include "src/EntityGPUStruct.h"
+#include "ComputeBuffer.h"
+#include "ProductionPackage.h"
+#include "Tlas.h"
+#include "EntityGPUStruct.h"
 class EntityManager {
 
 	int EntityCount;
@@ -38,6 +38,8 @@ public:
 	VkAccelerationStructureInstanceKHR* GetID(int& no);
 
 	EntityGPUStruct* GetDataPtr();
+
+	EntityGPUStruct* GetEntityArr();
 
 	void ReturnID(VkAccelerationStructureInstanceKHR* id);
 	void ReturnGPUData(EntityGPUStruct* data);

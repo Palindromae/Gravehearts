@@ -279,6 +279,13 @@ void DisjointCommandDispatcher::setStagingBuffer(VkDeviceMemory& stagingBufferMe
 	vkUnmapMemory(*device, stagingBufferMemory);
 }
 
+void DisjointCommandDispatcher::MapMemory(VkDeviceMemory* memory, VkDeviceSize length, void*& data) {
+	vkMapMemory(*device, *memory, 0, length, 0, &data);
+}
+void DisjointCommandDispatcher::UnmapMemory(VkDeviceMemory* memory) {
+	vkUnmapMemory(*device, *memory);
+}
+
 void DisjointCommandDispatcher::copyDataToBuffer(VkDeviceMemory bufferMemory, VkDeviceSize bufferSize, VkDeviceSize offset, const void* data) {
 	//this is inefficent premap the memory perma
 	void* mapMemory;
@@ -289,6 +296,7 @@ void DisjointCommandDispatcher::copyDataToBuffer(VkDeviceMemory bufferMemory, Vk
 
 	vkUnmapMemory(*device, bufferMemory);
 }
+
 
 void DisjointCommandDispatcher::copyDataToBuffer(VkBuffer& stagingBuffer, VkDeviceMemory stagingBufferMemory, VkBuffer& buffer,VkDeviceSize offset, VkDeviceSize bufferSize, nve::ProductionPackage* context, VkFence* fence) {
 	
@@ -342,9 +350,6 @@ void DisjointCommandDispatcher::copyBufferToBuffer(VkBuffer& src, VkBuffer& dst,
 	queues->endQueue(type);
 
 }
-
-
-
 
 void DisjointCommandDispatcher::copyDataFromBuffer(VkBuffer& stagingBuffer, VkDeviceMemory stagingBufferMemory, VkBuffer& buffer, VkDeviceSize offset, VkDeviceSize bufferSize, void* dataOut, nve::ProductionPackage* context) {
 	

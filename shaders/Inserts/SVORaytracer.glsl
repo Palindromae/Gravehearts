@@ -34,6 +34,7 @@ vec3 hitAABB(vec3 chunkPosition, vec3 invDir, const Ray r)
   return r.direction * t0 + r.position - chunkPosition;
 }
 
+/*
 ivec3 sign11(vec3 vec){
   
   ivec3 v = ivec3(-1);
@@ -48,7 +49,7 @@ ivec3 sign11(vec3 vec){
 
    return v;
 }
-
+*/
 void SetSVOPosition(vec3 position){
     SVOPosition = ivec3(position*greatestZoom);
 }
@@ -98,7 +99,7 @@ uint GetVoxelAtPosition(vec3 position, inout int current_quality_level){
     }
 }
 
-bool Step(const uint64_t ptr_mask, vec3 inv_ray_dir, vec3 direction, vec3 dir_sign, vec3 s01, inout vec3 position, inout int current_quality_level){
+bool Step(const uint64_t ptr_mask, const vec3 inv_ray_dir, const vec3 direction, const vec3 dir_sign, const vec3 s01, inout vec3 position, inout int current_quality_level){
    
     float voxelSize = QualityToSize(current_quality_level-1);
 
@@ -159,27 +160,22 @@ bool Step(const uint64_t ptr_mask, vec3 inv_ray_dir, vec3 direction, vec3 dir_si
     return current_quality_level > MaxQuality;
 }
 
-bool Raytrace(Ray ray, uint volume, uint chunkptr, out RayHit hit){
+bool Raytrace(Ray ray, const TracingPackage info, uint volume, uint chunkptr, out RayHit hit){
 
-    ChunkHeader header = ChunkHeaders[volume];
+   // ChunkHeader header = ChunkHeaders[volume];
 
 
-    if (header.ptrs[chunkptr] == MAXUINT)
+    if (ChunkHeaders[volume].ptrs[chunkptr] == MAXUINT)
+        return false;
+
+         
+    if (GPUMemory[ChunkHeaders[volume].ptrs[chunkptr]].mask == 0)
         return false;
 
 
+    vec3 position = hitAABB((ChunkHeaders[volume].position + GetHeaderOffset(chunkptr))* chunk_dimensions, info.inv_dir, ray);
+    position += ray.direction * 1/64.0;
 
-    VoxelBrick current = GPUMemory[header.ptrs[chunkptr]];
-
-    if (current.mask == 0)
-        return false;
-
-
-
-    vec3 s_dir = sign11(ray.direction);
-    vec3 inv_dir = 1/ray.direction;
-    vec3 position = hitAABB((header.position + GetHeaderOffset(chunkptr))* chunk_dimensions, inv_dir, ray);
-    vec3 s01 = max(s_dir, 0.);
 
     int current_quality_level = MaxQuality;
 
@@ -191,7 +187,7 @@ bool Raytrace(Ray ray, uint volume, uint chunkptr, out RayHit hit){
     SVOPosition.y = SVOPosition.y << 2;
     SVOPosition.z = SVOPosition.z << 4;
 
-    ptr_stack[current_quality_level] = header.ptrs[chunkptr];
+    ptr_stack[current_quality_level] = ChunkHeaders[volume].ptrs[chunkptr];
     SetPtr(current_quality_level);
     
 
@@ -199,12 +195,11 @@ bool Raytrace(Ray ray, uint volume, uint chunkptr, out RayHit hit){
     hit.position = position;
 
     
-    const uint64_t mask = GetMask(current_childPtr, s_dir);
+    const uint64_t mask = GetMask(current_childPtr, info.s_dir);
 
 
-    if((current.mask & mask) == 0)
+    if((GPUMemory[ChunkHeaders[volume].ptrs[chunkptr]].mask & mask) == 0)
         return false;
-
 
     int n = 0;
     while (true){
@@ -213,19 +208,20 @@ bool Raytrace(Ray ray, uint volume, uint chunkptr, out RayHit hit){
         if (voxel > 0){
 
             if(any(greaterThanEqual(position,chunk_dimensions)) || any(lessThan(position,vec3(0))) ){
-            return false;
+                return false;
             }
-
+            position += (ChunkHeaders[volume].position + GetHeaderOffset(chunkptr)) * chunk_dimensions;
             hit._distance = distance(position,ray.position);
-            hit.position = vec3(0,1,n);
+            //hit.position = vec3(0,1,n);
+            hit.position = position;
             hit.blockID = voxel;
             return true;
         }
-      
+
 
    
 
-        if(Step(mask, inv_dir, ray.direction, s_dir, s01, position, current_quality_level)){
+        if(Step(mask, info.inv_dir, ray.direction, info.s_dir, info.s01, position, current_quality_level)){
          hit.position = vec3(0,1,n);
          return  false;
         }

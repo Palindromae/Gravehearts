@@ -50,10 +50,6 @@ namespace Shaders
 		AcesFilmic,
 
 		// Chunks
-		UpdateChunkMapping,
-		UpdateChunkMappingBulk,
-		DownscaleOctree, 
-		VacantChunkGenerator,
 		WriteNewChunkVolume,
 		UpdateChunkVolume,
 
@@ -63,7 +59,7 @@ namespace Shaders
 		CopyListToVoxelBrickInDirect,
 
 		// Terrain Generation
-		OverworldHeightMap,
+		GenerateHeightMap,
 		SetOverworld3DNoise,
 		OverworldBlockSetter,
 		VoxelOctreeAllForOne,

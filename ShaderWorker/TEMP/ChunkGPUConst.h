@@ -27,6 +27,7 @@ const int MipsUnderOne = -2 ;
 
 #ifdef __cplusplus
 float QualityToSize(int quality);
+float SizeToQuality(float size);
 // 
 int GetChunkVolumeIndexFromPos(ivec3 volume_pos, ivec3 pos);
 int ChunkHeaderIndex(ivec3 pos);

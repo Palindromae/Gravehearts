@@ -1,0 +1,52 @@
+#version 450
+#extension GL_KHR_vulkan_glsl : enable
+#extension GL_EXT_nonuniform_qualifier : enable
+#extension GL_GOOGLE_include_directive : enable
+
+#include "ChunkGPUConst.h"
+#include "ChunkGenerationConst.h"
+
+
+#include "Helpers/ChunkIndexing.glsl"
+#include "Helpers/Simplex.glsl"
+
+layout(set = 0, binding = 0)  buffer  Noise3DVolumeN{
+  float[] noise3DVolume;
+};
+
+
+layout (push_constant) uniform constant
+{
+	ivec3 chunk_position;
+};
+
+
+float Gather3DNoise(int octave, vec3 position, inout float total_contribution){
+	total_contribution += noise3d_octaves[octave].contribution;
+	return reformat01(snoise(position * noise3d_octaves[octave].frequency + noise3d_octaves[octave].offset)) * noise3d_octaves[octave].contribution;
+}
+layout (local_size_x = 4, local_size_y = 8, local_size_z = 4) in;
+
+void main(){
+	
+	ivec3 noisePosition = ivec3(gl_GlobalInvocationID);
+
+	if(any(greaterThan(noisePosition, noise3d_dimensions)))
+        return;
+
+	// correctly center the 3d noise
+	noisePosition -= ivec3(noise3d_dimension_padding);
+	ivec3 position = noisePosition * noise3d_noiseSize + chunk_position * chunk_dimensions_int;
+
+	float contributions = 0;
+	float isovalue = 0;
+
+	isovalue += Gather3DNoise(0, position, contributions);
+
+	// Scale isovalue back to 0 -> 1
+	isovalue /= contributions;
+
+	noise3DVolume[CalculateNoise3DIndex(noisePosition)] = isovalue;
+}
+
+

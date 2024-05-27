@@ -1,8 +1,8 @@
 #include "Entity.h"
+#include "PhysicsManager.h"
 
-Entity::Entity(glm::vec3 pos, int model, glm::vec4 rotation, glm::vec3 scale) : rotation(rotation), scale(scale) {
-	int no = -1;
-	data = EntityManager::instance->GetID(no);
+Entity::Entity(glm::vec3 pos, int model, glm::vec4 rotation, glm::vec3 scale, PhysicsComponent physics_component) : rotation(rotation), scale(scale) {
+	data = EntityManager::instance->GetID(EntityID);
 	gpu_vars = EntityManager::instance->GetDataPtr();
 
 	gpu_vars->position = pos;
@@ -10,7 +10,7 @@ Entity::Entity(glm::vec3 pos, int model, glm::vec4 rotation, glm::vec3 scale) : 
 
 	SetTRS();
 
-	data->instanceCustomIndex = no;
+	data->instanceCustomIndex = EntityID;
 	data->mask = 0xff;
 	data->accelerationStructureReference = EntityManager::instance->GetModelBlasPtr(model);
 	data->flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
@@ -85,8 +85,18 @@ glm::vec3 Entity::Get_Scale() {
 	return scale;
 }
 
+int Entity::ID_Get() {
+	return EntityID;
+}
+
 Entity::~Entity() {
+	
+	// Remove Physics Object
+	PhysicsManager::Physics->RemovePhysicsObject(this);
+
 	data->mask = 0x00; //Invalidate data
 	data->transform = {};
 	EntityManager::instance->ReturnID(data);
+
+
 }

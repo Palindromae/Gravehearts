@@ -52,6 +52,8 @@ ivec3 SVOPosition;
  uint current_childPtr;
 
 
+//#Insert VolumeTracer.glsl
+
 //#Insert SVORaytracer.glsl
 
 
@@ -62,13 +64,44 @@ void main()
 	ray.direction = gl_WorldRayDirectionEXT;
 
 
+	TracingPackage info =  CreateTracingPackage(ray);
+
+	vec3 position = GetEntry(gl_InstanceCustomIndexEXT,  info.inv_dir, ray);
+
+	position += ray.direction * 1/32.0;
+
+	int index = ChunkHeaderIndex(ivec3(position/chunk_dimensions));
 	RayHit hit;
+	ChunkHeader header = ChunkHeaders[gl_InstanceCustomIndexEXT];
 
-	if(Raytrace(ray, gl_InstanceCustomIndexEXT, gl_PrimitiveID, hit)) {
-		reportIntersectionEXT(hit._distance,1);
+	//attribs = position/vec3(256);
+	//attribs = header.position/vec3(8);
+	//reportIntersectionEXT(1,1);
+	//return;
 
-	attribs = hit.position/vec3(32);
+
+	for(int i = 0; i<64; i++){
+		
+		if(Raytrace(ray,info, gl_InstanceCustomIndexEXT, index, hit)) {
+			reportIntersectionEXT(hit._distance,1);
+			attribs = hit.position/vec3(256);
+			return;
+		} 
+	/*
+		if(position.y < 32.0)
+		{
+			reportIntersectionEXT(1,1);
+			attribs = vec3(0,index,0)/512.0 * abba;
+			return;
+		}
+		*/
+		if(!TraceNext(ray, position, info, index))
+			return;
+
+		
 	}
-	//attribs = vec3(hit.blockID)/vec3(2);
 
+	attribs = position/vec3(256);
+	attribs = vec3(1,0,0);
+	reportIntersectionEXT(1,1);
 }

@@ -275,8 +275,6 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="hello_vulkan.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Raytrace.cpp" />
@@ -288,6 +286,8 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <ClCompile Include="src\ComputeShader.cpp" />
     <ClCompile Include="src\DisjointCommandDispatcher.cpp" />
     <ClCompile Include="src\DistanceCalculations.cpp" />
+    <ClCompile Include="src\Entity.cpp" />
+    <ClCompile Include="src\EntityManager.cpp" />
     <ClCompile Include="src\GenerationCoordinator.cpp" />
     <ClCompile Include="src\LoadComputeShaders.cpp" />
     <ClCompile Include="src\ManualRenderPass.cpp" />
@@ -301,26 +301,29 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <ClCompile Include="src\stdafx.cpp" />
     <ClInclude Include="AABBDef.h" />
     <ClInclude Include="D:\Projects\nvpro_core\nvp\resources.h" />
-    <ClInclude Include="Entity.h" />
-    <ClInclude Include="EntityManager.h" />
     <ClInclude Include="hello_vulkan.h" />
     <ClInclude Include="ObjStruct.h" />
     <ClInclude Include="Raytrace.h" />
+    <ClInclude Include="shaders\ChunkGenerationConst.h" />
     <ClInclude Include="shaders\ChunkGPUConst.h" />
     <ClInclude Include="shaders\IndirectWorkGroups.h" />
     <ClInclude Include="shaders\VoxelBrick.h" />
     <ClInclude Include="shaders\host_device.h" />
+    <ClInclude Include="src\CallbackGPUMemory.h" />
     <ClInclude Include="src\Chunk.h" />
     <ClInclude Include="src\ChunkConst.h" />
     <ClInclude Include="src\ChunkInterface.h" />
     <ClInclude Include="src\ChunkManager.h" />
     <ClInclude Include="src\ChunkVolume.h" />
+    <ClInclude Include="src\Physics_Collisions.h" />
     <ClInclude Include="src\ComputeBuffer.h" />
     <ClInclude Include="src\ComputeShader.h" />
     <ClInclude Include="src\DescriptiveObject.h" />
     <ClInclude Include="src\DisjointCommandDispatcher.h" />
     <ClInclude Include="src\DistanceCalculation.h" />
+    <ClInclude Include="src\EntityConst.h" />
     <ClInclude Include="src\EntityGPUStruct.h" />
+    <ClInclude Include="src\EntityManager.h" />
     <ClInclude Include="src\FilePath.h" />
     <ClInclude Include="src\GenerationCoordinator.h" />
     <ClInclude Include="src\LoadComputeShaders.h" />
@@ -333,6 +336,12 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <ClInclude Include="src\nve_page.h" />
     <ClInclude Include="src\nve_staticQueue.h" />
     <ClInclude Include="src\PagedBinding.h" />
+    <ClInclude Include="src\Physics_Const.h" />
+    <ClInclude Include="src\Physics_Component.h" />
+    <ClInclude Include="src\Physics_CubeTraceInfo.h" />
+    <ClInclude Include="src\Physics_Partition.h" />
+    <ClInclude Include="src\PhysicsManager.h" />
+    <ClInclude Include="src\Physics_RayCollision.h" />
     <ClInclude Include="src\ProductionPackage.h" />
     <ClInclude Include="src\QueueFamilyIndices.h" />
     <ClInclude Include="src\QueueTypes.h" />
@@ -343,13 +352,17 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <ClInclude Include="src\SpareFences.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\StoredComputeShaders.h" />
+    <ClInclude Include="src\ThreadStatus.h" />
     <ClInclude Include="src\Tlas.h" />
     <ClInclude Include="src\trace.h" />
     <None Include="shaders\frag_shader.frag" />
     <None Include="shaders\Helpers\ChunkHeaders.glsl" />
+    <None Include="shaders\Helpers\ChunkIndexing.glsl" />
     <None Include="shaders\Helpers\GPUMemory.glsl" />
+    <None Include="shaders\Helpers\Interpolate.glsl" />
     <None Include="shaders\Helpers\RayMasks.glsl" />
     <None Include="shaders\Helpers\Rays.glsl" />
+    <None Include="shaders\Helpers\Simplex.glsl" />
     <None Include="shaders\Inserts\ChunkHeaderAlloc.glsl" />
     <None Include="shaders\Inserts\SVORaytracer.glsl" />
     <None Include="shaders\Inserts\VolumeTracer.glsl" />
@@ -367,6 +380,8 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     </IGLSLShader>
     <GLSLShader Include="shaders\ChunkTrace.rchit" />
     <GLSLShader Include="shaders\CopyListToVoxelBrickIndirect.comp" />
+    <GLSLShader Include="shaders\Generate3DNoise.comp" />
+    <GLSLShader Include="shaders\GenerateHeightmap.comp" />
     <GLSLShader Include="shaders\UpdateChunkInVolume.comp" />
     <GLSLShader Include="shaders\WriteNewChunkVolume.comp">
       <FileType>Document</FileType>

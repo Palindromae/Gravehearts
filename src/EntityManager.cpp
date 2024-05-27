@@ -1,5 +1,7 @@
 #include "EntityManager.h"
-#include "src/ModelManager.h"
+#include "ModelManager.h"
+#include "EntityConst.h"
+#include <exception>
 
 EntityManager::EntityManager(int MaxEntities) : EntityCount(MaxEntities) {
 
@@ -72,7 +74,16 @@ EntityGPUStruct* EntityManager::GetDataPtr()
 
 		return counter;
 	}
+
+	if (maxPosData == MaxEntities)
+		throw new std::exception("Ran out of entities");
+
 	return &EntityGPUData[maxPosData++];
+}
+
+EntityGPUStruct* EntityManager::GetEntityArr()
+{
+	return EntityGPUData;
 }
 
 void EntityManager::ReturnID(VkAccelerationStructureInstanceKHR* id) {

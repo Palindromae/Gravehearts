@@ -15,23 +15,13 @@ ChunkManager::ChunkManager(nve::ProductionPackage* context) : context(context) {
 void ChunkManager::CreateChunkBlas()
 {
 
-	AABBDef* chunks = (AABBDef*)malloc(sizeof(AABBDef) * NoChunksPerVolume);
-	std::vector<int> indexes{};
+	AABBDef* chunks = (AABBDef*)malloc(sizeof(AABBDef) * 1);
 	std::vector<AABBDef> datas{};
-	for (size_t x = 0; x < NoChunksPerAxii; x++)
-	{
-		for (size_t y = 0; y < NoChunksPerAxii; y++)
-		{
-			for (size_t z = 0; z < NoChunksPerAxii; z++)
-			{
-				int index = ChunkHeaderIndex({ x,y,z });
-				chunks[index] = AABBDef({ glm::ivec3( x,y,z)*chunk_dimensions_int,  glm::ivec3(x,y,z) * chunk_dimensions_int + chunk_dimensions_int });
+	int index = 0;
+	chunks[index] = AABBDef({ glm::ivec3(0), chunk_dimensions_int * NoChunksPerAxii });
 				
-				datas.push_back(chunks[index]);
-				indexes.push_back(index);
-			}
-		}
-	}
+	datas.push_back(chunks[index]);
+
 
 
 	auto buffer_info = ComputeBufferInfo(sizeof(AABBDef), NoChunksPerVolume);
@@ -163,6 +153,7 @@ ChunkVolume* ChunkManager::CreateChunk(ChunkID position) {
 		ChunkVolume_Map[VolumePosition] = volume;
 
 
+
 		createConsts.position = position;
 		createConsts.ptrInMem = volume->StoragePtr;
 		createConsts.instance.instanceCustomIndex = volume->StoragePtr;
@@ -171,10 +162,18 @@ ChunkVolume* ChunkManager::CreateChunk(ChunkID position) {
 		createConsts.instance.transform = nvvk::toTransformMatrixKHR(mat);
 
 		
-		Shaders::Shaders[Shaders::WriteNewChunkVolume]->dispatch(context, 1, 1, 1, sizeof(createConsts), &createConsts, MonoidList(1).bind(ChunkVolumes)->bind(ChunkTlas.GetInstanceBuffer())->render());
-		//VkAccelerationStructureInstanceKHR data{};
+		Shaders::Shaders[Shaders::WriteNewChunkVolume]->dispatch(context, 1, 1, 1, sizeof(createConsts), &createConsts, MonoidList(2).bind(ChunkVolumes)->bind(ChunkTlas.GetInstanceBuffer())->render());
+		
 
-		//ChunkTlas.GetInstanceBuffer()->readBufferData(&data, 0, 64, context);
+		
+		
+	/*	ChunkVolumeGPU data{};
+		ChunkVolumeGPU data2{};
+
+		if(position != ChunkID(0)){
+			ChunkVolumes->readBufferData(&data, 0, sizeof(ChunkVolumeGPU), context);
+			ChunkVolumes->readBufferData(&data2, sizeof(ChunkVolumeGPU), sizeof(ChunkVolumeGPU), context);
+		}*/
 
 		MajorChange = 1;
 	}
@@ -209,6 +208,7 @@ void ChunkManager::UpdateGPUStructure() {
 	if (MajorChange == 1 ) {
 		// Rebuild
 		ChunkTlas.BuildTLAS();
+		MajorChange = 0;
 	}
 }
 

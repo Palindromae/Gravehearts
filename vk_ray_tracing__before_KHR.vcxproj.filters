@@ -55,8 +55,6 @@
     <ClCompile Include="src\stdafx.cpp">
       <Filter>Core\Source</Filter>
     </ClCompile>
-    <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="src\ModelManager.cpp" />
     <ClCompile Include="src\ChunkManager.cpp" />
     <ClCompile Include="src\ChunkInterface.cpp" />
@@ -64,6 +62,8 @@
     <ClCompile Include="shaders\ChunkGPUConst.cpp" />
     <ClCompile Include="src\RenderPassGenerator.cpp" />
     <ClCompile Include="src\ManualRenderPass.cpp" />
+    <ClCompile Include="src\Entity.cpp" />
+    <ClCompile Include="src\EntityManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Projects\nvpro_core\nvp\resources.h">
@@ -107,9 +107,6 @@
     </ClInclude>
     <ClInclude Include="shaders\host_device.h">
       <Filter>Shader Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ChunkConst.h">
-      <Filter>Core\Const</Filter>
     </ClInclude>
     <ClInclude Include="src\ShaderPushConstants.h">
       <Filter>Core\Const</Filter>
@@ -180,17 +177,11 @@
     <ClInclude Include="src\FilePath.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="EntityManager.h">
-      <Filter>Internal\Managers</Filter>
-    </ClInclude>
     <ClInclude Include="src\Tlas.h">
       <Filter>Core\Acceleration Structures</Filter>
     </ClInclude>
     <ClInclude Include="src\ModelManager.h">
       <Filter>Internal\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity.h">
-      <Filter>Internal\Entity</Filter>
     </ClInclude>
     <ClInclude Include="src\EntityGPUStruct.h">
       <Filter>Internal\Entity</Filter>
@@ -227,6 +218,45 @@
     </ClInclude>
     <ClInclude Include="src\ManualRenderPass.h">
       <Filter>Core\Compute Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\ChunkGenerationConst.h">
+      <Filter>Internal\Chunks</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CallbackGPUMemory.h">
+      <Filter>Core\Callback</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics_Component.h">
+      <Filter>Internal\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PhysicsManager.h">
+      <Filter>Internal\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntityManager.h">
+      <Filter>Internal\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThreadStatus.h">
+      <Filter>Core\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics_Partition.h">
+      <Filter>Internal\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics_CubeTraceInfo.h">
+      <Filter>Internal\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntityConst.h">
+      <Filter>Internal\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ChunkConst.h">
+      <Filter>Internal\Chunks</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics_Const.h">
+      <Filter>Internal\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics_RayCollision.h">
+      <Filter>Internal\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics_Collisions.h">
+      <Filter>Internal\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -271,6 +301,15 @@
     </None>
     <None Include="shaders\Inserts\VolumeTracer.glsl">
       <Filter>Shader Sources\Voxels\Raytracer</Filter>
+    </None>
+    <None Include="shaders\Helpers\Simplex.glsl">
+      <Filter>Shader Sources\Noise</Filter>
+    </None>
+    <None Include="shaders\Helpers\Interpolate.glsl">
+      <Filter>Shader Sources\Noise</Filter>
+    </None>
+    <None Include="shaders\Helpers\ChunkIndexing.glsl">
+      <Filter>Shader Sources\Noise</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -354,6 +393,18 @@
     <Filter Include="Shader Sources\Voxels\Chunks">
       <UniqueIdentifier>{b8045f26-1a88-410e-8402-f6ae96b5999a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Sources\Noise">
+      <UniqueIdentifier>{d836736d-b900-4195-a05c-931965ab1b95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Callback">
+      <UniqueIdentifier>{63a7095c-bb4d-434e-9e5e-32de1a858e6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\Physics">
+      <UniqueIdentifier>{88d11a20-1ae6-47f1-89f1-839a1cfea27a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Thread">
+      <UniqueIdentifier>{68ea6dbb-5569-4ad1-9cb0-5d54a9b0c0ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <GLSLShader Include="shaders\raytrace.rchit">
@@ -379,6 +430,12 @@
     </GLSLShader>
     <GLSLShader Include="shaders\UpdateChunkInVolume.comp">
       <Filter>Shader Sources\Voxels\Chunks</Filter>
+    </GLSLShader>
+    <GLSLShader Include="shaders\GenerateHeightmap.comp">
+      <Filter>Shader Sources\Noise</Filter>
+    </GLSLShader>
+    <GLSLShader Include="shaders\Generate3DNoise.comp">
+      <Filter>Shader Sources\Noise</Filter>
     </GLSLShader>
   </ItemGroup>
   <ItemGroup>

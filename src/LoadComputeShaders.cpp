@@ -27,6 +27,7 @@ namespace Shaders{
 		auto SparseSparseBuffer = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::Chunks::MaxVariableMipsForSparseImages},{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0, nve::Chunks::MaxVariableMipsForSparseImages}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
 
 		auto Buffer5 = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
+		auto Buffer6 = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
 		auto Buffer4Image1Buffer = ComputeBuffer::generateBasicDescriptorSet({ {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0},{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,0 }, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 0} });
 
 
@@ -94,9 +95,11 @@ namespace Shaders{
 	/*	loadShader("ChunkNodeAllocator.comp.spv",		   Shaders::ChunkNodeAllocator,           sizeof(ChunkNodeAllocatorConstants),   Buffer5Image1,       device);
 		loadShader("OverworldBrickSetter.comp.spv",		   Shaders::OverworldBrickSetter,         sizeof(OverworldBrickSetterConstants), Buffer4Image1Buffer, device);*/
 		loadShader("CopyListToVoxelBrickIndirect.comp.spv", Shaders::CopyListToVoxelBrickInDirect, sizeof(int),                               Buffer3,      device);
-		loadShader("VoxelBrickMemoryAllocator.comp.spv",    Shaders::VoxelBrickMemoryAllocator,    sizeof(nve::Chunks::TEMP_ALLOCATOR_CONST), Buffer5,      device);
+		loadShader("VoxelBrickMemoryAllocator.comp.spv",    Shaders::VoxelBrickMemoryAllocator,    sizeof(nve::Chunks::TEMP_ALLOCATOR_CONST), Buffer6,      device);
 
 		// Terrain Generation
+		loadShader("GenerateHeightmap.comp.spv", Shaders::GenerateHeightMap, sizeof(glm::ivec3), SingleBuffer, device);
+
 	/*	loadShader("OverworldHeightMap.comp.spv",   Shaders::OverworldHeightMap,    sizeof(OverworldNoiseSetterConstants), BufferBuffer,            device);
 		loadShader("SetOverworld3DNoise.comp.spv",  Shaders::SetOverworld3DNoise,   sizeof(Noise3DStruct),				  BufferBuffer,            device);
 		loadShader("OverworldBlockSetter.comp.spv", Shaders::OverworldBlockSetter,  sizeof(OverworldBlockSetterConstants), BufferBufferSparseImage, device);

@@ -5,6 +5,11 @@
 #include "Chunk.h"
 
 class GenerationCoordinator {
+
+    // Heightmap
+    ComputeBuffer* HeightmapData;
+
+    // Node Setting
 	ComputeBuffer* UnexpandedNodeA;
 	ComputeBuffer* UnexpandedNodeB;
 	ComputeBuffer* IndirectBuffer;

@@ -494,7 +494,7 @@ struct InitialScanData {
 };	
 
 struct ChunkHeader {
-	glm::vec3 position;
+	glm::ivec3 position;
 	UINT32 ptr; // first bit ptr or constant value. 30 bit pointer to data.
 };
 

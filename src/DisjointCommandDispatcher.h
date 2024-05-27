@@ -84,12 +84,18 @@ public:
 
 	void setStagingBuffer(VkDeviceMemory& stagingBufferMemory, VkDeviceSize bufferSize, const void* dataArray);
 
+	void MapMemory(VkDeviceMemory* memory, VkDeviceSize length, void*& data);
+
+	void UnmapMemory(VkDeviceMemory* memory);
+
 	void copyDataToBuffer(VkDeviceMemory bufferMemory, VkDeviceSize bufferSize, VkDeviceSize offset, const void* data);
 
 	void copyDataToBuffer(VkBuffer& stagingBuffer, VkDeviceMemory stagingBufferMemory, VkBuffer& buffer, VkDeviceSize offset, VkDeviceSize bufferSize, nve::ProductionPackage* context = nullptr, VkFence* fence = nullptr);
 
 
 	void copyBufferToBuffer(VkBuffer& src, VkBuffer& dst, uint32_t regions, const VkBufferCopy* copies, nve::ProductionPackage* context = nullptr);
+
+	void CopyMemoryDirect(VkDeviceSize offset, VkDeviceSize bufferSize, void* dataOut, nve::ProductionPackage* context);
 
 
 	void copyDataFromBuffer(VkBuffer& stagingBuffer, VkDeviceMemory stagingBufferMemory, VkBuffer& buffer, VkDeviceSize bufferSize, VkDeviceSize offset, void* dataOut, nve::ProductionPackage* context = nullptr);

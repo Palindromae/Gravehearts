@@ -81,7 +81,7 @@ private:
 };
 
 struct ChunkVolumeGPU {
-	glm::ivec3 pos;
+	glm::ivec4 pos;
 private:
 	int dataPtr[NoChunksPerVolume]; // Not CPU set
 };
