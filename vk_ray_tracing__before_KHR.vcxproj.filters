@@ -240,9 +240,6 @@
     <ClInclude Include="src\Physics_Partition.h">
       <Filter>Internal\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="src\Physics_CubeTraceInfo.h">
-      <Filter>Internal\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="src\EntityConst.h">
       <Filter>Internal\Entity</Filter>
     </ClInclude>
@@ -252,12 +249,11 @@
     <ClInclude Include="src\Physics_Const.h">
       <Filter>Internal\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="src\Physics_RayCollision.h">
-      <Filter>Internal\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="src\Physics_Collisions.h">
       <Filter>Internal\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="shaders\Physics_CubeTraceInfo.h" />
+    <ClInclude Include="shaders\Physics_RayCollision.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\frag_shader.frag">
@@ -405,6 +401,9 @@
     <Filter Include="Core\Thread">
       <UniqueIdentifier>{68ea6dbb-5569-4ad1-9cb0-5d54a9b0c0ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Sources\Physics">
+      <UniqueIdentifier>{bb37f4d9-9710-4488-ac79-d1ed5aefde12}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <GLSLShader Include="shaders\raytrace.rchit">
@@ -436,6 +435,15 @@
     </GLSLShader>
     <GLSLShader Include="shaders\Generate3DNoise.comp">
       <Filter>Shader Sources\Noise</Filter>
+    </GLSLShader>
+    <GLSLShader Include="shaders\CollisionDetectionPairing.comp">
+      <Filter>Shader Sources\Physics</Filter>
+    </GLSLShader>
+    <GLSLShader Include="shaders\CollisionDetectionRefire.comp">
+      <Filter>Shader Sources\Physics</Filter>
+    </GLSLShader>
+    <GLSLShader Include="shaders\InitialCollisionDetectionScatter.comp">
+      <Filter>Shader Sources\Physics</Filter>
     </GLSLShader>
   </ItemGroup>
   <ItemGroup>

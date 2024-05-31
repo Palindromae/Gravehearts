@@ -15,11 +15,14 @@ struct PhysicsRayCollision {
 	int ObjBID; //ID of ObjA is the index
 	vec3 objB_position;
 	float distanceToPosition;
+	vec3 normal;
 };
 
+
+// Temporary storage for one side of a collision. For one sidec collisions store index within the collisions
 struct PhysicsRayCollision_Work {
 	vec3 position;
-	int IDOfHit; //
+	int IDOfHit; 
 	float distanceToPosition;
 	int NoRays;
 };

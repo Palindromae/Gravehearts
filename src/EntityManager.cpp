@@ -81,10 +81,13 @@ EntityGPUStruct* EntityManager::GetDataPtr()
 	return &EntityGPUData[maxPosData++];
 }
 
-EntityGPUStruct* EntityManager::GetEntityArr()
+void EntityManager::GetEntityArr(glm::vec3*& PositionData, glm::vec4*& RotationData)
 {
-	return EntityGPUData;
+	PositionData = this->PositionData;
+	RotationData = this->RotationData;
 }
+
+
 
 void EntityManager::ReturnID(VkAccelerationStructureInstanceKHR* id) {
 	nextPositionInArray.push(id);

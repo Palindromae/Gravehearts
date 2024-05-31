@@ -84,7 +84,7 @@ NodeExpansion ExpandNode(vec3 position, vec3 chunkposition, int quality)
             // retrieve value
             heightmap_value = heightmap_world[ChunkPositionToHeightmapIndex(position,ivec2(x,y))];
 
-            expansion.blockValue = uint(position.y<heightmap_value);
+            expansion.blockValue = uint(position.y+chunkposition.y<heightmap_value);
             // size - minSize makes sure that the highest smallest block is being referenced
             bool isAccepted = (position.y + size - minSize) > heightmap_value;
             isAccepted = isAccepted && (heightmap_value>(0 + position.y));
