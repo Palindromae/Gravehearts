@@ -4,26 +4,30 @@
 #extension GL_EXT_shader_explicit_arithmetic_types_int64 : require
 #extension GL_EXT_shader_atomic_int64 : require
 
-
-#include "Physics_CubeTraceInfo.h"
-#include "Physics_RayCollisions.h"
-#include "ChunkGPUConst.h"
-#include "Helpers/Rays.glsl"
-#include "Helpers/AABB.glsl"
-layout(set = 0, binding = 0)  buffer  tracesN{
-    PhysicsCubeTraceInfo[] traces;
+layout(set = 0, binding = 0)  buffer  velocityN{
+    vec3 velocity;
 };
 
-layout(set = 1, binding = 0)  buffer  collisionsN{
+layout(set = 1, binding = 0)  buffer  colliderN{
+    vec3 colliders;
+};
+
+layout(set = 2, binding = 0)  buffer  activeN{
+    int actives;
+};
+
+layout(set = 2, binding = 0)  buffer  physObjN{
+    PhysicsObject physObj;
+};
+
+layout(set = 3, binding = 0)  buffer  collisionsN{
     PhysicsRayCollision[] collisions;
 };
 
-layout(set = 2, binding = 0)  buffer  rotationN{
-    vec4[] rotations;
-};
 
-layout(set = 3, binding = 0)  buffer  modelsN{
-    vec4[] models;
+layout (push_constant) uniform constant
+{
+    int offset;
 };
 
 shared float HitDistances[64];
@@ -31,14 +35,16 @@ shared vec3 HitPosition[64];
 shared vec3 SelfHitPosition[64];
 
 
+layout (local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
-// shared memory for MAX POSSBILE RAY QUERIES
 void main(){
-    int rayID = int(gl_GlobalInvocationID.x);
 
-    
-    // vec3 rotated_dimensions = traces.dimensions * rotations[objID];
-    
+    // make sure that object is active / under motion befor ground checks
+    int active = gl_WorkGroupID.x;
+    active/=32;
+    if(!(actives[active]>>(gl_WorkGroupID - active*32)) & 1)
+        return;
+
     /// Calculate how many rays total this should emit
     // Assume both support maximum quality voxels.
     vec3 RaysPer = models[A]/vec3(QualityToSize(1));
@@ -97,34 +103,15 @@ void main(){
 
     TracingPackage context = CreateTracingPackage(r);
 
-
-    vec3 hit;
-    if(!hitAABBWithSafety(traces[gl_WorkGroupID.x].positionB, context.inv_ray, r, hit, distanceTravelled))
-        return; // Missed other cube
-
-    if(distanceTravelled>traces[gl_WorkGroupID.x].maxDistance)
-        return;  // Other cubes collider is too far away
-
-    // Trace against self with ray opposite, if ray ever breaks distance to B + distance within self > max distance break and this fail collision query
-    Ray SelfRay = r;
-    SelfRay.direction = -r.direction;
-    RayHit SelfHit;
-    
-    // TODO Introduce a bottom level mask that checks for anything within the lower level. To mimic ray size
+// Raytrace Ground
     if(!RaytraceDistanceLimited(SelfRay, CreateTracingPackage(SelfRay), MODELID, hit,  distanceTravelled, traces[gl_WorkGroupID.x].maxDistance, SelfHit))) // NEEDS ALTERING TO A MODEL TRACER
         return;
 
-    if(distanceTravelled>traces[gl_WorkGroupID.x].maxDistance)
-        return;  // Other cubes collider is too far away
-        
-    // Trace B Model, if ray breaks distance to B + distance within A Model + distance within B Model > max distance break and fail this collision query
-    if(!RaytraceDistanceLimited(r, context, MODELID, hit,  distanceTravelled, traces[gl_WorkGroupID.x].maxDistance, SelfHit))) // NEEDS ALTERING TO A MODEL TRACER
-        return;
+// Raytrace Self
+    if(!RaytraceDistanceLimited(SelfRay, CreateTracingPackage(SelfRay), MODELID, hit,  distanceTravelled, traces[gl_WorkGroupID.x].maxDistance, SelfHit))) // NEEDS ALTERING TO A MODEL TRACER
+            return;
 
-    if(distanceTravelled>traces[gl_WorkGroupID.x].maxDistance)
-        return;  // Other cubes collider is too far away
-
-    HitDistances[rayID] = distanceTravelled;
+             HitDistances[rayID] = distanceTravelled;
 
     barrier();
 
@@ -165,4 +152,5 @@ void main(){
 
 
     }
+
 }

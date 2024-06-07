@@ -275,7 +275,8 @@ class PhysicsManager {
 
 		/// Apply Restraints
 
-
+		// Prevent Ground Collision
+		
 
 		// Find Possible Collisions
 		auto PossibleCollisions = SATCollisionDetection(partitionID);
@@ -340,20 +341,30 @@ class PhysicsManager {
 		
 		// Send out inital rays
 
-		// Pair up Collisions via total ordering of ID
-
-		// Refire remaning unpaired collisions
-		
-		
 		// Resolve Collisions
 
 		PhysicsRayCollision* collisions = (PhysicsRayCollision*)CollisionsCallback->GetMemoryCopy(); //Potentially have a int storing the number of collisions
+	
 		for (size_t i = 0; i < NoActiveEntities; i++)
 		{
-			ResolvePositionAfterCollision(FixedDeltaTime,,,collisions[i].normal,PhysicsComponents[trace_infos[i].ID], trace_infos[i].ID, collisions->objA_position,PhysicsComponents[collisions[i].ObjBID], collisions[i].ObjBID, collisions[i].objB_position, Entity_Position_Updated,Entity_Velocity);
+
+			if(collisions[i].distanceToPosition < collisions[i+NoActiveEntities].distanceToPosition)
+			{
+				if(collisions[i].ObjBID == NoCollision)
+					continue;
+				// Hit ObjB
+				ResolvePositionAfterCollision(FixedDeltaTime,,,collisions[i].normal,PhysicsComponents[trace_infos[i].ID], trace_infos[i].ID, collisions->objA_position,PhysicsComponents[collisions[i].ObjBID], collisions[i].ObjBID, collisions[i].objB_position, Entity_Position_Updated,Entity_Velocity);
+			} else if {
+				// Hit World
+				if(collision[i.distanceToPosition].ObjBID == NoCollision)
+					continue;
+				
+				ResolvePositionAfterCollisionWorld();
+			}
+
 		}
 	
-		
+		// INTEGRATE --- Update Angular Velocity and Velocity 
 		for (size_t i = 0; i < NoActiveEntities; i++)
 		{
 			UpdateVelocity(FixedDeltaTime, trace_infos[i].ID, Entity_Velocity, Entity_Position_Updated, Entity_Position_Past);
@@ -371,7 +382,6 @@ class PhysicsManager {
 		}
 
 
-		// INTEGRATE --- Update Angular Velocity and Velocity 
 
 
 		// Wipe Collisions data
