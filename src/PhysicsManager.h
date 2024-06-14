@@ -1,6 +1,6 @@
 #pragma once
 #include "Physics_Component.h"
-#include "EntityConst.h"
+#include "../shaders/EntityConst.h"
 #include "ThreadStatus.h"
 #include "Physics_Partition.h"
 #include "CallbackGPUMemory.h"
@@ -17,7 +17,10 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include "StoredComputeShaders.h"
 #include "Physics_Collisions.h"
+#include "MonoidList.h"
+#include "ModelManager.h"
 class PhysicsManager {
 	PhysicsComponent* PhysicsComponents{};
 	Entity* PhysicsEntities{};
@@ -25,19 +28,28 @@ class PhysicsManager {
 	std::jthread thread;
 	ThreadStatus status = ThreadStatus::Starting;
 	std::mutex status_mutex{};
+	nve::ProductionPackage* context;
 
 	///////// For SIMD
 
+
+
 	uint32_t* active_masks{};
+	float* inactive_time;
+
 
 	glm::vec3* Entity_Position_Past;
-	glm::quat* Entity_Rotation_Past;
 	glm::vec3* Entity_Position_Updated;
+	glm::vec3* Entity_Velocity;
+	glm::vec3* Entity_Velocity_Past;
+
+	glm::quat* Entity_Rotation_Past;
 	glm::quat* Entity_Rotation_Updated;
 	glm::quat* Entity_Angular_Velocity;
 	glm::quat* Entity_Angular_Velocity_Past;
-	glm::vec3* Entity_Velocity;
-	glm::vec3* Entity_Velocity_Past;
+
+	ComputeBuffer* EntityActiveMasksBuffer;
+
 	//	glm::vec3* Collider_Position_WorldSpace;
 	glm::vec3* Collider_Dimension_WorldSpace;
 
@@ -47,19 +59,27 @@ class PhysicsManager {
 	//////// Collisions
 
 	ComputeBuffer* Collision_Information;
-	ComputeBuffer* RayCollisions_WorkSpace;
 	ComputeBuffer* RayCollisions;
 	CallbackGPUMemory* CollisionsCallback;
 	////////
 	
 	const int ENTITYCHUNK_SIZE = sizeof(int);
+	const int IDLETIME = 5; //Time Taken to become inactive.
+	const float minVelocity = 0.001;
 
 		// Map in place until we add in space partitioning
-	PhysicsPartition partitions[9];
+	PhysicsPartition partitions[8];
 	bool newPhysicsFrame = false;
 
+	int PartitionUIDToIndex(int x, int y, int z) {
+		return x + y * 2 + z * 4;
+	}
+
+
 	int GetPartition(glm::vec3 position) {
-		return 0;
+		position /= PhysicsChunkSize;
+
+		return PartitionUIDToIndex(int(position.x) & 2, int(position.y) & 2, int(position.z) & 2);
 	}
 
 	void main_physics()
@@ -159,42 +179,110 @@ class PhysicsManager {
 		return  i >> 24;               // return just that top byte (after truncating to 32-bit even when int is wider than uint32_t)
 	}
 
+
+	bool SATCollisionAB(const int objI, const int objJ, SATCollision& collisionInfo) {
+		if (!(isEntityActive(objI) || isEntityActive(objJ))) // if either are active then allow the collision. Else neither are moving, skip!
+			return false;
+
+		float maxI = std::max(PhysicsComponents[objI].dimensions.x, PhysicsComponents[objI].dimensions.y, PhysicsComponents[objI].dimensions.z);
+		float maxJ = std::max(PhysicsComponents[objJ].dimensions.x, PhysicsComponents[objJ].dimensions.y, PhysicsComponents[objJ].dimensions.z);
+
+		if (glm::distance2(Entity_Position_Updated[objI], Entity_Position_Updated[objJ]) > (maxI + maxJ) * (maxI + maxJ))
+			return false;
+
+		collisionInfo.A_ID = objI;
+		collisionInfo.B_ID = objJ;
+
+		return SATOptimised(Entity_Position_Updated, Entity_Rotation_Updated, objI, PhysicsComponents[objI].dimensions, objJ, PhysicsComponents[objJ].dimensions, collisionInfo, Entity_Velocity[objI] - Entity_Velocity[objJ]);
+	}
+	 
+
 	std::vector<SATCollision> SATCollisionDetection(int partitionID) {
 
 		std::vector<SATCollision> collisions;
 		auto partition = partitions[partitionID];
-		int i = 0;
-		for (auto it = partitions[partitionID].EntityMap.begin(); it != partition.EntityMap.end(); it++, i++)
+
+		// For each region in this octant
+		for (auto const& [_, val] : partition.EntityMap)
 		{
-			auto jt = partitions[partitionID].EntityMap.begin();
-			for (size_t j = 0; j <= i; j++)
-				jt++; // step up to the current position to ensure a strict order
-
-			for (; jt != partition.EntityMap.end(); jt++)
+			// Step through each possible collision in the region
+			int i = 0;
+			for (auto it = val.begin(); it != val.end(); it++, i++)
 			{
-				auto iobj = it->first;
-				auto jobj = jt->first;
+				auto jt = val.begin();
+				for (size_t j = 0; j <= i; j++)
+					jt++; // step up to the current position to ensure a strict order
 
-				if (!(isEntityActive(iobj) || isEntityActive(jobj))) // if either are active then allow the collision. Else neither are moving, skip!
-					continue;
+				for (; jt != val.end(); jt++)
+				{
+					auto iobj = it->first;
+					auto jobj = jt->first;
 
-
-				SATCollision collision{};
-
-				if (SATOptimised(Entity_Position_Updated, Entity_Rotation_Updated, iobj, PhysicsComponents[iobj].dimensions, jobj, PhysicsComponents[jobj].dimensions, collision, Entity_Velocity[iobj] - Entity_Velocity[jobj])) {
-
-					collision.A_ID = iobj;
-					collision.B_ID = jobj;
+					SATCollision collision{};
+					if (!SATCollisionAB(iobj, jobj, collision))
+						continue;
 
 					collisions.push_back(collision);
 				}
 			}
+
 		}
+	
+		
+		/// For each entity in adjacent regions
+		glm::ivec3 adjkey[8];
+		int adjpartition[8];
+
+
+		for (auto const& [key, val] : partition.EntityMap)
+		{
+			// For each partition region, calculate all offsets
+			int i = 0;
+			for (size_t x = 0; x < 2; x++)
+			{
+				for (size_t y = 0; y < 2; y++)
+				{
+					for (size_t z = 0; z < 2; z++)
+					{
+						adjkey[i] = (key + glm::ivec3(x, y, z)) &2;
+						adjpartition[i] = PartitionUIDToIndex(adjkey[i].x, adjkey[i].y, adjkey[i].z);
+						i++;
+					}
+				}
+			}
+			
+			// For each entity within a region
+			for (auto it = val.begin(); it != val.end(); it++)
+			{
+				for (size_t n = 0; n < 8; n++)
+				{
+					for (const auto& [id, val] : partitions[adjpartition[n]].EntityMap[adjkey[n]])
+					{
+						auto iobj = it->first;
+
+						if (!(isEntityActive(iobj) || isEntityActive(id))) // if either are active then allow the collision. Else neither are moving, skip!
+							continue;
+
+						SATCollision collision{};
+						if (SATCollisionAB(iobj, id, collision))
+							collisions.push_back(collision);
+					
+					}
+				}
+			}
+
+		}
+
+
+
+
+
+		
 
 	}
 
 
-	void ApplyForcesToActiveEntities()
+	void ApplyForcesToActiveEntities(int& NoActiveEntities, int*& ActiveEntities)
 	{
 		std::vector<int> ActiveChunks{};
 		ActiveChunks.reserve(100);
@@ -257,12 +345,13 @@ class PhysicsManager {
 
 	void PhysicsUpdate() {
 		int partitionID = 0;
+		ComputeBuffer* Models;
 		PhysicsPartition* partition = &partitions[partitionID];
 		{
 			glm::vec3* PositionBuffer;
 			glm::quat* RotationBuffer;
 
-			EntityManager::instance->GetEntityArr(PositionBuffer, RotationBuffer);
+			EntityManager::instance->GetEntityArr(PositionBuffer, RotationBuffer, Models);
 
 			memcpy(Entity_Position_Updated, PositionBuffer, sizeof(glm::vec3) * MaxEntities);
 			memcpy(Entity_Rotation_Updated, RotationBuffer, sizeof(glm::vec4) * MaxEntities);
@@ -271,7 +360,10 @@ class PhysicsManager {
 		}
 
 		// Initiate Velocities -- Apply Forces, Apply Current Velocities
-		ApplyForcesToActiveEntities();
+		int* ActiveEntities;
+		int ActiveEntitiesNO;
+
+		ApplyForcesToActiveEntities(ActiveEntitiesNO, ActiveEntities);
 
 		/// Apply Restraints
 
@@ -282,10 +374,10 @@ class PhysicsManager {
 		auto PossibleCollisions = SATCollisionDetection(partitionID);
 
 		// Create Collision Queries
-		std::vector<const SATCollision&> ColliderOnCollider{};
+		std::vector<SATCollision&> ColliderOnCollider{};
 		std::vector<PhysicsCubeTraceInfo> ModelOnX{};
 		int i = 0;
-		for (const auto& PCol : PossibleCollisions)
+		for (auto& PCol : PossibleCollisions)
 		{
 
 			if (PhysicsComponents[PCol.A_ID].collderType == ColliderType::Virtual && PhysicsComponents[PCol.B_ID].collderType == ColliderType::Virtual) { // Colliders are both virtual, so only use the SAT collision
@@ -331,62 +423,119 @@ class PhysicsManager {
 			ModelOnX.push_back(trace);
 			i++;
 		}
-	  
+	
+
+	
 
 
 		// Apply Initial Phyiscs and Send out collision "feelers"
-
+	
 
 		// Solve Collisions
 		
 		// Send out inital rays
 
-		// Resolve Collisions
+		/// Resolve Collisions
+
+		// Resolve Virtual Collisions
+		for (SATCollision& VCol : ColliderOnCollider)
+		{
+			ResolvePositionAfterCollision(FixedDeltaTime, VCol.PointOfContact, VCol.MinimumTranslationVector, glm::normalize(VCol.MinimumTranslationVector), PhysicsComponents[VCol.A_ID], VCol.A_ID, PhysicsComponents[VCol.B_ID], VCol.B_ID, Entity_Position_Updated, Entity_Velocity);
+		}
+
+		DisjointDispatcher->WaitOnOneFenceMax(&context->fence);
 
 		PhysicsRayCollision* collisions = (PhysicsRayCollision*)CollisionsCallback->GetMemoryCopy(); //Potentially have a int storing the number of collisions
-	
-		for (size_t i = 0; i < NoActiveEntities; i++)
-		{
 
-			if(collisions[i].distanceToPosition < collisions[i+NoActiveEntities].distanceToPosition)
-			{
-				if(collisions[i].ObjBID == NoCollision)
-					continue;
+		//for (size_t i = 0; i < ModelOnX.size(); i++)
+		//{
+			// If the ObjB is closer than the world, collide with it
+			//if(collisions[i].distanceToPosition < collisions[i + PossibleCollisions.size()].distanceToPosition)
+			//{
+			//	if(collisions[i].ObjBID == NoCollision)
+		//			continue;
 				// Hit ObjB
-				ResolvePositionAfterCollision(FixedDeltaTime,,,collisions[i].normal,PhysicsComponents[trace_infos[i].ID], trace_infos[i].ID, collisions->objA_position,PhysicsComponents[collisions[i].ObjBID], collisions[i].ObjBID, collisions[i].objB_position, Entity_Position_Updated,Entity_Velocity);
-			} else if {
+			//	ResolvePositionAfterCollision(FixedDeltaTime,,,collisions[i].normal,PhysicsComponents[trace_infos[i].ID], trace_infos[i].ID, collisions->objA_position,PhysicsComponents[collisions[i].ObjBID], collisions[i].ObjBID, collisions[i].objB_position, Entity_Position_Updated,Entity_Velocity);
+		//	}
+		//	else if (collisions[i + PossibleCollisions.size()].ObjBID != NoCollision) {
 				// Hit World
-				if(collision[i.distanceToPosition].ObjBID == NoCollision)
-					continue;
-				
-				ResolvePositionAfterCollisionWorld();
-			}
 
+		//	if (collisions[i].ObjBID == NoCollision)
+		//					continue;
+
+
+		//	}
+
+		//}
+		
+		// Find World Collisions
+		int temp;
+		Shaders::Shaders[Shaders::ObjectWorldCollisionDetection]->dispatch(context, MaxEntities, 1, 1, sizeof(int), &temp, MonoidList(4).bind(EntityManager::instance->EntityVec3Data)->bind(EntityManager::instance->EntityVec4Data)->bind(Models)->bind(ModelManager::instance->modelBuffer)->render(), false);
+
+		for (size_t i = 0; i < ActiveEntitiesNO; i++)
+		{
+			int j = ActiveEntities[i];
+			if (collisions[j].ObjBID == NoCollision)
+					continue;
+
+			ResolvePositionAfterCollision_World(collisions[j], PhysicsComponents[j],j,Entity_Position_Updated, Entity_Velocity);
 		}
+
 	
 		// INTEGRATE --- Update Angular Velocity and Velocity 
-		for (size_t i = 0; i < NoActiveEntities; i++)
+		for (size_t i = 0; i < ActiveEntitiesNO; i++)
 		{
-			UpdateVelocity(FixedDeltaTime, trace_infos[i].ID, Entity_Velocity, Entity_Position_Updated, Entity_Position_Past);
-			UpdateAngularVelocity(FixedDeltaTime, trace_infos[i].ID, Entity_Angular_Velocity, Entity_Rotation_Updated, Entity_Rotation_Past);
+			UpdateVelocity(FixedDeltaTime, ActiveEntities[i], Entity_Velocity, Entity_Position_Updated, Entity_Position_Past);
+			UpdateAngularVelocity(FixedDeltaTime, ActiveEntities[i], Entity_Angular_Velocity, Entity_Rotation_Updated, Entity_Rotation_Past);
 		}
+
+		// Resolve Collision Velocities
 		
-		for (size_t i = 0; i < NoActiveEntities; i++)
+		for (const auto& VCol : ColliderOnCollider)
 		{
-			PhysicsRayCollision collision = collisions[trace_infos[i].ID];
+			ResolveVelocitiesAfterCollision(
+				FixedDeltaTime, VCol.ADist, VCol.PointOfContact,glm::normalize(VCol.MinimumTranslationVector),
+				Entity_Position_Updated, Entity_Rotation_Updated, Entity_Velocity, Entity_Angular_Velocity,
+				Entity_Position_Past, Entity_Rotation_Past, Entity_Velocity_Past, Entity_Angular_Velocity_Past, 
+				PhysicsComponents[VCol.A_ID], VCol.A_ID, PhysicsComponents[VCol.B_ID], VCol.B_ID);
+
+		}
+
+		for (size_t i = 0; i < ActiveEntitiesNO; i++)
+		{
+			int j = ActiveEntities[i];
+
+			PhysicsRayCollision collision = collisions[j];
 
 			if (collision.ObjBID == NoCollision)
 				continue;
-
-			ResolveCollision(trace_infos[i].ID, collision.objA_position, collision.ObjBID, collision.objB_position, collision.distanceToPosition);
+			
+			//ResolveVelocitiesAfterCollision_World
+			ResolveVelocitiesAfterCollision(
+				FixedDeltaTime, collision.distanceToPosition, collision.objA_position, collision.normal,
+				Entity_Position_Updated, Entity_Rotation_Updated, Entity_Velocity, Entity_Angular_Velocity,
+				Entity_Position_Past, Entity_Rotation_Past, Entity_Velocity_Past, Entity_Angular_Velocity_Past,
+				PhysicsComponents[j], j, PhysicsComponents[collision.ObjBID], collision.ObjBID);
 		}
 
+		// Check Activity of Entities
 
+		for (size_t i = 0; i < ActiveEntitiesNO; i++)
+		{
+			inactive_time[ActiveEntities[i]] += int(glm::dot(Entity_Velocity[ActiveEntities[i]], Entity_Velocity[ActiveEntities[i]]) < minVelocity) * FixedDeltaTime;
+
+			int mask = 0;
+			int bump = (ActiveEntities[i] & (ENTITYCHUNK_SIZE - 1));
+			mask |= 1 << bump;
+
+			int entityChunk = ActiveEntities[i] / ENTITYCHUNK_SIZE;
+			active_masks[entityChunk] = (active_masks[entityChunk] & ~mask) | ((inactive_time[ActiveEntities[i]] > IDLETIME)<<bump);
+		}
 
 
 		// Wipe Collisions data
 
-		free(trace_infos);
+		free(ActiveEntities);
 	}
 
 public:
@@ -412,6 +561,7 @@ public:
 			throw new std::exception("you cannot have more than one physics managers running at a time");
 
 		Physics = this;
+		context = new nve::ProductionPackage(QueueType::Graphics);
 
 		PhysicsComponents = (PhysicsComponent*)malloc(sizeof(PhysicsComponent) * MaxEntities);
 		Entity_Position_Updated = (glm::vec3*)malloc(sizeof(glm::vec3) * MaxEntities);
@@ -420,6 +570,7 @@ public:
 		Entity_Angular_Velocity = (glm::quat*)malloc(sizeof(glm::quat) * MaxEntities);
 		Entity_Velocity_Past = (glm::vec3*)malloc(sizeof(glm::vec3) * MaxEntities);
 		Entity_Velocity = (glm::vec3*)malloc(sizeof(glm::vec3) * MaxEntities);
+		inactive_time = (float*)malloc(sizeof(float) * MaxEntities);
 
 
 
@@ -431,8 +582,6 @@ public:
 		auto info_collision_work = ComputeBufferInfo(sizeof(PhysicsRayCollision_Work), MaxEntities*MaxRaysPerFace);
 
 		// Create buffers to work on collisions
-		RayCollisions_WorkSpace = new ComputeBuffer(info_collision_work);
-
 		info.properties |= CallbackGPUMemory::IdealPropertyFlags;
 		Collision_Information = new ComputeBuffer(info_collision);
 
@@ -453,12 +602,14 @@ public:
 	}
 
 	void AddPhysicsObject(Entity* entity){
-		int partitionID = GetPartition(entity->Get_Position());
-		partitions[partitionID].AddEntity(entity);
+		const glm::vec3 pos = entity->Get_Position();
+		int partitionID = GetPartition(pos);
+		partitions[partitionID].AddEntity(entity, pos);
 	}
 
 	void RemovePhysicsObject(Entity* entity) {
+		const glm::vec3 pos = entity->Get_Position();
 		int partitionID = GetPartition(entity->Get_Position());
-		partitions[partitionID].RemoveEntity(entity->ID_Get());
+		partitions[partitionID].RemoveEntity(entity, pos);
 	}
 };

@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "Model.h"
+#include "../shaders/Model.h"
 #include "ComputeBuffer.h"
 #include <nvvk/vulkanhppsupport.hpp>
 
@@ -13,7 +13,7 @@ class ModelManager {
 	std::vector<VkAccelerationStructureKHR> BlasModels{};
 
 public:
-	ComputeBuffer* instanceBuffer{};
+	ComputeBuffer* modelBuffer{};
 	inline static ModelManager* instance{};
 	ModelManager();
 

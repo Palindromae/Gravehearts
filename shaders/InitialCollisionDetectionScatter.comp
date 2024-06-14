@@ -84,6 +84,9 @@ void main(){
 
     vec3 RaysScaling = ptr / (RaysPer / MaxedRaysPer) * models[A];
 
+    // Calculate Per Axii's Size
+
+
     // Rotate to world space
     ptr -= dimensions / 2;
     vec3 rotated_ptr = ptr * rotations[A] + dimensions * rotations[A] / 2;

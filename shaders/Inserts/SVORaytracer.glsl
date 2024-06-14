@@ -292,7 +292,85 @@ bool Raytrace(Ray ray, const TracingPackage info, uint volume, uint chunkptr, ou
     }
 }
 
+
+
 ///// DISTANCE TRACER ////////////////////////////////////////
+
+
+bool RaytraceDistanceLimited_ConeTrace_World(Ray ray, const TracingPackage info, const int RaySize, uint volume, uint chunkptr, inout float currentDistance, const float maxDistance, out RayHit hit){
+
+   // ChunkHeader header = ChunkHeaders[volume];
+
+
+    if (ChunkHeaders[volume].ptrs[chunkptr] == MAXUINT)
+        return false;
+
+         
+    if (GPUMemory[ChunkHeaders[volume].ptrs[chunkptr]].mask == 0)
+        return false;
+
+
+    vec3 position = hitAABB((ChunkHeaders[volume].position + GetHeaderOffset(chunkptr))* chunk_dimensions, info.inv_dir, ray);
+    position += ray.direction * 1/64.0;
+
+
+    int current_quality_level = MaxQuality;
+
+
+   // float scale = minimumResolution >> 2; // div 4
+    
+    SetSVOPosition(position);
+    // Stagger the SVOPosition for later merging
+    SVOPosition.y = SVOPosition.y << 2;
+    SVOPosition.z = SVOPosition.z << 4;
+
+    ptr_stack[current_quality_level] = ChunkHeaders[volume].ptrs[chunkptr];
+    SetPtr(current_quality_level);
+    
+
+    
+    hit.position = position;
+
+    
+    const uint64_t mask = GetMask(current_childPtr, info.s_dir);
+
+
+    if((GPUMemory[ChunkHeaders[volume].ptrs[chunkptr]].mask & mask) == 0)
+        return false;
+
+    int n = 0;
+    while (true){
+
+        uint voxel = GetVoxelAtPosition(position, current_quality_level);
+        if (voxel > 0){
+
+            if(any(greaterThanEqual(position,chunk_dimensions)) || any(lessThan(position,vec3(0))) ){
+                return false;
+            }
+
+            position += (ChunkHeaders[volume].position + GetHeaderOffset(chunkptr)) * chunk_dimensions;
+            hit._distance = distance(position,ray.position);
+            //hit.position = vec3(0,1,n);
+            hit.position = position;
+            hit.blockID = voxel;
+            return true;
+        }
+
+        if(StepGetDistance(mask, info.inv_dir, ray.direction, info.s_dir, info.s01, position, current_quality_level, dist)){
+             hit.position = vec3(0,1,n);
+             return  false;
+        }
+        
+        currentDistance += dist;
+
+        if(dist> maxDistance)
+            return false;
+
+        n++;
+    }
+}
+
+
 
 bool RaytraceDistanceLimited(Ray ray, const TracingPackage info, uint volume, uint chunkptr, vec3 position, inout float currentDistance, const float maxDistance, out RayHit hit){
 
@@ -367,3 +445,4 @@ bool RaytraceDistanceLimited(Ray ray, const TracingPackage info, uint volume, ui
         n++;
     }
 }
+

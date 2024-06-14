@@ -73,6 +73,8 @@ namespace Shaders
 		ZeroOutBuffer,
 		ZeroOutImage,
 
+		// Physics
+		ObjectWorldCollisionDetection,
 
 		END
 	};

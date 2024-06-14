@@ -3,19 +3,22 @@
 #include <nvvk/raytraceKHR_vk.hpp>
 #include "EntityManager.h"
 #include <glm/gtc/matrix_transform.hpp>
-#include "EntityGPUStruct.h"
-#include "PhysicsComponent.h"
+#include "Physics_Component.h"
 class Entity
 {
 	VkAccelerationStructureInstanceKHR* data{}; // Pointer into array
-	EntityGPUStruct* gpu_vars;
-	glm::vec4 rotation{ };
+
+	// Data
+	int dataptr;
+	glm::vec3* position;
+	glm::quat* rotation;
+	int* model;
 	glm::vec3 scale{};
 
 	int EntityID = -1;
 
 public:
-	Entity(glm::vec3 pos, int model, glm::vec4 rotation = glm::vec4(0), glm::vec3 scale = glm::vec3(1), PhysicsComponent physics_component = {});
+	Entity(glm::vec3 pos, int model, glm::quat rotation = glm::quat(), glm::vec3 scale = glm::vec3(1), PhysicsComponent physics_component = {});
 
 	void SetPhysicsComponent(PhysicsComponent component);
 
@@ -29,9 +32,9 @@ public:
 	// ROTATION
 
 
-	void Rotate(glm::vec4 rotate);
-	void SetRotation(glm::vec4 rotation);
-	glm::vec3 Get_Rotation();
+	void Rotate(glm::quat rotate);
+	void SetRotation(glm::quat rotation);
+	glm::quat Get_Rotation();
 
 	//SCALE
 

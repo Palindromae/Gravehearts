@@ -29,6 +29,9 @@ struct SATCollision {
     float timeToTarget{};
     int A_ID;
     int B_ID;
+
+    // To Be filled in during position resolution
+    glm::vec3 PointOfContact;
 };
 
 glm::vec3 FindMinTranslationVector(glm::vec3 vector, glm::vec3 minimumVector, const float BorderProject, const float VelocityProject, const float CurrentSeperatingDistance, float& MinSeperatingDistance, const bool currentSeperation,  float& timeToTarget)
@@ -279,15 +282,13 @@ void ApplyForce(float deltaTime, glm::vec3 force, const uint32_t ID, glm::vec3* 
 	VelocityBuffer[ID] += force * deltaTime;
 }
 
-bool ResolvePositionAfterCollision(const float deltaTime, glm::vec3& contact_point, const glm::vec3 ABDeltaPositionResolution, const glm::vec3 normal, const PhysicsComponent& objA, const uint32_t objA_id, const glm::vec3 objA_position_collisionPoint, const PhysicsComponent& objB, const uint32_t objB_id, const glm::vec3 objB_position_collisionPoint, glm::vec3* PositionBuffer, glm::vec3* VelocityBuffer) {
+bool ResolvePositionAfterCollision(const float deltaTime, glm::vec3& contact_point, const glm::vec3 ABDeltaPositionResolution, const glm::vec3 normal, const PhysicsComponent& objA, const uint32_t objA_id, const PhysicsComponent& objB, const uint32_t objB_id, glm::vec3* PositionBuffer, glm::vec3* VelocityBuffer) {
 
 	glm::vec3 delta_velocity = (VelocityBuffer[objB_id] - VelocityBuffer[objA_id]) * deltaTime;
 
 
-	if (CollisionPoint(deltaTime, delta_velocity, objA_position_collisionPoint, VelocityBuffer[objA_id], objB_position_collisionPoint, contact_point))
+	if (CollisionPoint(deltaTime, delta_velocity, PositionBuffer[objA_id], VelocityBuffer[objA_id], PositionBuffer[objB_id], contact_point))
 		return;
-
-	
 
 	float w_sum = objA.inverse_mass + objB.inverse_mass;
 
@@ -296,14 +297,17 @@ bool ResolvePositionAfterCollision(const float deltaTime, glm::vec3& contact_poi
 
 }
 
+
+bool ResolvePositionAfterCollision_World(const PhysicsRayCollision collision, const PhysicsComponent& objA, const uint32_t objA_id, glm::vec3* PositionBuffer, glm::vec3* VelocityBuffer) {
+    PositionBuffer[objA_id] += glm::normalize(VelocityBuffer[objA_id])* collision.distanceToPosition;
+}
+
+
 void ResolveVelocitiesAfterCollision(const float deltaTime, float distanceToPosition, glm::vec3 contact_point, glm::vec3 normal,
 	glm::vec3* PositionBuffer, glm::quat* RotationBuffer, glm::vec3* VelocityBuffer, glm::quat* AngularVelocityBuffer, 
 	glm::vec3* PositionBuffer_Past, glm::quat* RotationBuffer_Past, glm::vec3* VelocityBuffer_Past, glm::quat* AngularVelocityBuffer_Past,
-	const PhysicsComponent& objA, uint32_t objA_id, glm::vec3 objA_position_collisionPoint,
-	const PhysicsComponent& objB, uint32_t objB_id, glm::vec3 objB_collisionPoint) {
-
-
-
+	const PhysicsComponent& objA, uint32_t objA_id,
+	const PhysicsComponent& objB, uint32_t objB_id) {
 
 	/// PRESENT CLOSING VELOCITIES
 	glm::vec3 A_rotation_arm = (contact_point - (objA.CentreOfRotation + PositionBuffer[objA_id]));
@@ -385,6 +389,75 @@ void ResolveVelocitiesAfterCollision(const float deltaTime, float distanceToPosi
 	
 
 }
+
+
+void ResolveVelocitiesAfterCollision_World(const float deltaTime, float distanceToPosition, glm::vec3 contact_point, glm::vec3 normal,
+    glm::vec3* PositionBuffer, glm::quat* RotationBuffer, glm::vec3* VelocityBuffer, glm::quat* AngularVelocityBuffer,
+    glm::vec3* PositionBuffer_Past, glm::quat* RotationBuffer_Past, glm::vec3* VelocityBuffer_Past, glm::quat* AngularVelocityBuffer_Past,
+    const PhysicsComponent& objA, uint32_t objA_id, glm::vec3 objA_position_collisionPoint) {
+
+    /// PRESENT CLOSING VELOCITIES
+    glm::vec3 A_rotation_arm = (contact_point - (objA.CentreOfRotation + PositionBuffer[objA_id]));
+    glm::vec3 A_closing_velocity = ClosingVelocity(VelocityBuffer[objA_id], AngularVelocityBuffer[objA_id], A_rotation_arm);
+
+    /// PAST CLOSING VELOCITIES
+    glm::vec3 A_rotation_arm_past = (contact_point - (objA.CentreOfRotation + PositionBuffer_Past[objA_id]));
+    glm::vec3 A_closing_velocity_past = ClosingVelocity(VelocityBuffer_Past[objA_id], AngularVelocityBuffer_Past[objA_id], A_rotation_arm_past);
+
+    // RELATIVES VELOCITIES FOR BOTH TIMEFRAMES
+    glm::vec3 velocity_relative = A_closing_velocity;
+    glm::vec3 past_velocity_relative = A_closing_velocity_past;
+
+    float Normal_Velocity = glm::dot(velocity_relative, normal);
+    float Normal_PreVelocity = glm::dot(past_velocity_relative, normal);
+
+    // TANGENTS
+    glm::vec3 A_Tangent = glm::cross(A_rotation_arm, normal);
+
+    // AUGMENTS
+    float Augmentation = glm::dot(A_Tangent, A_Tangent) * objA.MomentOfInertia;
+
+    // SOLVE VARIABLES
+    float restitution = 0;
+    float w_sum = objA.inverse_mass;
+    float restitution_vel = -restitution * Normal_PreVelocity;
+    float j = (-Normal_Velocity + restitution_vel) / (w_sum + Augmentation);
+
+    // RESOLVE
+    glm::vec3 Velocity_Impulse = normal * j;
+
+    // RESOLVE VELOCITY
+    VelocityBuffer[objA_id] += Velocity_Impulse * objA.inverse_mass;
+
+    // RESOLVE ANGULAR VELOCITY
+    AngularVelocityBuffer[objA_id] *= objA.InverseInertia * glm::cross(Velocity_Impulse, A_rotation_arm);
+
+    /// FRICTION
+
+    // TANGENTS
+    glm::vec3 Tangent = velocity_relative - Normal_Velocity * normal;
+    glm::vec3 A_Frictional_Tangent = glm::cross(A_rotation_arm, Tangent);
+
+    // AUGMENTS
+    float Augment_T = glm::dot(A_Frictional_Tangent, A_Frictional_Tangent) * objA.MomentOfInertia;
+
+    // CALCULATE FRICTION
+    float frictionCoefficient = glm::dot(velocity_relative, A_Tangent); // Could be wrong
+    float jt = (-frictionCoefficient) / (w_sum + Augment_T);
+
+    float friction = (objA.StaticFriction + WorldStaticFriction) * .5;
+    if (jt > j * friction)
+        friction = (objA.DynamicFriction + WorldDynamicFriction) * .5;
+
+    glm::vec3 FrictionImpulse = friction * jt * Tangent;
+
+    // RESOLVE FRICTIONAL VELOCITY
+    VelocityBuffer[objA_id] += FrictionImpulse * objA.inverse_mass;
+
+    // RESOLVE FRICTIONAL ANGULAR VELOCITY
+    AngularVelocityBuffer[objA_id] *= objA.InverseInertia * glm::cross(FrictionImpulse, A_rotation_arm);
+}
+
 //float frictionFraction = glm::dot(delta_velocity, normal);
 //
 //ApplyForce(frictionFraction, delta_velocity, objA_id, VelocityBuffer);

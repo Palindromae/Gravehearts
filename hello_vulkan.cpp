@@ -150,7 +150,7 @@ void HelloVulkan::updateDescriptorSet()
    VkDescriptorBufferInfo dbiEntityDesc{EntityManager::instance->EntityData_Buffer->buffer, 0, VK_WHOLE_SIZE};
   writes.emplace_back(m_descSetLayoutBind.makeWrite(m_descSet, SceneBindings::eEntities, &dbiEntityDesc));
 
-   VkDescriptorBufferInfo dbiModelDesc{ModelManager::instance->instanceBuffer->buffer, 0, VK_WHOLE_SIZE};
+   VkDescriptorBufferInfo dbiModelDesc{ModelManager::instance->modelBuffer->buffer, 0, VK_WHOLE_SIZE};
   writes.emplace_back(m_descSetLayoutBind.makeWrite(m_descSet, SceneBindings::eModels, &dbiModelDesc));
 
   // All texture samplers

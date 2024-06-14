@@ -1,6 +1,6 @@
 #include "EntityManager.h"
 #include "ModelManager.h"
-#include "EntityConst.h"
+#include "../shaders/EntityConst.h"
 #include <exception>
 
 EntityManager::EntityManager(int MaxEntities) : EntityCount(MaxEntities) {
@@ -10,7 +10,9 @@ EntityManager::EntityManager(int MaxEntities) : EntityCount(MaxEntities) {
 	instance = this;
 
 	EntityData = (VkAccelerationStructureInstanceKHR*)malloc(sizeof(VkAccelerationStructureInstanceKHR) * MaxEntities);
-	EntityGPUData = (EntityGPUStruct*)malloc(sizeof(EntityGPUStruct) * MaxEntities);
+
+	EntityVec3Data = new ComputeBuffer(ComputeBufferInfo(sizeof(glm::vec3),EntityCount * EntityVec3::END));
+	EntityVec4Data = new ComputeBuffer(ComputeBufferInfo(sizeof(glm::vec4),EntityCount * EntityVec4::END));
 
 	VkAccelerationStructureInstanceKHR null_instance{};
 	null_instance.flags = 0x00;
@@ -31,8 +33,6 @@ EntityManager::EntityManager(int MaxEntities) : EntityCount(MaxEntities) {
 	EntityTlas.setup();
 	EntityTlas.SetupInstanceBuffer(MaxEntities);
 	EntityInstance_Buffer = EntityTlas.GetInstanceBuffer();
-
-	EntityData_Buffer = new ComputeBuffer(ComputeBufferInfo(sizeof(EntityGPUStruct), MaxEntities));
 }
 
 
@@ -65,26 +65,34 @@ VkAccelerationStructureInstanceKHR* EntityManager::GetID(int& no) {
 	no = maxPos;
 	return &EntityData[maxPos++];
 }
-EntityGPUStruct* EntityManager::GetDataPtr()
+int EntityManager::GetDataPtr(glm::vec3*& position, glm::quat*& rotation, int*& model)
 {
+	int counter;
 	if (nextEntityGPUPos.size() > 0)
 	{
-		EntityGPUStruct* counter = nextEntityGPUPos.front();
+		counter = nextEntityGPUPos.front();
 		nextEntityGPUPos.pop();
 
-		return counter;
+	} else {
+
+		if (maxPosData == MaxEntities)
+			throw new std::exception("Ran out of entities");
+	
+		counter = maxPosData++;
 	}
 
-	if (maxPosData == MaxEntities)
-		throw new std::exception("Ran out of entities");
+	position = &PositionData[counter];
+	rotation = &rotation[counter];
+	model = &model[counter];
 
-	return &EntityGPUData[maxPosData++];
+	return counter;
 }
 
-void EntityManager::GetEntityArr(glm::vec3*& PositionData, glm::vec4*& RotationData)
+void EntityManager::GetEntityArr(glm::vec3*& PositionData, glm::quat*& RotationData, ComputeBuffer*& Models)
 {
 	PositionData = this->PositionData;
 	RotationData = this->RotationData;
+	Models = this->EntityModel_Buffer;
 }
 
 
@@ -93,7 +101,7 @@ void EntityManager::ReturnID(VkAccelerationStructureInstanceKHR* id) {
 	nextPositionInArray.push(id);
 }
 
-void EntityManager::ReturnGPUData(EntityGPUStruct* data)
+void EntityManager::ReturnGPUData(int data)
 {
 	nextEntityGPUPos.push(data);
 }

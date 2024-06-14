@@ -1,12 +1,13 @@
 #include "Entity.h"
 #include "PhysicsManager.h"
 
-Entity::Entity(glm::vec3 pos, int model, glm::vec4 rotation, glm::vec3 scale, PhysicsComponent physics_component) : rotation(rotation), scale(scale) {
+Entity::Entity(glm::vec3 pos, int model, glm::quat rotation, glm::vec3 scale, PhysicsComponent physics_component) : scale(scale) {
 	data = EntityManager::instance->GetID(EntityID);
-	gpu_vars = EntityManager::instance->GetDataPtr();
+	dataptr = EntityManager::instance->GetDataPtr(position,this->rotation,this->model);
 
-	gpu_vars->position = pos;
-	gpu_vars->model = model;
+	*position = pos;
+	*this->model = model;
+	*this->rotation = rotation;
 
 	SetTRS();
 
@@ -24,7 +25,7 @@ void Entity::SetTRS() {
 	//glm::mat4 translate_scale = glm::mat4{ { scale.x,0,0,pos.x },{ 0,scale.y, 0, pos.y },{ 0, 0, scale.z, pos.z },{ 0, 0, 0, 1 } };
 
 
-	glm::mat4 mat = glm::translate(glm::mat4(1), gpu_vars->position);
+	glm::mat4 mat = glm::translate(glm::mat4(1), *position);
 	//mat = mat * glm::rotate(glm::mat4(1), 1.0f, glm::vec3(0));
 	//mat = mat * glm::scale(glm::mat4(1), scale);
 	data->transform = nvvk::toTransformMatrixKHR(mat);
@@ -36,7 +37,7 @@ void Entity::SetTRS() {
 
 void Entity::Translate(glm::vec3 translate)
 {
-	gpu_vars->position += translate;
+	*position += translate;
 
 	SetTRS();
 
@@ -44,29 +45,29 @@ void Entity::Translate(glm::vec3 translate)
 
 void Entity::SetPosition(glm::vec3 position) {
 
-	gpu_vars->position = position;
+	*this->position = position;
 
 	SetTRS();
 }
 
 glm::vec3 Entity::Get_Position() {
-	return gpu_vars->position;
+	return *position;
 }
 
-void Entity::Rotate(glm::vec4 rotate) {
-	rotation *= rotate;
+void Entity::Rotate(glm::quat rotate) {
+	*rotation *= rotate;
 
 	SetTRS();
 }
 
-void Entity::SetRotation(glm::vec4 rotation) {
-	this->rotation = rotation;
+void Entity::SetRotation(glm::quat rotation) {
+	*this->rotation = rotation;
 
 	SetTRS();
 }
 
-glm::vec3 Entity::Get_Rotation() {
-	return rotation;
+glm::quat Entity::Get_Rotation() {
+	return *rotation;
 }
 
 void Entity::Scale(glm::vec3 scale) {

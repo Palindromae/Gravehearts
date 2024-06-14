@@ -3,9 +3,9 @@
 #include "nvh/fileoperations.hpp"
 #include "nvvk/buffers_vk.hpp"
 #include <obj_loader.h>
-#include "AABBDef.h"
-#include "EntityManager.h"
+#include "shaders/AABBDef.h"
 #include "src/ChunkInterface.h"
+#include "src/EntityManager.h"
 
 void Raytrace::setup(const VkDevice& device, const VkPhysicalDevice& physicalDevice, nvvk::ResourceAllocator* allocator, uint32_t queueFamily)
 {

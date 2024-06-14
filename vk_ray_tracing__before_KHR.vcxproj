@@ -306,10 +306,9 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <ClInclude Include="Raytrace.h" />
     <ClInclude Include="shaders\ChunkGenerationConst.h" />
     <ClInclude Include="shaders\ChunkGPUConst.h" />
-    <GLSLShader Include="shaders\CollisionDetectionRefire.comp">
-      <FileType>Document</FileType>
-    </GLSLShader>
+    <ClInclude Include="shaders\EntityConst.h" />
     <ClInclude Include="shaders\IndirectWorkGroups.h" />
+    <ClInclude Include="shaders\Model.h" />
     <ClInclude Include="shaders\Physics_CubeTraceInfo.h" />
     <ClInclude Include="shaders\Physics_RayCollision.h" />
     <ClInclude Include="shaders\VoxelBrick.h" />
@@ -326,14 +325,11 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <ClInclude Include="src\DescriptiveObject.h" />
     <ClInclude Include="src\DisjointCommandDispatcher.h" />
     <ClInclude Include="src\DistanceCalculation.h" />
-    <ClInclude Include="src\EntityConst.h" />
-    <ClInclude Include="src\EntityGPUStruct.h" />
     <ClInclude Include="src\EntityManager.h" />
     <ClInclude Include="src\FilePath.h" />
     <ClInclude Include="src\GenerationCoordinator.h" />
     <ClInclude Include="src\LoadComputeShaders.h" />
     <ClInclude Include="src\ManualRenderPass.h" />
-    <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\ModelManager.h" />
     <ClInclude Include="src\MonoidList.h" />
     <ClInclude Include="src\nveQueues.h" />
@@ -358,9 +354,6 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <ClInclude Include="src\ThreadStatus.h" />
     <ClInclude Include="src\Tlas.h" />
     <ClInclude Include="src\trace.h" />
-    <GLSLShader Include="shaders\CollisionDetectionPairing.comp">
-      <FileType>Document</FileType>
-    </GLSLShader>
     <None Include="shaders\frag_shader.frag" />
     <None Include="shaders\Helpers\ChunkHeaders.glsl" />
     <None Include="shaders\Helpers\ChunkIndexing.glsl" />
@@ -391,6 +384,7 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <GLSLShader Include="shaders\CopyListToVoxelBrickIndirect.comp" />
     <GLSLShader Include="shaders\Generate3DNoise.comp" />
     <GLSLShader Include="shaders\GenerateHeightmap.comp" />
+    <GLSLShader Include="shaders\ObjectWorldCollisionDetection.comp" />
     <GLSLShader Include="shaders\UpdateChunkInVolume.comp" />
     <GLSLShader Include="shaders\WriteNewChunkVolume.comp">
       <FileType>Document</FileType>

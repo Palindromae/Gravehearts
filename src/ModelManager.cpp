@@ -26,9 +26,9 @@ ModelManager::ModelManager() {
 	buffer_info.usage |= VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT
 		| VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
 	buffer_info.memoryCreateFlags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT;
-	instanceBuffer = new ComputeBuffer(buffer_info);
+	modelBuffer = new ComputeBuffer(buffer_info);
 
-	instanceBuffer->setBufferData(StaticModels.data(), 0, StaticModels.size(), context, &context->fence);
+	modelBuffer->setBufferData(StaticModels.data(), 0, StaticModels.size(), context, &context->fence);
 
 	BuildModelBLAS();
 }
@@ -52,7 +52,7 @@ void ModelManager::BuildModelBLAS()
 	{
 		VkBufferDeviceAddressInfo b_info{};
 		b_info.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
-		b_info.buffer = instanceBuffer->buffer;
+		b_info.buffer = modelBuffer->buffer;
 		VkAccelerationStructureGeometryAabbsDataKHR aabbsData{};
 		aabbsData.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_AABBS_DATA_KHR;
 		aabbsData.data.deviceAddress = CommandDispatcher->GetBufferDeviceAddress(b_info);

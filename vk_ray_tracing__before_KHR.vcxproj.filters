@@ -183,12 +183,6 @@
     <ClInclude Include="src\ModelManager.h">
       <Filter>Internal\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="src\EntityGPUStruct.h">
-      <Filter>Internal\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Model.h">
-      <Filter>Internal\Entity</Filter>
-    </ClInclude>
     <ClInclude Include="src\ChunkVolume.h">
       <Filter>Internal\Chunks</Filter>
     </ClInclude>
@@ -240,9 +234,6 @@
     <ClInclude Include="src\Physics_Partition.h">
       <Filter>Internal\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="src\EntityConst.h">
-      <Filter>Internal\Entity</Filter>
-    </ClInclude>
     <ClInclude Include="src\ChunkConst.h">
       <Filter>Internal\Chunks</Filter>
     </ClInclude>
@@ -254,6 +245,12 @@
     </ClInclude>
     <ClInclude Include="shaders\Physics_CubeTraceInfo.h" />
     <ClInclude Include="shaders\Physics_RayCollision.h" />
+    <ClInclude Include="shaders\Model.h">
+      <Filter>Internal\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\EntityConst.h">
+      <Filter>Internal\Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\frag_shader.frag">
@@ -436,13 +433,10 @@
     <GLSLShader Include="shaders\Generate3DNoise.comp">
       <Filter>Shader Sources\Noise</Filter>
     </GLSLShader>
-    <GLSLShader Include="shaders\CollisionDetectionPairing.comp">
-      <Filter>Shader Sources\Physics</Filter>
-    </GLSLShader>
-    <GLSLShader Include="shaders\CollisionDetectionRefire.comp">
-      <Filter>Shader Sources\Physics</Filter>
-    </GLSLShader>
     <GLSLShader Include="shaders\InitialCollisionDetectionScatter.comp">
+      <Filter>Shader Sources\Physics</Filter>
+    </GLSLShader>
+    <GLSLShader Include="shaders\ObjectWorldCollisionDetection.comp">
       <Filter>Shader Sources\Physics</Filter>
     </GLSLShader>
   </ItemGroup>

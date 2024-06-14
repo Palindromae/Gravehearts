@@ -2,13 +2,14 @@
 #include "ComputeBuffer.h"
 #include "ProductionPackage.h"
 #include "Tlas.h"
-#include "EntityGPUStruct.h"
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <queue>
 #include <vulkan/vulkan_core.h>
 #include <corecrt_malloc.h>
 #include <exception>
+
+
 class EntityManager {
 
 	int EntityCount;
@@ -16,20 +17,25 @@ class EntityManager {
 	//EntityGPUStruct* EntityGPUData{};
 	
 	std::queue<VkAccelerationStructureInstanceKHR*> nextPositionInArray{};
-	std::queue<EntityGPUStruct*> nextEntityGPUPos{};
+	std::queue<int> nextEntityGPUPos{};
 	int maxPos{};
 	int maxPosData{};
 	nve::ProductionPackage* context{};
 	ComputeBuffer* EntityInstance_Buffer{};
+	ComputeBuffer* EntityModel_Buffer{};
 
 ////// Entity Spacial Data /////////////////////
 	glm::vec3* PositionData;
 	glm::quat* RotationData;
 	int* ModelData;
+
+
 ///// 
 public:
 	static inline EntityManager* instance{};
-	ComputeBuffer* EntityData_Buffer{};
+
+	ComputeBuffer* EntityVec3Data;
+	ComputeBuffer* EntityVec4Data;
 
 	Tlas EntityTlas{};
 
@@ -45,12 +51,11 @@ public:
 
 	VkAccelerationStructureInstanceKHR* GetID(int& no);
 
-	EntityGPUStruct* GetDataPtr();
+	int GetDataPtr(glm::vec3*& position, glm::quat*& rotation, int*& model);
 
-	void GetEntityArr(glm::vec3*& PositionData, glm::quat*& RotationData);
-
+	void GetEntityArr(glm::vec3*& PositionData, glm::quat*& RotationData, ComputeBuffer*& Models);
 	void ReturnID(VkAccelerationStructureInstanceKHR* id);
-	void ReturnGPUData(EntityGPUStruct* data);
+	void ReturnGPUData(int data);
 
 	~EntityManager();
 
