@@ -48,8 +48,8 @@
 #include "src/Physics_Const.h"
 #include "src/CurrentEntityTLSData.h"
 #include <iostream>
-#include "src/PhysicsManager.h"
-
+#include "src/PhysicsInterface.h"
+#include "shaders/EntityConst.h"
 
 //////////////////////////////////////////////////////////////////////////
 #define UNUSED(x) (void)(x)
@@ -330,7 +330,7 @@ int main(int argc, char** argv)
 
 
 
-  bool interpolate;
+  bool interpolate = true;
 
   float time = 0;
 
@@ -381,7 +381,7 @@ int main(int argc, char** argv)
           // Expect the previous frame to have finished
 
           // Do a physics step
-          PhysicsManager::Physics->InitiateNewPhysicsUpdate(true);
+          PhysicsInterface::Physics->InitiateNewPhysicsUpdate(true);
 
           accumulatedTime -= FixedDeltaTime;
           if (accumulatedTime >= FixedDeltaTime)
@@ -393,9 +393,9 @@ int main(int argc, char** argv)
 
       // INTERPOLATE between current time and previous time
       if (interpolate)
-          TLS::InterpolatedFrame->Interpolate(TLS::PreviousInterpolationFrame, PhysicsManager::Physics->GetCurrentDefinedPhysicsFrame(), accumulatedTime / FixedDeltaTime);
+          TLS::InterpolatedFrame->Interpolate(TLS::PreviousInterpolationFrame, PhysicsInterface::Physics->GetCurrentDefinedPhysicsFrame(), accumulatedTime / FixedDeltaTime);
       else
-          TLS::InterpolatedFrame->Interpolate(TLS::PreviousInterpolationFrame, PhysicsManager::Physics->GetCurrentDefinedPhysicsFrame(), 1);
+          TLS::InterpolatedFrame->Interpolate(TLS::PreviousInterpolationFrame, PhysicsInterface::Physics->GetCurrentDefinedPhysicsFrame(), 1);
 
       /// GAME LOGIC
 

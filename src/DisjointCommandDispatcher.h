@@ -196,8 +196,6 @@ public:
 
 	void DestroyShaderModule(VkShaderModule& shaderModule);
 
-	void CreateDescriptorSetLayout(const VkDescriptorSetLayoutCreateInfo& info, VkDescriptorSetLayout& layout);
-
 	void CreatePipelineLayout(const VkPipelineLayoutCreateInfo& info, VkPipelineLayout& layout);
 
 	void CreateRaytracingPipeline(const VkRayTracingPipelineCreateInfoKHR& info, VkPipeline& pipeline);

@@ -23,7 +23,7 @@ Position_PastFrame = 0,
 Position_NextFrame = 1,  // Current frame that Physics is calculating
 Velocity_PastFrame = 2,
 Velocity_NextFrame = 3,   
-END
+ENDPhysicsVec3 = 5
 END_BINDING();
 
 START_BINDING(PhysicsVec4)
@@ -31,15 +31,15 @@ Rotation_PresentFrame = 0,
 Rotation_NextFrame = 1,    
 AngularVelocity_PresentFrame = 2,   
 AngularVelocity_NextFrame = 3,   
-END
+ENDPhysicsVec4 = 4
 END_BINDING();
 
 START_BINDING(EntityVec3)
 Position_Interpolated = 0,
-END
+ENDEnitityVec3 = 1
 END_BINDING();
 
 START_BINDING(EntityVec4)
-Rotation_Interpolated,
-END
+Rotation_Interpolated = 0,
+ENDEnitityVec4 = 1
 END_BINDING();

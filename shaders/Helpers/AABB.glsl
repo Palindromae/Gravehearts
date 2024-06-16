@@ -19,8 +19,9 @@ vec3 hitAABB(vec3 chunkPosition, vec3 invDir, const Ray r)
 
 bool hitAABBWithSafety(vec3 chunkPosition, vec3 invDir, const Ray r, out vec3 hit, out float dist)
 {
-  if(all(lessThan(r.position, chunkPosition + chunk_dimensions)) && all(greaterThan(r.position, chunkPosition))){
-   return r.position - chunkPosition;
+  if(all(lessThan(r.position, chunkPosition + chunk_dimensions)) && all(greaterThan(r.position, chunkPosition))){ // Is ray within the cube
+   hit = r.position - chunkPosition;
+   return true;
   }
 
   vec3  diff   = chunkPosition - r.position;

@@ -22,7 +22,6 @@ class EntityManager {
 	int maxPosData{};
 	nve::ProductionPackage* context{};
 	ComputeBuffer* EntityInstance_Buffer{};
-	ComputeBuffer* EntityModel_Buffer{};
 
 ////// Unique Entity Data /////////////////////
 	int* ModelData;
@@ -32,6 +31,7 @@ public:
 
 	ComputeBuffer* EntityVec3Data;
 	ComputeBuffer* EntityVec4Data;
+	ComputeBuffer* EntityModel_Buffer{};
 
 	Tlas EntityTlas{};
 

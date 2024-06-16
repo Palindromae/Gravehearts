@@ -20,7 +20,7 @@ public:
 
     void setup(bool ShouldBuildDescriptiveObject = true) {
         context = new nve::ProductionPackage(QueueType::Graphics);
-        this->ShouldBuildDescriptiveObject = BuildDescriptiveObject;
+        this->ShouldBuildDescriptiveObject = ShouldBuildDescriptiveObject;
     }
 
     void SetupInstanceBuffer(int instances) {

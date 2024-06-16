@@ -53,7 +53,7 @@ struct PhysicsComponent
 	}
 
 	// Create a component using all programmatically defined values. This should be set on a the model being used
-	PhysicsComponent(glm::vec3 origin, glm::vec3 dimension, float mass = 1, uint32_t mask = 0xff) :  dimension(dimension), mask(mask), mass(mass){
+	PhysicsComponent(glm::vec3 origin, glm::vec3 dimension, float mass = 1, uint32_t mask = 0xff) :  dimensions(dimension), mask(mask), mass(mass){
 		inverse_mass = (mass != 0) ? 1 / mass : 0;
 		CentreOfRotation = dimension / glm::vec3(2.0); // assume that the CoM is in the middle. 
 	}

@@ -2,9 +2,11 @@
 #ifdef __cplusplus
 #pragma once
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 // GLSL Type
 using vec3 = glm::vec3;
-using vec4 = glm::quat;
+using vec4 = glm::vec4;
 using ivec3 = glm::ivec3;
 using uint = unsigned int;
 #endif

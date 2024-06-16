@@ -36,7 +36,7 @@
 #include "nvvk/renderpasses_vk.hpp"
 #include "nvvk/shaders_vk.hpp"
 #include "nvvk/buffers_vk.hpp"
-#include "EntityManager.h"
+#include "src/EntityManager.h"
 #include "src/ModelManager.h"
 
 extern std::vector<std::string> defaultSearchPaths;
@@ -120,7 +120,15 @@ void HelloVulkan::createDescriptorSetLayout()
   m_descSetLayoutBind.addBinding(SceneBindings::eTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, nbTxt,
                                  VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR);
 
-  m_descSetLayoutBind.addBinding(SceneBindings::eEntities, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
+  m_descSetLayoutBind.addBinding(SceneBindings::eEntitiesVec3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
+                                 VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_INTERSECTION_BIT_KHR
+                                     | VK_SHADER_STAGE_ANY_HIT_BIT_KHR);
+
+  m_descSetLayoutBind.addBinding(SceneBindings::eEntitiesVec4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
+                                 VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_INTERSECTION_BIT_KHR
+                                     | VK_SHADER_STAGE_ANY_HIT_BIT_KHR);
+  
+  m_descSetLayoutBind.addBinding(SceneBindings::eEntitiesModels, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1,
                                  VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_INTERSECTION_BIT_KHR
                                      | VK_SHADER_STAGE_ANY_HIT_BIT_KHR);
 
@@ -147,8 +155,14 @@ void HelloVulkan::updateDescriptorSet()
   VkDescriptorBufferInfo dbiSceneDesc{m_bObjDesc.buffer, 0, VK_WHOLE_SIZE};
   writes.emplace_back(m_descSetLayoutBind.makeWrite(m_descSet, SceneBindings::eObjDescs, &dbiSceneDesc));
 
-   VkDescriptorBufferInfo dbiEntityDesc{EntityManager::instance->EntityData_Buffer->buffer, 0, VK_WHOLE_SIZE};
-  writes.emplace_back(m_descSetLayoutBind.makeWrite(m_descSet, SceneBindings::eEntities, &dbiEntityDesc));
+   VkDescriptorBufferInfo dbi3EntityDesc{EntityManager::instance->EntityVec3Data->buffer, 0, VK_WHOLE_SIZE};
+  writes.emplace_back(m_descSetLayoutBind.makeWrite(m_descSet, SceneBindings::eEntitiesVec3, &dbi3EntityDesc));
+
+   VkDescriptorBufferInfo dbi4EntityDesc{EntityManager::instance->EntityVec4Data->buffer, 0, VK_WHOLE_SIZE};
+  writes.emplace_back(m_descSetLayoutBind.makeWrite(m_descSet, SceneBindings::eEntitiesVec4, &dbi4EntityDesc));
+
+   VkDescriptorBufferInfo dbiMEntityDesc{EntityManager::instance->EntityModel_Buffer->buffer, 0, VK_WHOLE_SIZE};
+  writes.emplace_back(m_descSetLayoutBind.makeWrite(m_descSet, SceneBindings::eEntitiesModels, &dbiMEntityDesc));
 
    VkDescriptorBufferInfo dbiModelDesc{ModelManager::instance->modelBuffer->buffer, 0, VK_WHOLE_SIZE};
   writes.emplace_back(m_descSetLayoutBind.makeWrite(m_descSet, SceneBindings::eModels, &dbiModelDesc));

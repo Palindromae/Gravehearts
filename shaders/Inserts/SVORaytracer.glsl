@@ -4,7 +4,6 @@
 // #include Helpers/RayMasks.glsl
 // #include ChunkGPUConst.h
 // ChunkHeaders (ChunkHeader)  ChunkHeader[] ChunkHeaders;
-// VoxelBrick[] GPUMemory
 //  uint ptr_stack[MaxQuality+1]
 
 // X is starts at bit 0
@@ -310,7 +309,7 @@ bool RaytraceDistanceLimited_ConeTrace_World(Ray ray, const TracingPackage info,
         return false;
 
 
-    vec3 position = hitAABB((ChunkHeaders[volume].position + GetHeaderOffset(chunkptr))* chunk_dimensions, info.inv_dir, ray);
+    vec3 position = hitAABB((ChunkHeaders[volume].position + GetHeaderOffset(chunkptr)) * chunk_dimensions, info.inv_dir, ray);
     position += ray.direction * 1/64.0;
 
 
@@ -338,6 +337,7 @@ bool RaytraceDistanceLimited_ConeTrace_World(Ray ray, const TracingPackage info,
     if((GPUMemory[ChunkHeaders[volume].ptrs[chunkptr]].mask & mask) == 0)
         return false;
 
+    float dist;
     int n = 0;
     while (true){
 

@@ -27,17 +27,31 @@
 
 #include "raycommon.glsl"
 #include "wavefront.glsl"
+#include "EntityConst.h"
+#include "Model.h"
 
 struct Ray
 {
   vec3 origin;
   vec3 direction;
 };
-layout(set = 1, binding = eEntities, scalar) buffer allEntities_
+layout(set = 1, binding = eEntitiesVec3, scalar) buffer allEntitiesVec3_
 {
-  Entity i[];
+  vec3 i[];
 }
-allEntities;
+allEntitiesVec3;
+
+layout(set = 1, binding = eEntitiesVec4, scalar) buffer allEntitiesVec4_
+{
+  vec3 i[];
+}
+allEntitiesVec4;
+
+layout(set = 1, binding = eEntitiesModels, scalar) buffer allEntitiesModels_
+{
+  int i[];
+}
+allEntitiesModels;
 
 layout(set = 1, binding = eModels, scalar) buffer allModel_
 {
@@ -73,16 +87,17 @@ void main()
     reportIntersectionEXT(1,1);
 return;
 //gl_PrimitiveID for sub geometry
-    Entity entity = allEntities.i[gl_InstanceCustomIndexEXT];
-    Model impl = allModels.i[entity.model];
+    int model = allEntitiesModels.i[gl_InstanceCustomIndexEXT];
+    Model impl = allModels.i[model];
       Ray ray;
   ray.origin    = gl_WorldRayOriginEXT;
   ray.direction = gl_WorldRayDirectionEXT;
 
     Sphere sphere;
-    sphere.center = (impl.AABB.MAX + impl.AABB.MIN) * 0.5;
-    sphere.radius = impl.AABB.MAX.y - sphere.center.y;
-    sphere.center += entity.position;
+ //   sphere.center = (impl.AABB.MAX + impl.AABB.MIN) * 0.5;
+    sphere.radius = impl.aabbdef.minimum.y - impl.aabbdef.maximum.y;
+    sphere.radius = 5;
+    sphere.center = allEntitiesVec3.i[gl_InstanceCustomIndexEXT + MaxEntities * Position_Interpolated];
     // Sphere intersection
    float tHit = hitSphere(sphere, ray);
   attribs = vec3(sphere.center/20.0);

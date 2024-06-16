@@ -1036,10 +1036,6 @@ void DisjointCommandDispatcher::DestroyShaderModule(VkShaderModule& shaderModule
 	vkDestroyShaderModule(*device, shaderModule, nullptr);
 }		
 
-void DisjointCommandDispatcher::CreateDescriptorSetLayout(const VkDescriptorSetLayoutCreateInfo& info, VkDescriptorSetLayout& layout) {
-	if (vkCreateDescriptorSetLayout(*device, &info, nullptr, &layout) != VK_SUCCESS)
-		throw std::runtime_error("failed to create descriptor set layout!");
-}
 void DisjointCommandDispatcher::CreatePipelineLayout(const VkPipelineLayoutCreateInfo& info, VkPipelineLayout& layout) {
 	if (vkCreatePipelineLayout(*device, &info, nullptr, &layout) != VK_SUCCESS)
 		throw std::runtime_error("failed to create pipeline layout!");

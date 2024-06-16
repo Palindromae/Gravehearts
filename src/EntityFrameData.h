@@ -3,6 +3,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include "Physics_Const.h"
+#include "../shaders/EntityConst.h"
 struct EntityFrameData {
 	
 	// Position

@@ -12,8 +12,8 @@ EntityManager::EntityManager(int MaxEntities) : EntityCount(MaxEntities) {
 
 	EntityData = (VkAccelerationStructureInstanceKHR*)malloc(sizeof(VkAccelerationStructureInstanceKHR) * MaxEntities);
 
-	EntityVec3Data = new ComputeBuffer(ComputeBufferInfo(sizeof(glm::vec3),EntityCount * EntityVec3::END));
-	EntityVec4Data = new ComputeBuffer(ComputeBufferInfo(sizeof(glm::vec4),EntityCount * EntityVec4::END));
+	EntityVec3Data = new ComputeBuffer(ComputeBufferInfo(sizeof(glm::vec3),EntityCount * EntityVec3::ENDEnitityVec3));
+	EntityVec4Data = new ComputeBuffer(ComputeBufferInfo(sizeof(glm::vec4),EntityCount * EntityVec4::ENDEnitityVec4));
 
 	VkAccelerationStructureInstanceKHR null_instance{};
 	null_instance.flags = 0x00;

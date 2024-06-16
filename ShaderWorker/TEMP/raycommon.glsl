@@ -42,12 +42,6 @@ struct aabb {
 	vec3 MAX;
 };
 
-struct Model{
-	aabb AABB;
-	int DataPtr;
-	int Custom;
-
-};
 
 struct Entity{
 	vec3 position;

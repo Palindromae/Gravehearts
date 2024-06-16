@@ -14,7 +14,7 @@ class ChunkManager {
 
 	int CurrentPtrMax = 0;
 	std::queue<int> reusePTR{};
-	inline static int maxVolumes = ceil(3125000.0 / NoChunksPerVolume);
+	inline static int maxVolumes = static_cast<int>(ceil(3125000.0 / NoChunksPerVolume));
 
 	std::unordered_map<ChunkID, ChunkVolume*> ChunkVolume_Map{};
 

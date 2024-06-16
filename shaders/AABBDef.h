@@ -9,6 +9,12 @@ using uint = unsigned int;
 
 struct AABBDef
 {
+#ifdef __cplusplus
 	vec3 minimum{0, 0, 0};  // Aabb
 	vec3 maximum{0, 0, 0};  // Aabb
+#else
+	// GLSL definition without defaults
+	vec3 minimum; 
+	vec3 maximum;
+#endif
 };

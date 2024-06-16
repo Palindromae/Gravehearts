@@ -1,5 +1,5 @@
 #include "ChunkManager.h"
-#include "../AABBDef.h"
+#include "../shaders/AABBDef.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "ModelManager.h"
 

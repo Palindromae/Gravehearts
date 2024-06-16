@@ -64,6 +64,12 @@
     <ClCompile Include="src\ManualRenderPass.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\EntityManager.cpp" />
+    <ClCompile Include="src\PhysicsManager.cpp" />
+    <ClCompile Include="src\PhysicsInterface.cpp" />
+    <ClCompile Include="src\Physics_Collisions.cpp" />
+    <ClCompile Include="src\CurrentEntityTLSData.cpp">
+      <Filter>Internal\EntityData</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Projects\nvpro_core\nvp\resources.h">
@@ -260,6 +266,9 @@
     <ClInclude Include="shaders\AABBDef.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="src\PhysicsInterface.h">
+      <Filter>Internal\Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\frag_shader.frag">
@@ -451,12 +460,6 @@
     <GLSLShader Include="shaders\Generate3DNoise.comp">
       <Filter>Shader Sources\Noise</Filter>
     </GLSLShader>
-    <GLSLShader Include="shaders\InitialCollisionDetectionScatter.comp">
-      <Filter>Shader Sources\Physics</Filter>
-    </GLSLShader>
-    <GLSLShader Include="shaders\ObjectWorldCollisionDetection.comp">
-      <Filter>Shader Sources\Physics</Filter>
-    </GLSLShader>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />
@@ -467,6 +470,9 @@
     </IGLSLShader>
     <IGLSLShader Include="shaders\ChunkTrace.rint">
       <Filter>Shader Sources\Voxels\Chunks</Filter>
+    </IGLSLShader>
+    <IGLSLShader Include="shaders\ObjectWorldCollisionDetection.comp">
+      <Filter>Shader Sources\Physics</Filter>
     </IGLSLShader>
   </ItemGroup>
 </Project>
