@@ -96,9 +96,6 @@
     <ClInclude Include="Raytrace.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="AABBDef.h">
-      <Filter>Common</Filter>
-    </ClInclude>
     <ClInclude Include="ObjStruct.h">
       <Filter>Common</Filter>
     </ClInclude>
@@ -260,6 +257,9 @@
     <ClInclude Include="src\CurrentEntityTLSData.h">
       <Filter>Internal\EntityData</Filter>
     </ClInclude>
+    <ClInclude Include="shaders\AABBDef.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\frag_shader.frag">
@@ -315,6 +315,9 @@
     </None>
     <None Include="shaders\Helpers\CollisionConst.glsl">
       <Filter>Shader Sources\Physics</Filter>
+    </None>
+    <None Include="shaders\Helpers\AABB.glsl">
+      <Filter>Shader Headers\Helpers</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

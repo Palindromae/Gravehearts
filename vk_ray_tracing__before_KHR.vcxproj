@@ -299,11 +299,11 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <ClCompile Include="src\SingleTimeCommands.cpp" />
     <ClCompile Include="src\SpareFences.cpp" />
     <ClCompile Include="src\stdafx.cpp" />
-    <ClInclude Include="AABBDef.h" />
     <ClInclude Include="D:\Projects\nvpro_core\nvp\resources.h" />
     <ClInclude Include="hello_vulkan.h" />
     <ClInclude Include="ObjStruct.h" />
     <ClInclude Include="Raytrace.h" />
+    <ClInclude Include="shaders\AABBDef.h" />
     <ClInclude Include="shaders\ChunkGenerationConst.h" />
     <ClInclude Include="shaders\ChunkGPUConst.h" />
     <ClInclude Include="shaders\EntityConst.h" />
@@ -358,6 +358,7 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <ClInclude Include="src\Tlas.h" />
     <ClInclude Include="src\trace.h" />
     <None Include="shaders\frag_shader.frag" />
+    <None Include="shaders\Helpers\AABB.glsl" />
     <None Include="shaders\Helpers\ChunkHeaders.glsl" />
     <None Include="shaders\Helpers\ChunkIndexing.glsl" />
     <None Include="shaders\Helpers\CollisionConst.glsl" />

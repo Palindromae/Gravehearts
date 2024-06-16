@@ -6,7 +6,6 @@
 
 
 #include "Physics_CubeTraceInfo.h"
-#include "Physics_RayCollisions.h"
 #include "ChunkGPUConst.h"
 #include "Helpers/Rays.glsl"
 #include "Helpers/AABB.glsl"
@@ -35,7 +34,7 @@ shared vec3 SelfHitPosition[64];
 // shared memory for MAX POSSBILE RAY QUERIES
 void main(){
     int rayID = int(gl_GlobalInvocationID.x);
-
+/*
     
     // vec3 rotated_dimensions = traces.dimensions * rotations[objID];
     
@@ -168,4 +167,5 @@ void main(){
 
 
     }
+    */
 }
