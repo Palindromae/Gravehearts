@@ -95,7 +95,6 @@ void PhysicsManager::PhysicsUpdate() {
 	}
 
 
-	PhysicsRayCollision* collisions = (PhysicsRayCollision*)CollisionsCallback->GetMemoryCopy(); //Potentially have a int storing the number of collisions
 
 	//for (size_t i = 0; i < ModelOnX.size(); i++)
 	//{
@@ -125,6 +124,7 @@ void PhysicsManager::PhysicsUpdate() {
 	int temp;
 	Shaders::Shaders[Shaders::ObjectWorldCollisionDetection]->dispatch(context, MaxEntities, 1, 1, sizeof(int), &temp, MonoidList(4).bind(PhysicsVec3Data)->bind(PhysicsVec3Data)->bind(EntityActiveMasksBuffer)->bind(Models)->bind(ModelManager::instance->modelBuffer)->bind(ChunkTlas)->render());
 	//DisjointDispatcher->WaitOnOneFenceMax(&context->fence);
+	PhysicsRayCollision* collisions = (PhysicsRayCollision*)CollisionsCallback->GetMemoryCopy(); //Potentially have a int storing the number of collisions
 
 	for (size_t i = 0; i < ActiveEntitiesNO; i++)
 	{

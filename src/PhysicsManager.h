@@ -60,7 +60,7 @@ private:
 	ComputeBuffer* EntityActiveMasksBuffer;
 
 	//	glm::vec3* Collider_Position_WorldSpace;
-	glm::vec3* Collider_Dimension_WorldSpace;
+	//  glm::vec3* Collider_Dimension_WorldSpace;
 
 	///////
 	//	glm::vec3* WorldPositionsToWork;
@@ -72,7 +72,8 @@ private:
 	CallbackGPUMemory* CollisionsCallback;
 	////////
 	
-	const int ENTITYCHUNK_SIZE = sizeof(int);
+	const int ENTITYCHUNK_SIZE = sizeof(uint32_t);
+	const int MAXENTITY_MASKS = MaxEntities / ENTITYCHUNK_SIZE;
 	const int IDLETIME = 5; //Time Taken to become inactive.
 	const float minVelocity = 0.001;
 
@@ -145,21 +146,6 @@ private:
 		CollisionArea += areaTemp.x + areaTemp.y;
 
 		return CollisionArea;
-	}
-
-	void UpdateEntityChunk(int i) {
-
-		for (size_t j = 0; j < ENTITYCHUNK_SIZE; j++)
-		{
-			//Collider_Position_WorldSpace [i + j] = PhysicsEntities[j + i].Get_Position();
-			Collider_Dimension_WorldSpace[i + j] = PhysicsEntities[j + i].Get_Rotation() * PhysicsComponents[j + i].dimensions;
-		}
-
-		/*	for (size_t j = 0; j < 32; j++)
-			{
-				WorldPositionsToWork[j] = PhysicsEntities[j + i].Get_Position() + PhysicsComponents[j + i].origin;
-				WorldDimensionsToWork[j] = PhysicsEntities[j + i].Get_Rotation() + PhysicsComponents[j + i].dimension;
-			}*/
 	}
 
 	void ApplyGravity(float deltaTime, int ID) {
@@ -302,7 +288,7 @@ private:
 				continue;
 
 			NoActiveEntities += numberOfSetBits(active_masks[i]);
-			UpdateEntityChunk(j);
+			//UpdateEntityChunk(j);
 
 
 			ActiveChunks.push_back(i);
@@ -379,24 +365,23 @@ public:
 
 		PhysicsComponents = (PhysicsComponent*)malloc(sizeof(PhysicsComponent) * MaxEntities);
 		inactive_time = (float*)malloc(sizeof(float) * MaxEntities);
+		active_masks = (uint32_t*)malloc(sizeof(uint32_t) * MAXENTITY_MASKS);
 
 		PhysicsVec3Data = new ComputeBuffer(ComputeBufferInfo(sizeof(vec3), MaxEntities * PhysicsVec3::ENDPhysicsVec3));
-		PhysicsVec3Data = new ComputeBuffer(ComputeBufferInfo(sizeof(vec4), MaxEntities * PhysicsVec4::ENDPhysicsVec4));
-
+		PhysicsVec4Data = new ComputeBuffer(ComputeBufferInfo(sizeof(vec4), MaxEntities * PhysicsVec4::ENDPhysicsVec4));
+		EntityActiveMasksBuffer = new ComputeBuffer(ComputeBufferInfo(ENTITYCHUNK_SIZE, MAXENTITY_MASKS));
 
 		auto info = ComputeBufferInfo(sizeof(PhysicsCubeTraceInfo), MaxEntities);
 	//	info.properties |= CallbackGPUMemory::IdealPropertyFlags;
 		Collision_Information = new ComputeBuffer(info);
 		
 		auto info_collision = ComputeBufferInfo(sizeof(PhysicsRayCollision), MaxEntities*MaxRaysPerFace);
-		auto info_collision_work = ComputeBufferInfo(sizeof(PhysicsRayCollision_Work), MaxEntities*MaxRaysPerFace);
 
 		// Create buffers to work on collisions
-		info.properties |= CallbackGPUMemory::IdealPropertyFlags;
-		Collision_Information = new ComputeBuffer(info_collision);
+		info_collision.properties |= CallbackGPUMemory::IdealPropertyFlags;
+		RayCollisions = new ComputeBuffer(info_collision);
 
-		CollisionsCallback = new CallbackGPUMemory(&Collision_Information->memory, Collision_Information->info.length);
-
+		CollisionsCallback = new CallbackGPUMemory(&RayCollisions->memory, RayCollisions->info.length);
 	}
 
 	void InitiateNewPhysicsUpdate(bool WaitTilLastPhysicsEnded);

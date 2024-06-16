@@ -296,7 +296,6 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <ClCompile Include="src\nveQueues.cpp" />
     <ClCompile Include="src\PhysicsInterface.cpp" />
     <ClCompile Include="src\PhysicsManager.cpp" />
-    <ClCompile Include="src\Physics_Collisions.cpp" />
     <ClCompile Include="src\ProductionPackage.cpp" />
     <ClCompile Include="src\QueueFamilyIndices.cpp" />
     <ClCompile Include="src\RenderPassGenerator.cpp" />

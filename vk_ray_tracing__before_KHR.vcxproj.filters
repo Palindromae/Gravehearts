@@ -66,7 +66,6 @@
     <ClCompile Include="src\EntityManager.cpp" />
     <ClCompile Include="src\PhysicsManager.cpp" />
     <ClCompile Include="src\PhysicsInterface.cpp" />
-    <ClCompile Include="src\Physics_Collisions.cpp" />
     <ClCompile Include="src\CurrentEntityTLSData.cpp">
       <Filter>Internal\EntityData</Filter>
     </ClCompile>
