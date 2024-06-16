@@ -12,10 +12,9 @@ public:
 private:
 	PhysicsManager* Manager;
 
-	PhysicsInterface();
 
 public:
-
+	PhysicsInterface();
 	void AddPhysicsObject(Entity* entity);
 	void RemovePhysicsObject(Entity* entity);
 	EntityFrameData* GetCurrentDefinedPhysicsFrame();

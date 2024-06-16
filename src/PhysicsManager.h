@@ -375,10 +375,10 @@ public:
 	//	info.properties |= CallbackGPUMemory::IdealPropertyFlags;
 		Collision_Information = new ComputeBuffer(info);
 		
-		auto info_collision = ComputeBufferInfo(sizeof(PhysicsRayCollision), MaxEntities*MaxRaysPerFace);
+		auto info_collision = ComputeBufferInfo(sizeof(PhysicsRayCollision), MaxEntities);
 
 		// Create buffers to work on collisions
-		info_collision.properties |= CallbackGPUMemory::IdealPropertyFlags;
+		info_collision.properties = CallbackGPUMemory::IdealPropertyFlags;
 		RayCollisions = new ComputeBuffer(info_collision);
 
 		CollisionsCallback = new CallbackGPUMemory(&RayCollisions->memory, RayCollisions->info.length);

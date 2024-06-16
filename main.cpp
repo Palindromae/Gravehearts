@@ -131,9 +131,6 @@ void Render()
             helloVk.rasterize(cmdBuf);
             vkCmdEndRenderPass(cmdBuf);
         }
-
-
-
     }
 
 
@@ -279,6 +276,7 @@ int main(int argc, char** argv)
   Shaders::LoadComputeShaders::LoadComputeShaders(&vkctx.m_device);
 
 
+  new PhysicsInterface();
   new ModelManager();
   new EntityManager(5);
   Entity* entity2 = new Entity(glm::vec3(0), 0);
@@ -315,20 +313,11 @@ int main(int argc, char** argv)
   helloVk.createPostPipeline();
   helloVk.updatePostDescriptorSet();
 
-
-
-    // #VKRay
+  // #VKRay
   helloVk.initRayTracing();
-
-
-
-
 
   helloVk.setupGlfwCallbacks(window);
   ImGui_ImplGlfw_InitForVulkan(window, true);
-
-
-
 
   bool interpolate = true;
 
@@ -351,11 +340,11 @@ int main(int argc, char** argv)
       // Show UI window.
       if (helloVk.showGui())
       {
-
           bool changed = false;
 
           changed |= ImGui::ColorEdit3("Clear color", reinterpret_cast<float*>(&clearColor));
           changed |= ImGui::Checkbox("Ray Tracer mode", &useRaytracer);  // Switch between raster and ray tracing
+          changed |= ImGui::Checkbox("Interpolate", &interpolate);  // Allow physics interpolation
           //  if(changed)
              // helloVk.resetFrame();
 
@@ -365,8 +354,6 @@ int main(int argc, char** argv)
           ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
           ImGuiH::Control::Info("", "", "(F10) Toggle Pane", ImGuiH::Control::Flags::Disabled);
           ImGuiH::Panel::End();
-
-
       }
 
       const auto now = std::chrono::high_resolution_clock::now();

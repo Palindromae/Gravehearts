@@ -6,7 +6,7 @@ using vec3 = glm::vec3;
 using ivec3 = glm::ivec3;
 using uint = unsigned int;
 #endif
-const int MaxEntities = 1200;
+const int MaxEntities = 1216; // Must be a multiple of 32 or the mask
 
 
 // clang-format off

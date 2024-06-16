@@ -11,9 +11,11 @@ EntityManager::EntityManager(int MaxEntities) : EntityCount(MaxEntities) {
 	instance = this;
 
 	EntityData = (VkAccelerationStructureInstanceKHR*)malloc(sizeof(VkAccelerationStructureInstanceKHR) * MaxEntities);
+	ModelData = (int*)malloc(sizeof(int) * MaxEntities);
 
 	EntityVec3Data = new ComputeBuffer(ComputeBufferInfo(sizeof(glm::vec3),EntityCount * EntityVec3::ENDEnitityVec3));
 	EntityVec4Data = new ComputeBuffer(ComputeBufferInfo(sizeof(glm::vec4),EntityCount * EntityVec4::ENDEnitityVec4));
+	EntityModel_Buffer = new ComputeBuffer(ComputeBufferInfo(sizeof(int),EntityCount));
 
 	VkAccelerationStructureInstanceKHR null_instance{};
 	null_instance.flags = 0x00;
@@ -97,7 +99,7 @@ int EntityManager::GetDataPtr(glm::vec3*& position, glm::quat*& rotation, int*& 
 
 	position = &TLS::InterpolatedFrame->PositionBuffer[counter];
 	rotation = &TLS::InterpolatedFrame->RotationBuffer[counter];
-	model = &model[counter];
+	model = &ModelData[counter];
 
 	return counter;
 }
