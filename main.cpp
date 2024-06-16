@@ -381,7 +381,7 @@ int main(int argc, char** argv)
           // Expect the previous frame to have finished
 
           // Do a physics step
-          PhysicsManager::Physics->InitiateNewPhysicsUpdate(false);
+          PhysicsManager::Physics->InitiateNewPhysicsUpdate(true);
 
           accumulatedTime -= FixedDeltaTime;
           if (accumulatedTime >= FixedDeltaTime)

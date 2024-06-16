@@ -2,7 +2,7 @@
 #include <vulkan/vulkan_core.h>
 #include "ComputeBuffer.h"
 #include <nvvk/vulkanhppsupport.hpp>
-class Tlas {
+class Tlas : DescriptiveObject{
 
 	ComputeBuffer* instanceBuffer{};
 	ComputeBuffer* accelerationBuffer{};
@@ -11,10 +11,16 @@ class Tlas {
     nvvk::Buffer TlasBuffer;
     nve::ProductionPackage* context{};
 
-public:
+    bool ShouldBuildDescriptiveObject = false;
+    bool IsDescriptiveObjectBuilt = false;
+    nvvk::DescriptorSetBindings setLayoutBind;
 
-    void setup() {
+public:
+    VkAccelerationStructureKHR acceleration_structure{};
+
+    void setup(bool ShouldBuildDescriptiveObject = true) {
         context = new nve::ProductionPackage(QueueType::Graphics);
+        this->ShouldBuildDescriptiveObject = BuildDescriptiveObject;
     }
 
     void SetupInstanceBuffer(int instances) {
@@ -42,7 +48,53 @@ public:
         instanceBuffer->setBufferData(data, 0, instanceBuffer->info.length, context, &context->fence);
     }
 
-    VkAccelerationStructureKHR acceleration_structure{};
+    void updateDescriptorSet()
+    {
+        VkAccelerationStructureKHR tlas = acceleration_structure;
+
+        VkWriteDescriptorSetAccelerationStructureKHR descASInfo{ VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR };
+        descASInfo.accelerationStructureCount = 1;
+        descASInfo.pAccelerationStructures = &tlas;
+
+
+        VkWriteDescriptorSet  was = setLayoutBind.makeWrite(set, 0, &descASInfo);
+
+        std::vector<VkWriteDescriptorSet> writes{};
+        CommandDispatcher->updateDescriptorSets(1, &was, 0);
+    }
+
+    void BuildDescriptiveObject() {
+
+        if (IsDescriptiveObjectBuilt)
+        {
+            updateDescriptorSet();
+        }
+
+        setLayoutBind.addBinding(0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1,
+            VK_SHADER_STAGE_COMPUTE_BIT);  // TLAS
+
+
+        pool = DisjointDispatcher->CreateDescriptorPool(setLayoutBind);
+        layout = DisjointDispatcher->CreateDescriptorSetLayout(setLayoutBind);
+
+        VkDescriptorSetAllocateInfo allocateInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
+        allocateInfo.descriptorPool = pool;
+        allocateInfo.descriptorSetCount = 1;
+        allocateInfo.pSetLayouts = &layout;
+        CommandDispatcher->createDescriptorSets(allocateInfo, set);
+
+        VkWriteDescriptorSetAccelerationStructureKHR descASInfo{ VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR };
+        descASInfo.accelerationStructureCount = 1;
+        descASInfo.pAccelerationStructures = &acceleration_structure;
+
+
+        auto write = setLayoutBind.makeWrite(set, 0, &descASInfo);
+
+        CommandDispatcher->updateDescriptorSets(1, &write, 0);
+        IsDescriptiveObjectBuilt = true;
+    }
+
+
     void BuildTLAS()
     {
 
@@ -120,6 +172,14 @@ public:
 
         CommandDispatcher->m_alloc->destroy(ScrapMemory);
 
+        if (ShouldBuildDescriptiveObject)
+            BuildDescriptiveObject();
+
     }
+
+
+   
+
+
  
 };

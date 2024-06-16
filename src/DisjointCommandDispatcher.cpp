@@ -149,7 +149,7 @@ void DisjointCommandDispatcher::createFence(VkFence* fence, VkFenceCreateFlagBit
 	vkCreateFence(*device, &info, nullptr, fence);
 }
 
-void DisjointCommandDispatcher::createDescriptorPool(VkDescriptorPoolCreateInfo& poolInfo, VkDescriptorPool& pool) {
+void DisjointCommandDispatcher::CreateDescriptorPool(VkDescriptorPoolCreateInfo& poolInfo, VkDescriptorPool& pool) {
 	if (vkCreateDescriptorPool(*device, &poolInfo, nullptr, &pool) != VK_SUCCESS)
 		throw std::runtime_error("failed to create descriptor pool");
 }
@@ -169,7 +169,7 @@ void DisjointCommandDispatcher::GetImageRequirements(const VkImage& image, uint3
 	vkGetImageSparseMemoryRequirements(*device, image, count, &req);
 }
 
-void DisjointCommandDispatcher::createDescriptorSetLayout(const VkDescriptorSetLayoutCreateInfo& layoutInfo, VkDescriptorSetLayout& layout) {
+void DisjointCommandDispatcher::CreateDescriptorSetLayout(const VkDescriptorSetLayoutCreateInfo& layoutInfo, VkDescriptorSetLayout& layout) {
 	if (vkCreateDescriptorSetLayout(*device, &layoutInfo, nullptr, &layout) != VK_SUCCESS)
 		throw std::runtime_error("failed to create descriptor set layout");
 }

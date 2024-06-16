@@ -9,6 +9,7 @@
 #include "nveQueues.h"
 #include "nvvk/memallocator_dma_vk.hpp"
 #include "nvvk/resourceallocator_vk.hpp"
+#include <nvvk/vulkanhppsupport.hpp>
 
 #define DisjointDispatcher DisjointCommandDispatcher::dispatcher
 #define CommandDispatcher DisjointCommandDispatcher::dispatcher
@@ -60,12 +61,12 @@ public:
 
 	void createFence(VkFence* fence, VkFenceCreateFlagBits flag = VkFenceCreateFlagBits(0));
 
-	void createDescriptorPool(VkDescriptorPoolCreateInfo& poolInfo, VkDescriptorPool& pool);
+	void CreateDescriptorPool(VkDescriptorPoolCreateInfo& poolInfo, VkDescriptorPool& pool);
 
 	void BindSparseMemory(VkBindSparseInfo& info, const VkFence& fence);
 	void GetImageRequirements(const VkImage& image, uint32_t* count, VkSparseImageMemoryRequirements& req);
 
-	void createDescriptorSetLayout(const VkDescriptorSetLayoutCreateInfo& layoutInfo, VkDescriptorSetLayout& layout);
+	void CreateDescriptorSetLayout(const VkDescriptorSetLayoutCreateInfo& layoutInfo, VkDescriptorSetLayout& layout);
 
 	void createDescriptorSets(const VkDescriptorSetAllocateInfo& allocInfo, VkDescriptorSet& set);
 
@@ -145,9 +146,6 @@ public:
 
 	void resetFence(const VkFence& fence) ;
 
-
-	void CreateDescriptivePool(const VkDescriptorPoolCreateInfo& poolInfo, VkDescriptorPool& pool, VkAllocationCallbacks* allocation = nullptr);
-
 	void GetPhysicalDeviceProperties(VkPhysicalDeviceMemoryProperties& properties);
 
 	void GetPhysicalDeviceProperties(VkPhysicalDeviceProperties2& properties);
@@ -169,6 +167,7 @@ public:
 	VkCommandPool createCommandPool(QueueType type = QueueType::Graphics);
 
 	VkCommandBuffer createCommandBuffers(VkCommandPool pool, VkCommandBufferLevel level);
+
 
 	void createFrameBuffer(VkFramebufferCreateInfo framebufferInfo, VkFramebuffer* buffer);
 
@@ -211,6 +210,13 @@ public:
 
 	NveQueues* queues;
 
+	VkDescriptorPool CreateDescriptorPool(const nvvk::DescriptorSetBindings& nvvkBindings) {
+		return nvvkBindings.createPool(*device);
+	}
+
+	VkDescriptorSetLayout CreateDescriptorSetLayout(nvvk::DescriptorSetBindings& nvvkBindings) {
+		return nvvkBindings.createLayout(*device);
+	}
 
 
 	VkCommandBuffer beginSingleTimeCommands(nve::ProductionPackage* package) {

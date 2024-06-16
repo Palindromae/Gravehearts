@@ -37,7 +37,7 @@ void ComputeBuffer::createDescriptorPool() {
 	poolInfo.pPoolSizes = &poolSizes;
 	poolInfo.maxSets = 1;
 
-	DisjointCommandDispatcher::dispatcher->createDescriptorPool(poolInfo, pool);
+	DisjointCommandDispatcher::dispatcher->CreateDescriptorPool(poolInfo, pool);
 }
 
 void ComputeBuffer::createDescriptorLayout() {
@@ -55,7 +55,7 @@ void ComputeBuffer::createDescriptorLayout() {
 	layoutInfo.pBindings = &bufferBinding;
 	layoutInfo.flags = 0;
 
-	DisjointCommandDispatcher::dispatcher->createDescriptorSetLayout(layoutInfo, layout);
+	DisjointCommandDispatcher::dispatcher->CreateDescriptorSetLayout(layoutInfo, layout);
 }
 
 void ComputeBuffer::createDescriptorSet() {
