@@ -2,7 +2,7 @@
 #include <vulkan/vulkan_core.h>
 #include "ComputeBuffer.h"
 #include <nvvk/vulkanhppsupport.hpp>
-class Tlas : DescriptiveObject{
+class Tlas : public DescriptiveObject{
 
 	ComputeBuffer* instanceBuffer{};
 	ComputeBuffer* accelerationBuffer{};
