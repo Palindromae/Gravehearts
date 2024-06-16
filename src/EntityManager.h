@@ -24,12 +24,8 @@ class EntityManager {
 	ComputeBuffer* EntityInstance_Buffer{};
 	ComputeBuffer* EntityModel_Buffer{};
 
-////// Entity Spacial Data /////////////////////
-	glm::vec3* PositionData;
-	glm::quat* RotationData;
+////// Unique Entity Data /////////////////////
 	int* ModelData;
-
-
 ///// 
 public:
 	static inline EntityManager* instance{};
@@ -48,12 +44,13 @@ public:
 
 	void BuildTlas();
 
+	void RebuildTLS();
 
 	VkAccelerationStructureInstanceKHR* GetID(int& no);
 
 	int GetDataPtr(glm::vec3*& position, glm::quat*& rotation, int*& model);
 
-	void GetEntityArr(glm::vec3*& PositionData, glm::quat*& RotationData, ComputeBuffer*& Models);
+	void GetEntityArr(ComputeBuffer*& Models);
 	void ReturnID(VkAccelerationStructureInstanceKHR* id);
 	void ReturnGPUData(int data);
 

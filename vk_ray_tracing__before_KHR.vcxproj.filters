@@ -251,6 +251,15 @@
     <ClInclude Include="shaders\EntityConst.h">
       <Filter>Internal\Entity</Filter>
     </ClInclude>
+    <ClInclude Include="src\EntityFrameData.h">
+      <Filter>Internal\EntityData</Filter>
+    </ClInclude>
+    <ClInclude Include="src\InterpolatedFrameData.h">
+      <Filter>Internal\EntityData</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CurrentEntityTLSData.h">
+      <Filter>Internal\EntityData</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\frag_shader.frag">
@@ -303,6 +312,9 @@
     </None>
     <None Include="shaders\Helpers\ChunkIndexing.glsl">
       <Filter>Shader Sources\Noise</Filter>
+    </None>
+    <None Include="shaders\Helpers\CollisionConst.glsl">
+      <Filter>Shader Sources\Physics</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -400,6 +412,9 @@
     </Filter>
     <Filter Include="Shader Sources\Physics">
       <UniqueIdentifier>{bb37f4d9-9710-4488-ac79-d1ed5aefde12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\EntityData">
+      <UniqueIdentifier>{44cb17e2-9836-41c8-a998-8665c606b920}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

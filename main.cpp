@@ -30,6 +30,7 @@
 #include "imgui.h"
 #include "imgui/imgui_helper.h"
 
+
 #include "hello_vulkan.h"
 #include "imgui/imgui_camera_widget.h"
 #include "nvh/cameramanipulator.hpp"
@@ -40,10 +41,15 @@
 #include "src/DisjointCommandDispatcher.h"
 #include "src/QueueFamilyIndices.h"
 #include "src/LoadComputeShaders.h"
-#include "EntityManager.h"
-#include "Entity.h"
+#include "src/EntityManager.h"
+#include "src/Entity.h"
 #include "src/ModelManager.h"
-#include  "src/ChunkInterface.h"
+#include "src/ChunkInterface.h"
+#include "src/Physics_Const.h"
+#include "src/CurrentEntityTLSData.h"
+#include <iostream>
+#include "src/PhysicsManager.h"
+
 
 //////////////////////////////////////////////////////////////////////////
 #define UNUSED(x) (void)(x)
@@ -51,7 +57,6 @@
 
 // Default search path for shaders
 std::vector<std::string> defaultSearchPaths;
-
 
 // GLFW Callback functions
 static void onErrorCallback(int error, const char* description)
@@ -79,6 +84,82 @@ void renderUI(HelloVulkan& helloVk)
 //////////////////////////////////////////////////////////////////////////
 static int const SAMPLE_WIDTH  = 1280;
 static int const SAMPLE_HEIGHT = 720;
+HelloVulkan helloVk;
+glm::vec4 clearColor = glm::vec4(1, 1, 1, 1.00f);
+
+bool useRaytracer = true;
+
+void Render()
+{
+    // Start rendering the scene
+    helloVk.prepareFrame();
+
+    // Start command buffer of this frame
+    auto                   curFrame = helloVk.getCurFrame();
+    const VkCommandBuffer& cmdBuf = helloVk.getCommandBuffers()[curFrame];
+
+    VkCommandBufferBeginInfo beginInfo{ VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    vkBeginCommandBuffer(cmdBuf, &beginInfo);
+
+
+    // Updating camera buffer
+    helloVk.updateUniformBuffer(cmdBuf);
+    helloVk.raytracer.updateRtDescriptorSetPerFrame();
+    // Clearing screen
+    std::array<VkClearValue, 2> clearValues{};
+    clearValues[0].color = { {clearColor[0], clearColor[1], clearColor[2], clearColor[3]} };
+    clearValues[1].depthStencil = { 1.0f, 0 };
+
+    // Offscreen render pass
+    {
+        VkRenderPassBeginInfo offscreenRenderPassBeginInfo{ VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
+        offscreenRenderPassBeginInfo.clearValueCount = 2;
+        offscreenRenderPassBeginInfo.pClearValues = clearValues.data();
+        offscreenRenderPassBeginInfo.renderPass = helloVk.m_offscreenRenderPass;
+        offscreenRenderPassBeginInfo.framebuffer = helloVk.m_offscreenFramebuffer;
+        offscreenRenderPassBeginInfo.renderArea = { {0, 0}, helloVk.getSize() };
+
+        if (useRaytracer)
+        {
+            helloVk.raytrace(cmdBuf, clearColor);
+        }
+        else
+        {
+            // Rendering Scene
+            vkCmdBeginRenderPass(cmdBuf, &offscreenRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+            helloVk.rasterize(cmdBuf);
+            vkCmdEndRenderPass(cmdBuf);
+        }
+
+
+
+    }
+
+
+    // 2nd rendering pass: tone mapper, UI
+    {
+        VkRenderPassBeginInfo postRenderPassBeginInfo{ VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
+        postRenderPassBeginInfo.clearValueCount = 2;
+        postRenderPassBeginInfo.pClearValues = clearValues.data();
+        postRenderPassBeginInfo.renderPass = helloVk.getRenderPass();
+        postRenderPassBeginInfo.framebuffer = helloVk.getFramebuffers()[curFrame];
+        postRenderPassBeginInfo.renderArea = { {0, 0}, helloVk.getSize() };
+
+        // Rendering tonemapper
+        vkCmdBeginRenderPass(cmdBuf, &postRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+        helloVk.drawPost(cmdBuf);
+        // Rendering UI
+        ImGui::Render();
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmdBuf);
+        vkCmdEndRenderPass(cmdBuf);
+    }
+
+    // Submit for display
+    vkEndCommandBuffer(cmdBuf);
+    helloVk.submitFrame();
+}
+
 
 
 //--------------------------------------------------------------------------------------------------
@@ -150,8 +231,7 @@ int main(int argc, char** argv)
   // Use a compatible device
   vkctx.initDevice(compatibleDevices[0], contextInfo);
 
-  // Create example
-  HelloVulkan helloVk;
+
 
   // Window need to be opened to get the surface on which to draw
   VkSurfaceKHR surface = helloVk.getVkSurface(vkctx.m_instance, window);
@@ -240,10 +320,8 @@ int main(int argc, char** argv)
     // #VKRay
   helloVk.initRayTracing();
 
-  bool useRaytracer = true;
 
 
-  glm::vec4 clearColor = glm::vec4(1, 1, 1, 1.00f);
 
 
   helloVk.setupGlfwCallbacks(window);
@@ -252,123 +330,88 @@ int main(int argc, char** argv)
 
 
 
-
+  bool interpolate;
 
   float time = 0;
 
+  auto current = std::chrono::high_resolution_clock::now();
+  double accumulatedTime = 0;
 
-
-  // Main loop
-  while(!glfwWindowShouldClose(window))
+  while (!glfwWindowShouldClose(window))
   {
-    glfwPollEvents();
-    if(helloVk.isMinimized())
-      continue;
+      glfwPollEvents();
+      if (helloVk.isMinimized())
+          continue;
 
-    // Start the Dear ImGui frame
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
-    // Show UI window.
-    if(helloVk.showGui())
-    {
-
-      bool changed = false;
-
-      changed |= ImGui::ColorEdit3("Clear color", reinterpret_cast<float*>(&clearColor));
-      changed |= ImGui::Checkbox("Ray Tracer mode", &useRaytracer);  // Switch between raster and ray tracing
-    //  if(changed)
-       // helloVk.resetFrame();
-
-      ImGuiH::Panel::Begin();
-      ImGui::ColorEdit3("Clear color", reinterpret_cast<float*>(&clearColor));
-      renderUI(helloVk);
-      ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-      ImGuiH::Control::Info("", "", "(F10) Toggle Pane", ImGuiH::Control::Flags::Disabled);
-      ImGuiH::Panel::End();
-
-      
-    }
-
-    // Start rendering the scene
-    helloVk.prepareFrame();
-
-    // Start command buffer of this frame
-    auto                   curFrame = helloVk.getCurFrame();
-    const VkCommandBuffer& cmdBuf   = helloVk.getCommandBuffers()[curFrame];
-
-    VkCommandBufferBeginInfo beginInfo{VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-    vkBeginCommandBuffer(cmdBuf, &beginInfo);
+      // Start the Dear ImGui frame
+      ImGui_ImplGlfw_NewFrame();
+      ImGui::NewFrame();
 
 
-    entity->SetPosition(glm::vec3(0, glm::sin(time * 0.333)*15 , 0));
-    entity2->SetPosition(glm::vec3(0, glm::sin(time * 0.333)*15 , glm::sin(time * 0.333) * 15));
-    entity3->SetPosition(glm::vec3(-glm::sin(time * 0.333) * 15, glm::sin(time * 0.333)*15 , -glm::cos(time * 0.333) * 15));
-    time += ImGui::GetIO().DeltaTime;
-
-    EntityManager::instance->UpdateBuffer();
-    EntityManager::instance->BuildTlas();
-    ChunkInterface::instance->RebuildGPUStructures();
-
-
-
-    // Updating camera buffer
-    helloVk.updateUniformBuffer(cmdBuf);
-    helloVk.raytracer.updateRtDescriptorSetPerFrame();
-    // Clearing screen
-    std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color        = {{clearColor[0], clearColor[1], clearColor[2], clearColor[3]}};
-    clearValues[1].depthStencil = {1.0f, 0};
-
-    // Offscreen render pass
-    {
-      VkRenderPassBeginInfo offscreenRenderPassBeginInfo{VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
-      offscreenRenderPassBeginInfo.clearValueCount = 2;
-      offscreenRenderPassBeginInfo.pClearValues    = clearValues.data();
-      offscreenRenderPassBeginInfo.renderPass      = helloVk.m_offscreenRenderPass;
-      offscreenRenderPassBeginInfo.framebuffer     = helloVk.m_offscreenFramebuffer;
-      offscreenRenderPassBeginInfo.renderArea      = {{0, 0}, helloVk.getSize()};
-
-      if(useRaytracer)
+      // Show UI window.
+      if (helloVk.showGui())
       {
-        helloVk.raytrace(cmdBuf, clearColor);
+
+          bool changed = false;
+
+          changed |= ImGui::ColorEdit3("Clear color", reinterpret_cast<float*>(&clearColor));
+          changed |= ImGui::Checkbox("Ray Tracer mode", &useRaytracer);  // Switch between raster and ray tracing
+          //  if(changed)
+             // helloVk.resetFrame();
+
+          ImGuiH::Panel::Begin();
+          ImGui::ColorEdit3("Clear color", reinterpret_cast<float*>(&clearColor));
+          renderUI(helloVk);
+          ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+          ImGuiH::Control::Info("", "", "(F10) Toggle Pane", ImGuiH::Control::Flags::Disabled);
+          ImGuiH::Panel::End();
+
+
       }
+
+      const auto now = std::chrono::high_resolution_clock::now();
+      double frameTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - current).count();
+
+      current = now;
+      accumulatedTime += frameTime;
+      while (accumulatedTime >= FixedDeltaTime) {
+
+          // How long did previous step take?
+
+          // Expect the previous frame to have finished
+
+          // Do a physics step
+          PhysicsManager::Physics->InitiateNewPhysicsUpdate(false);
+
+          accumulatedTime -= FixedDeltaTime;
+          if (accumulatedTime >= FixedDeltaTime)
+          {
+              std::cout << "PHYSICS EXPECTING TO BE RAN TWICE";
+          }
+      }
+
+
+      // INTERPOLATE between current time and previous time
+      if (interpolate)
+          TLS::InterpolatedFrame->Interpolate(TLS::PreviousInterpolationFrame, PhysicsManager::Physics->GetCurrentDefinedPhysicsFrame(), accumulatedTime / FixedDeltaTime);
       else
-      {
-      // Rendering Scene
-        vkCmdBeginRenderPass(cmdBuf, &offscreenRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-        helloVk.rasterize(cmdBuf);
-        vkCmdEndRenderPass(cmdBuf);
-      }
+          TLS::InterpolatedFrame->Interpolate(TLS::PreviousInterpolationFrame, PhysicsManager::Physics->GetCurrentDefinedPhysicsFrame(), 1);
 
+      /// GAME LOGIC
 
-      
-    }
+      // ENTITY LOGIC --- Before physics updates to buffer
 
+      // ENTITY LOGIC --- After buffer
+      EntityManager::instance->RebuildTLS();
+      EntityManager::instance->UpdateBuffer();
 
-    // 2nd rendering pass: tone mapper, UI
-    {
-      VkRenderPassBeginInfo postRenderPassBeginInfo{VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
-      postRenderPassBeginInfo.clearValueCount = 2;
-      postRenderPassBeginInfo.pClearValues    = clearValues.data();
-      postRenderPassBeginInfo.renderPass      = helloVk.getRenderPass();
-      postRenderPassBeginInfo.framebuffer     = helloVk.getFramebuffers()[curFrame];
-      postRenderPassBeginInfo.renderArea      = {{0, 0}, helloVk.getSize()};
-
-      // Rendering tonemapper
-      vkCmdBeginRenderPass(cmdBuf, &postRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-      helloVk.drawPost(cmdBuf);
-      // Rendering UI
-      ImGui::Render();
-      ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmdBuf);
-      vkCmdEndRenderPass(cmdBuf);
-    }
-
-    // Submit for display
-    vkEndCommandBuffer(cmdBuf);
-    helloVk.submitFrame();
+      // Rebuild TLAS --- Can be done before gamelogic of async until now
+      EntityManager::instance->BuildTlas();
+      ChunkInterface::instance->RebuildGPUStructures();
+      // Render
+      Render();
   }
+
 
   // Cleanup
   vkDeviceWaitIdle(helloVk.getDevice());

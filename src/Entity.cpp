@@ -34,7 +34,7 @@ void Entity::SetTRS() {
 }
 
 // POSITION
-
+/*
 void Entity::Translate(glm::vec3 translate)
 {
 	*position += translate;
@@ -69,7 +69,7 @@ void Entity::SetRotation(glm::quat rotation) {
 glm::quat Entity::Get_Rotation() {
 	return *rotation;
 }
-
+*/
 void Entity::Scale(glm::vec3 scale) {
 	this->scale *= scale;
 

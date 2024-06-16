@@ -219,7 +219,7 @@ void main(){
     float distanceTravelled = 0;
 
     Ray r;
-    r.position = rotated_ptr + initialPosition[entityID + Position_PresentFrame * MaxEntities];
+    r.position = rotated_ptr + EntityVec3[entityID + Position_PastFrame * MaxEntities];
     r.direction = traces[gl_WorkGroupID.x].direction;
 
     TracingPackage context = CreateTracingPackage(r);

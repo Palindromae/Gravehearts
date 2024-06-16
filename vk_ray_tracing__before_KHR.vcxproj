@@ -319,6 +319,9 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <ClInclude Include="src\ChunkInterface.h" />
     <ClInclude Include="src\ChunkManager.h" />
     <ClInclude Include="src\ChunkVolume.h" />
+    <ClInclude Include="src\CurrentEntityTLSData.h" />
+    <ClInclude Include="src\EntityFrameData.h" />
+    <ClInclude Include="src\InterpolatedFrameData.h" />
     <ClInclude Include="src\Physics_Collisions.h" />
     <ClInclude Include="src\ComputeBuffer.h" />
     <ClInclude Include="src\ComputeShader.h" />
@@ -357,6 +360,7 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <None Include="shaders\frag_shader.frag" />
     <None Include="shaders\Helpers\ChunkHeaders.glsl" />
     <None Include="shaders\Helpers\ChunkIndexing.glsl" />
+    <None Include="shaders\Helpers\CollisionConst.glsl" />
     <None Include="shaders\Helpers\GPUMemory.glsl" />
     <None Include="shaders\Helpers\Interpolate.glsl" />
     <None Include="shaders\Helpers\RayMasks.glsl" />

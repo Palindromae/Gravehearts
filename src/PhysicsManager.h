@@ -1,6 +1,9 @@
 #pragma once
 #include "Physics_Component.h"
 #include "../shaders/EntityConst.h"
+#include "../shaders/Physics_CubeTraceInfo.h"
+#include "../shaders/ChunkGPUConst.h"
+#include "../shaders/Physics_RayCollision.h"
 #include "ThreadStatus.h"
 #include "Physics_Partition.h"
 #include "CallbackGPUMemory.h"
@@ -8,11 +11,10 @@
 #include <mutex>
 #include <thread>
 #include <exception>
-#include "../shaders/Physics_CubeTraceInfo.h"
-#include "../shaders/ChunkGPUConst.h"
+#include <chrono>
 #include "EntityManager.h"
 #include "Physics_Const.h"
-#include "../shaders/Physics_RayCollision.h"
+#include "EntityFrameData.h"
 
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -21,7 +23,13 @@
 #include "Physics_Collisions.h"
 #include "MonoidList.h"
 #include "ModelManager.h"
+#include "CurrentEntityTLSData.h"
+
 class PhysicsManager {
+
+public:
+private:
+
 	PhysicsComponent* PhysicsComponents{};
 	Entity* PhysicsEntities{};
 
@@ -29,6 +37,13 @@ class PhysicsManager {
 	ThreadStatus status = ThreadStatus::Starting;
 	std::mutex status_mutex{};
 	nve::ProductionPackage* context;
+
+	
+	Tlas* ChunkTlas;
+	
+	// Diagnostics
+
+	std::chrono::system_clock::time_point CurrentPhysicsFrameStartPoint{};
 
 	///////// For SIMD
 
@@ -38,16 +53,11 @@ class PhysicsManager {
 	float* inactive_time;
 
 
-	glm::vec3* Entity_Position_Past;
-	glm::vec3* Entity_Position_Updated;
-	glm::vec3* Entity_Velocity;
-	glm::vec3* Entity_Velocity_Past;
+	EntityFrameData PastFrame{};
+	EntityFrameData CurrentFrame{};
 
-	glm::quat* Entity_Rotation_Past;
-	glm::quat* Entity_Rotation_Updated;
-	glm::quat* Entity_Angular_Velocity;
-	glm::quat* Entity_Angular_Velocity_Past;
-
+	ComputeBuffer* PhysicsVec3Data;
+	ComputeBuffer* PhysicsVec4Data;
 	ComputeBuffer* EntityActiveMasksBuffer;
 
 	//	glm::vec3* Collider_Position_WorldSpace;
@@ -87,9 +97,11 @@ class PhysicsManager {
 		while (true)
 		{
 			if (newPhysicsFrame) {
+				CurrentPhysicsFrameStartPoint = std::chrono::system_clock::now();
 				newPhysicsFrame = false;
-
+				Status_Set(ThreadStatus::Working);
 				PhysicsUpdate();
+				Status_Set(ThreadStatus::Processed);
 			}
 
 		}
@@ -152,13 +164,13 @@ class PhysicsManager {
 	}
 
 	void ApplyGravity(float deltaTime, int ID) {
-		Entity_Position_Updated[ID] += PhysicsComponents[ID].Gravity * deltaTime;
+		CurrentFrame.PositionBuffer[ID] += PhysicsComponents[ID].Gravity * deltaTime;
 	}
 	void ApplyVelocity(float deltaTime, int ID) {
-		Entity_Position_Updated[ID] += Entity_Velocity[ID] * deltaTime;
+		CurrentFrame.PositionBuffer[ID] += CurrentFrame.VelocityBuffer[ID] * deltaTime;
 	}
 	void ApplyAngularVelocity(float deltaTime, int ID) {
-		Entity_Rotation_Updated[ID] = Entity_Rotation_Updated[ID] * Entity_Angular_Velocity[ID] * deltaTime;
+		CurrentFrame.RotationBuffer[ID] = CurrentFrame.RotationBuffer[ID] * CurrentFrame.AngularVelocityBuffer[ID] * deltaTime;
 	}
 
 	bool isEntityActive(int id) {
@@ -187,13 +199,13 @@ class PhysicsManager {
 		float maxI = std::max(PhysicsComponents[objI].dimensions.x, PhysicsComponents[objI].dimensions.y, PhysicsComponents[objI].dimensions.z);
 		float maxJ = std::max(PhysicsComponents[objJ].dimensions.x, PhysicsComponents[objJ].dimensions.y, PhysicsComponents[objJ].dimensions.z);
 
-		if (glm::distance2(Entity_Position_Updated[objI], Entity_Position_Updated[objJ]) > (maxI + maxJ) * (maxI + maxJ))
+		if (glm::distance2(CurrentFrame.PositionBuffer[objI], CurrentFrame.PositionBuffer[objJ]) > (maxI + maxJ) * (maxI + maxJ))
 			return false;
 
 		collisionInfo.A_ID = objI;
 		collisionInfo.B_ID = objJ;
 
-		return SATOptimised(Entity_Position_Updated, Entity_Rotation_Updated, objI, PhysicsComponents[objI].dimensions, objJ, PhysicsComponents[objJ].dimensions, collisionInfo, Entity_Velocity[objI] - Entity_Velocity[objJ]);
+		return SATOptimised(CurrentFrame.PositionBuffer, CurrentFrame.RotationBuffer, objI, PhysicsComponents[objI].dimensions, objJ, PhysicsComponents[objJ].dimensions, collisionInfo, CurrentFrame.VelocityBuffer[objI] - CurrentFrame.VelocityBuffer[objJ]);
 	}
 	 
 
@@ -347,17 +359,7 @@ class PhysicsManager {
 		int partitionID = 0;
 		ComputeBuffer* Models;
 		PhysicsPartition* partition = &partitions[partitionID];
-		{
-			glm::vec3* PositionBuffer;
-			glm::quat* RotationBuffer;
-
-			EntityManager::instance->GetEntityArr(PositionBuffer, RotationBuffer, Models);
-
-			memcpy(Entity_Position_Updated, PositionBuffer, sizeof(glm::vec3) * MaxEntities);
-			memcpy(Entity_Rotation_Updated, RotationBuffer, sizeof(glm::vec4) * MaxEntities);
-			memcpy(Entity_Position_Past, PositionBuffer, sizeof(glm::vec3) * MaxEntities);
-			memcpy(Entity_Rotation_Past, RotationBuffer, sizeof(glm::vec4) * MaxEntities);
-		}
+		EntityManager::instance->GetEntityArr(Models);
 
 		// Initiate Velocities -- Apply Forces, Apply Current Velocities
 		int* ActiveEntities;
@@ -367,7 +369,6 @@ class PhysicsManager {
 
 		/// Apply Restraints
 
-		// Prevent Ground Collision
 		
 
 		// Find Possible Collisions
@@ -385,10 +386,10 @@ class PhysicsManager {
 				continue;
 			}
 
-			glm::vec3 rel_velocity = Entity_Velocity[PCol.B_ID] - Entity_Velocity[PCol.A_ID];
+			glm::vec3 rel_velocity = CurrentFrame.VelocityBuffer[PCol.B_ID] - CurrentFrame.VelocityBuffer[PCol.A_ID];
 			glm::vec3 normal = glm::normalize(rel_velocity);
-			glm::quat rotationAtIncidenceA = glm::fastMix(Entity_Rotation_Past[PCol.A_ID], Entity_Rotation_Updated[PCol.A_ID], PCol.timeToTarget / FixedDeltaTime);
-			glm::quat rotationAtIncidenceB = glm::fastMix(Entity_Rotation_Past[PCol.B_ID], Entity_Rotation_Updated[PCol.B_ID], PCol.timeToTarget / FixedDeltaTime);
+			glm::quat rotationAtIncidenceA = glm::fastMix(PastFrame.RotationBuffer[PCol.A_ID], CurrentFrame.RotationBuffer[PCol.A_ID], PCol.timeToTarget / FixedDeltaTime);
+			glm::quat rotationAtIncidenceB = glm::fastMix(PastFrame.RotationBuffer[PCol.B_ID], CurrentFrame.RotationBuffer[PCol.B_ID], PCol.timeToTarget / FixedDeltaTime);
 
 			float A_Size = CalculateShadowCubeSize(normal * rotationAtIncidenceA, PCol.A_ID);
 			float B_Size = CalculateShadowCubeSize(normal * rotationAtIncidenceB, PCol.B_ID);
@@ -396,11 +397,11 @@ class PhysicsManager {
 			PhysicsCubeTraceInfo trace{};
 			if (A_Size < B_Size)
 			{
-				trace.positionA = Entity_Position_Past[PCol.A_ID] + Entity_Velocity[PCol.A_ID] * PCol.timeToTarget;
+				trace.positionA = PastFrame.PositionBuffer[PCol.A_ID] + CurrentFrame.VelocityBuffer[PCol.A_ID] * PCol.timeToTarget;
 				trace.RotationA = rotationAtIncidenceA;
 				trace.ModelTypeA = (int)PhysicsComponents[PCol.A_ID].collderType;
 
-				trace.positionB = Entity_Position_Past[PCol.B_ID] + Entity_Velocity[PCol.B_ID] * PCol.timeToTarget;
+				trace.positionB = PastFrame.PositionBuffer[PCol.B_ID] + CurrentFrame.VelocityBuffer[PCol.B_ID] * PCol.timeToTarget;
 				trace.RotationB = rotationAtIncidenceB;
 				trace.ModelTypeB = (int)PhysicsComponents[PCol.B_ID].collderType;
 			}
@@ -408,11 +409,11 @@ class PhysicsManager {
 			{
 
 				// Prefer rays come from smaller target
-				trace.positionB = Entity_Position_Past[PCol.A_ID] + Entity_Velocity[PCol.A_ID] * PCol.timeToTarget;
+				trace.positionB = PastFrame.PositionBuffer[PCol.A_ID] + CurrentFrame.VelocityBuffer[PCol.A_ID] * PCol.timeToTarget;
 				trace.RotationB = rotationAtIncidenceA;
 				trace.ModelTypeB = (int)PhysicsComponents[PCol.A_ID].collderType;
 
-				trace.positionA = Entity_Position_Past[PCol.B_ID] + Entity_Velocity[PCol.B_ID] * PCol.timeToTarget;
+				trace.positionA = PastFrame.PositionBuffer[PCol.B_ID] + CurrentFrame.VelocityBuffer[PCol.B_ID] * PCol.timeToTarget;
 				trace.RotationA = rotationAtIncidenceB;
 				trace.ModelTypeA = (int)PhysicsComponents[PCol.B_ID].collderType;
 			}
@@ -424,15 +425,19 @@ class PhysicsManager {
 			i++;
 		}
 	
-
-	
-
+		PhysicsVec3Data->setBufferData(PastFrame.PositionBuffer, PhysicsVec3::Position_PastFrame * MaxEntities, MaxEntities, context);
+		PhysicsVec3Data->setBufferData(CurrentFrame.PositionBuffer, PhysicsVec3::Velocity_PastFrame * MaxEntities, MaxEntities, context);
+		
+		PhysicsVec4Data->setBufferData(CurrentFrame.RotationBuffer, PhysicsVec4::Rotation_NextFrame * MaxEntities, MaxEntities, context);
+		
+		EntityActiveMasksBuffer->setBufferData(EntityActiveMasksBuffer, 0, EntityActiveMasksBuffer->info.length, context);
 
 		// Apply Initial Phyiscs and Send out collision "feelers"
 	
 
 		// Solve Collisions
-		
+		// Prevent Ground Collision
+
 		// Send out inital rays
 
 		/// Resolve Collisions
@@ -440,10 +445,9 @@ class PhysicsManager {
 		// Resolve Virtual Collisions
 		for (SATCollision& VCol : ColliderOnCollider)
 		{
-			ResolvePositionAfterCollision(FixedDeltaTime, VCol.PointOfContact, VCol.MinimumTranslationVector, glm::normalize(VCol.MinimumTranslationVector), PhysicsComponents[VCol.A_ID], VCol.A_ID, PhysicsComponents[VCol.B_ID], VCol.B_ID, Entity_Position_Updated, Entity_Velocity);
+			ResolvePositionAfterCollision(FixedDeltaTime, VCol.PointOfContact, VCol.MinimumTranslationVector, glm::normalize(VCol.MinimumTranslationVector), PhysicsComponents[VCol.A_ID], VCol.A_ID, PhysicsComponents[VCol.B_ID], VCol.B_ID, CurrentFrame.PositionBuffer, CurrentFrame.VelocityBuffer);
 		}
 
-		DisjointDispatcher->WaitOnOneFenceMax(&context->fence);
 
 		PhysicsRayCollision* collisions = (PhysicsRayCollision*)CollisionsCallback->GetMemoryCopy(); //Potentially have a int storing the number of collisions
 
@@ -455,7 +459,7 @@ class PhysicsManager {
 			//	if(collisions[i].ObjBID == NoCollision)
 		//			continue;
 				// Hit ObjB
-			//	ResolvePositionAfterCollision(FixedDeltaTime,,,collisions[i].normal,PhysicsComponents[trace_infos[i].ID], trace_infos[i].ID, collisions->objA_position,PhysicsComponents[collisions[i].ObjBID], collisions[i].ObjBID, collisions[i].objB_position, Entity_Position_Updated,Entity_Velocity);
+			//	ResolvePositionAfterCollision(FixedDeltaTime,,,collisions[i].normal,PhysicsComponents[trace_infos[i].ID], trace_infos[i].ID, collisions->objA_position,PhysicsComponents[collisions[i].ObjBID], collisions[i].ObjBID, collisions[i].objB_position, CurrentFrame.PositionBuffer,CurrentFrame.VelocityBuffer);
 		//	}
 		//	else if (collisions[i + PossibleCollisions.size()].ObjBID != NoCollision) {
 				// Hit World
@@ -467,10 +471,14 @@ class PhysicsManager {
 		//	}
 
 		//}
+
+
+
 		
 		// Find World Collisions
 		int temp;
-		Shaders::Shaders[Shaders::ObjectWorldCollisionDetection]->dispatch(context, MaxEntities, 1, 1, sizeof(int), &temp, MonoidList(4).bind(EntityManager::instance->EntityVec3Data)->bind(EntityManager::instance->EntityVec4Data)->bind(Models)->bind(ModelManager::instance->modelBuffer)->render(), false);
+		Shaders::Shaders[Shaders::ObjectWorldCollisionDetection]->dispatch(context, MaxEntities, 1, 1, sizeof(int), &temp, MonoidList(4).bind(PhysicsVec3Data)->bind(PhysicsVec3Data)->bind(EntityActiveMasksBuffer)->bind(Models)->bind(ModelManager::instance->modelBuffer)->bind(ChunkTlas)->render());
+		//DisjointDispatcher->WaitOnOneFenceMax(&context->fence);
 
 		for (size_t i = 0; i < ActiveEntitiesNO; i++)
 		{
@@ -478,15 +486,15 @@ class PhysicsManager {
 			if (collisions[j].ObjBID == NoCollision)
 					continue;
 
-			ResolvePositionAfterCollision_World(collisions[j], PhysicsComponents[j],j,Entity_Position_Updated, Entity_Velocity);
+			ResolvePositionAfterCollision_World(collisions[j], PhysicsComponents[j],j,CurrentFrame.PositionBuffer, CurrentFrame.VelocityBuffer);
 		}
 
 	
 		// INTEGRATE --- Update Angular Velocity and Velocity 
 		for (size_t i = 0; i < ActiveEntitiesNO; i++)
 		{
-			UpdateVelocity(FixedDeltaTime, ActiveEntities[i], Entity_Velocity, Entity_Position_Updated, Entity_Position_Past);
-			UpdateAngularVelocity(FixedDeltaTime, ActiveEntities[i], Entity_Angular_Velocity, Entity_Rotation_Updated, Entity_Rotation_Past);
+			UpdateVelocity(FixedDeltaTime, ActiveEntities[i], CurrentFrame.VelocityBuffer, CurrentFrame.PositionBuffer, PastFrame.PositionBuffer);
+			UpdateAngularVelocity(FixedDeltaTime, ActiveEntities[i], CurrentFrame.AngularVelocityBuffer, CurrentFrame.RotationBuffer, PastFrame.RotationBuffer);
 		}
 
 		// Resolve Collision Velocities
@@ -495,8 +503,8 @@ class PhysicsManager {
 		{
 			ResolveVelocitiesAfterCollision(
 				FixedDeltaTime, VCol.ADist, VCol.PointOfContact,glm::normalize(VCol.MinimumTranslationVector),
-				Entity_Position_Updated, Entity_Rotation_Updated, Entity_Velocity, Entity_Angular_Velocity,
-				Entity_Position_Past, Entity_Rotation_Past, Entity_Velocity_Past, Entity_Angular_Velocity_Past, 
+				CurrentFrame.PositionBuffer, CurrentFrame.RotationBuffer, CurrentFrame.VelocityBuffer, CurrentFrame.AngularVelocityBuffer,
+				PastFrame.PositionBuffer, PastFrame.RotationBuffer, PastFrame.VelocityBuffer, PastFrame.AngularVelocityBuffer,
 				PhysicsComponents[VCol.A_ID], VCol.A_ID, PhysicsComponents[VCol.B_ID], VCol.B_ID);
 
 		}
@@ -513,8 +521,8 @@ class PhysicsManager {
 			//ResolveVelocitiesAfterCollision_World
 			ResolveVelocitiesAfterCollision(
 				FixedDeltaTime, collision.distanceToPosition, collision.objA_position, collision.normal,
-				Entity_Position_Updated, Entity_Rotation_Updated, Entity_Velocity, Entity_Angular_Velocity,
-				Entity_Position_Past, Entity_Rotation_Past, Entity_Velocity_Past, Entity_Angular_Velocity_Past,
+				CurrentFrame.PositionBuffer, CurrentFrame.RotationBuffer, CurrentFrame.VelocityBuffer, CurrentFrame.AngularVelocityBuffer,
+				PastFrame.PositionBuffer, PastFrame.RotationBuffer, PastFrame.VelocityBuffer, PastFrame.AngularVelocityBuffer,
 				PhysicsComponents[j], j, PhysicsComponents[collision.ObjBID], collision.ObjBID);
 		}
 
@@ -522,7 +530,8 @@ class PhysicsManager {
 
 		for (size_t i = 0; i < ActiveEntitiesNO; i++)
 		{
-			inactive_time[ActiveEntities[i]] += int(glm::dot(Entity_Velocity[ActiveEntities[i]], Entity_Velocity[ActiveEntities[i]]) < minVelocity) * FixedDeltaTime;
+
+			inactive_time[ActiveEntities[i]] += int(glm::dot(CurrentFrame.VelocityBuffer[ActiveEntities[i]], CurrentFrame.VelocityBuffer[ActiveEntities[i]]) < minVelocity) * FixedDeltaTime;
 
 			int mask = 0;
 			int bump = (ActiveEntities[i] & (ENTITYCHUNK_SIZE - 1));
@@ -555,6 +564,10 @@ public:
 		status_mutex.unlock();
 	}
 
+	EntityFrameData* GetCurrentDefinedPhysicsFrame() {
+		return &PastFrame;
+	}
+
 	PhysicsManager() {
 
 		if (Physics != nullptr)
@@ -564,14 +577,10 @@ public:
 		context = new nve::ProductionPackage(QueueType::Graphics);
 
 		PhysicsComponents = (PhysicsComponent*)malloc(sizeof(PhysicsComponent) * MaxEntities);
-		Entity_Position_Updated = (glm::vec3*)malloc(sizeof(glm::vec3) * MaxEntities);
-		Entity_Rotation_Updated = (glm::quat*)malloc(sizeof(glm::quat) * MaxEntities);
-		Entity_Angular_Velocity_Past = (glm::quat*)malloc(sizeof(glm::quat) * MaxEntities);
-		Entity_Angular_Velocity = (glm::quat*)malloc(sizeof(glm::quat) * MaxEntities);
-		Entity_Velocity_Past = (glm::vec3*)malloc(sizeof(glm::vec3) * MaxEntities);
-		Entity_Velocity = (glm::vec3*)malloc(sizeof(glm::vec3) * MaxEntities);
 		inactive_time = (float*)malloc(sizeof(float) * MaxEntities);
 
+		PhysicsVec3Data = new ComputeBuffer(ComputeBufferInfo(sizeof(vec3), MaxEntities * PhysicsVec3::END));
+		PhysicsVec3Data = new ComputeBuffer(ComputeBufferInfo(sizeof(vec4), MaxEntities * PhysicsVec4::END));
 
 
 		auto info = ComputeBufferInfo(sizeof(PhysicsCubeTraceInfo), MaxEntities);
@@ -596,6 +605,11 @@ public:
 			if (Status_Get() == ThreadStatus::Ready)
 				break;
 		}
+
+		//SetCurrentFrame.Copy(CurrentFrame);
+
+		TLS::PreviousInterpolationFrame->Copy(PastFrame);
+		PastFrame.Copy(CurrentFrame);
 
 		newPhysicsFrame = true;
 

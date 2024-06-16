@@ -2,6 +2,7 @@
 #include "ModelManager.h"
 #include "../shaders/EntityConst.h"
 #include <exception>
+#include "CurrentEntityTLSData.h"
 
 EntityManager::EntityManager(int MaxEntities) : EntityCount(MaxEntities) {
 
@@ -44,12 +45,25 @@ VkDeviceAddress EntityManager::GetModelBlasPtr(int model) {
 
 void EntityManager::UpdateBuffer() {
 	EntityInstance_Buffer->setBufferData(EntityData,    0, EntityCount, context, &context->fence);
-	EntityData_Buffer->    setBufferData(EntityGPUData, 0, EntityCount, context, &context->fence);
+	
+	EntityVec3Data->setBufferData(TLS::InterpolatedFrame->PositionBuffer, EntityVec3::Position_Interpolated * MaxEntities, MaxEntities, context);
+	EntityVec4Data->setBufferData(TLS::InterpolatedFrame->PositionBuffer, EntityVec4::Rotation_Interpolated * MaxEntities, MaxEntities, context);
+	
 }
 
 void EntityManager::BuildTlas()
 {
 	EntityTlas.BuildTLAS();
+}
+
+void EntityManager::RebuildTLS() {
+	for (size_t i = 0; i < MaxEntities; i++)
+	{
+		glm::mat4 mat = glm::translate(glm::mat4(1), TLS::InterpolatedFrame->PositionBuffer[i]);
+		mat = mat * glm::toMat4(TLS::InterpolatedFrame->RotationBuffer[i]);
+		//mat = mat * glm::scale(glm::mat4(1), scale);
+		EntityData[i].transform = nvvk::toTransformMatrixKHR(mat);
+	}
 }
 
 VkAccelerationStructureInstanceKHR* EntityManager::GetID(int& no) {
@@ -81,17 +95,15 @@ int EntityManager::GetDataPtr(glm::vec3*& position, glm::quat*& rotation, int*& 
 		counter = maxPosData++;
 	}
 
-	position = &PositionData[counter];
-	rotation = &rotation[counter];
+	position = &TLS::InterpolatedFrame->PositionBuffer[counter];
+	rotation = &TLS::InterpolatedFrame->RotationBuffer[counter];
 	model = &model[counter];
 
 	return counter;
 }
 
-void EntityManager::GetEntityArr(glm::vec3*& PositionData, glm::quat*& RotationData, ComputeBuffer*& Models)
+void EntityManager::GetEntityArr(ComputeBuffer*& Models)
 {
-	PositionData = this->PositionData;
-	RotationData = this->RotationData;
 	Models = this->EntityModel_Buffer;
 }
 
