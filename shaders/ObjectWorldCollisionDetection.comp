@@ -44,7 +44,7 @@ layout(set = 3, binding = 0)  buffer  Entity_modelsN{
 layout(set = 4, binding = 0)  buffer  modelsN{
     Model[] models;
 };
-layout(set = 5, binding = eTlasChunks) uniform accelerationStructureEXT ChunkTlas;
+layout(set = 5, binding = 0) uniform accelerationStructureEXT ChunkTlas;
 
 layout(set = 6, binding = 0)  buffer  collisionsN{
     PhysicsRayCollision[] collisions;

@@ -9,6 +9,8 @@ Entity::Entity(glm::vec3 pos, int model, glm::quat rotation, glm::vec3 scale, Ph
 	*position = pos;
 	*this->model = model;
 	*this->rotation = rotation;
+	NVEPhysics->AddPhysicsObject(this);
+	NVEPhysics->SetEntityActive(EntityID);
 
 	SetTRS();
 
@@ -99,7 +101,8 @@ int Entity::ID_Get() {
 Entity::~Entity() {
 	
 	// Remove Physics Object
-	PhysicsInterface::Physics->RemovePhysicsObject(this);
+	NVEPhysics->RemovePhysicsObject(this);
+	NVEPhysics->SetEntityInactive(EntityID);
 
 	data->mask = 0x00; //Invalidate data
 	data->transform = {};

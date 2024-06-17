@@ -34,6 +34,7 @@ namespace Shaders{
 	
 
 		// Unique Descriptions
+		auto ObjectWorldDetection = ComputeBuffer::generateBasicDescriptorSet({ { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,0 }, { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,1 }, { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,1 } , { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,1 } , { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,1 } , { VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR,1 }, { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,1 }, { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,1 }, { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,1 } });
 		auto CopyWorldToBuffer    = ComputeBuffer::generateBasicDescriptorSet({ { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,0 },{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,1 },{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,2 },{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,3 },{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,4 } });
 		auto WriteUpdatesToBuffer = ComputeBuffer::generateBasicDescriptorSet({ { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,0 },{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,1 },{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,2 } });
 		auto AverageImage         = ComputeBuffer::generateBasicDescriptorSet({ { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,0 }, { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,0 } });
@@ -106,6 +107,10 @@ namespace Shaders{
 		loadShader("VoxelOctreeAllForOne.comp.spv", Shaders::VoxelOctreeAllForOne,  sizeof(OctreeConstants),				  VoxelOctree,             device);*/
 		
 		//loadShader("VoxelOctreeAllForOneWithSafetyMips.comp.spv",  Shaders::VoxelOctreeAllForOneWithSafetyMips,  sizeof(OctreeConstants), VoxelOctree, device);
+
+		// Physics
+		loadShader("ObjectWorldCollisionDetection.comp.spv", Shaders::ObjectWorldCollisionDetection, sizeof(int), ObjectWorldDetection, device);
+
 
 		// Utility
 		/*loadShader("ReadTexture.comp.spv",         Shaders::ReadTexture,			sizeof(ReadTextureConstants),		SparseImageBuffer,		  device);

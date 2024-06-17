@@ -2,15 +2,13 @@
 #include "CurrentEntityTLSData.h"
 
 void PhysicsManager::PhysicsUpdate() {
+	return;
 	int partitionID = 0;
 	ComputeBuffer* Models;
 	PhysicsPartition* partition = &partitions[partitionID];
 	EntityManager::instance->GetEntityArr(Models);
 
 	// Initiate Velocities -- Apply Forces, Apply Current Velocities
-	int* ActiveEntities;
-	int ActiveEntitiesNO;
-
 	ApplyForcesToActiveEntities(ActiveEntitiesNO, ActiveEntities);
 
 	/// Apply Restraints
@@ -176,15 +174,8 @@ void PhysicsManager::PhysicsUpdate() {
 
 	for (size_t i = 0; i < ActiveEntitiesNO; i++)
 	{
-
 		inactive_time[ActiveEntities[i]] += int(glm::dot(CurrentFrame.VelocityBuffer[ActiveEntities[i]], CurrentFrame.VelocityBuffer[ActiveEntities[i]]) < minVelocity) * FixedDeltaTime;
-
-		int mask = 0;
-		int bump = (ActiveEntities[i] & (ENTITYCHUNK_SIZE - 1));
-		mask |= 1 << bump;
-
-		int entityChunk = ActiveEntities[i] / ENTITYCHUNK_SIZE;
-		active_masks[entityChunk] = (active_masks[entityChunk] & ~mask) | ((inactive_time[ActiveEntities[i]] > IDLETIME) << bump);
+		SetEntityActivity(ActiveEntities[i], (inactive_time[ActiveEntities[i]] > IDLETIME));
 	}
 
 
@@ -197,7 +188,8 @@ void PhysicsManager::InitiateNewPhysicsUpdate(bool WaitTilLastPhysicsEnded) {
 
 	while (WaitTilLastPhysicsEnded)
 	{
-		if (Status_Get() == ThreadStatus::Ready)
+		
+		if ((int(Status_Get()) & (int(ThreadStatus::Ready)) | int(ThreadStatus::Processed)) > 0) // if ready or processed
 			break;
 	}
 
@@ -205,6 +197,14 @@ void PhysicsManager::InitiateNewPhysicsUpdate(bool WaitTilLastPhysicsEnded) {
 
 	TLS::PreviousInterpolationFrame->Copy(PastFrame);
 	PastFrame.Copy(CurrentFrame);
+
+
+	TLS::NumberOfActiveEntities = ActiveEntitiesNO;
+
+	if (TLS::ActiveEntities != nullptr)
+		free(TLS::ActiveEntities);
+
+	TLS::ActiveEntities = ActiveEntities;
 
 	newPhysicsFrame = true;
 

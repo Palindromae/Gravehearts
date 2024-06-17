@@ -5,10 +5,11 @@
 #include "EntityFrameData.h"
 
 class PhysicsManager;
+#define NVEPhysics PhysicsInterface::PhysInterface
 
 class PhysicsInterface {
 public:
-	inline static PhysicsInterface* Physics{};
+	inline static PhysicsInterface* PhysInterface{};
 private:
 	PhysicsManager* Manager;
 
@@ -19,4 +20,11 @@ public:
 	void RemovePhysicsObject(Entity* entity);
 	EntityFrameData* GetCurrentDefinedPhysicsFrame();
 	void InitiateNewPhysicsUpdate(bool WaitTilLastPhysicsEnded);
+
+	void SetEntityActivity(int id, bool status);
+
+	void SetEntityInactive(int id);
+
+	void SetEntityActive(int id);
+
 };

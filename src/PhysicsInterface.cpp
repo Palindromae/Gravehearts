@@ -2,10 +2,10 @@
 #include "PhysicsManager.h"
 
 PhysicsInterface::PhysicsInterface() {
-	if (Physics != nullptr)
+	if (PhysInterface != nullptr)
 		throw new std::exception("you cannot have more than one physics managers running at a time");
 
-	Physics = this;
+	PhysInterface = this;
 
 	Manager = new PhysicsManager();
 }
@@ -27,3 +27,18 @@ void PhysicsInterface::InitiateNewPhysicsUpdate(bool WaitTilLastPhysicsEnded)
 {
 	Manager->InitiateNewPhysicsUpdate(WaitTilLastPhysicsEnded);
 }
+
+void PhysicsInterface::SetEntityActivity(int id, bool status) {
+	Manager->SetEntityActivity(id, status);
+}
+
+void PhysicsInterface::SetEntityInactive(int id)
+{
+	Manager->SetEntityInactive(id);
+}
+
+void PhysicsInterface::SetEntityActive(int id)
+{
+	Manager->SetEntityActive(id);
+}
+

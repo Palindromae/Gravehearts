@@ -68,6 +68,7 @@ public:
         if (IsDescriptiveObjectBuilt)
         {
             updateDescriptorSet();
+            return;
         }
 
         setLayoutBind.addBinding(0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1,

@@ -47,7 +47,7 @@ START_BINDING(SceneBindings)
   eEntitiesVec3 = 3,   // Access to Entities
   eEntitiesVec4 = 4,   // Access to Entities
   eEntitiesModels = 5,   // Access to Entities
-  eModels = 5   // Access to Models
+  eModels = 6   // Access to Models
 END_BINDING();
 
 START_BINDING(RtxBindings)

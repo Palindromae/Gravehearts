@@ -12,7 +12,6 @@
 
 class EntityManager {
 
-	int EntityCount;
 	VkAccelerationStructureInstanceKHR* EntityData{};
 	//EntityGPUStruct* EntityGPUData{};
 	
@@ -35,7 +34,7 @@ public:
 
 	Tlas EntityTlas{};
 
-	EntityManager(int MaxEntities);
+	EntityManager();
 
 	VkDeviceAddress GetModelBlasPtr(int model);
 

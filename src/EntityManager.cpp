@@ -4,7 +4,7 @@
 #include <exception>
 #include "CurrentEntityTLSData.h"
 
-EntityManager::EntityManager(int MaxEntities) : EntityCount(MaxEntities) {
+EntityManager::EntityManager() {
 
 	if (instance != nullptr)
 		throw std::exception("Cannot have more than one entity managers!");
@@ -13,9 +13,9 @@ EntityManager::EntityManager(int MaxEntities) : EntityCount(MaxEntities) {
 	EntityData = (VkAccelerationStructureInstanceKHR*)malloc(sizeof(VkAccelerationStructureInstanceKHR) * MaxEntities);
 	ModelData = (int*)malloc(sizeof(int) * MaxEntities);
 
-	EntityVec3Data = new ComputeBuffer(ComputeBufferInfo(sizeof(glm::vec3),EntityCount * EntityVec3::ENDEnitityVec3));
-	EntityVec4Data = new ComputeBuffer(ComputeBufferInfo(sizeof(glm::vec4),EntityCount * EntityVec4::ENDEnitityVec4));
-	EntityModel_Buffer = new ComputeBuffer(ComputeBufferInfo(sizeof(int),EntityCount));
+	EntityVec3Data = new ComputeBuffer(ComputeBufferInfo(sizeof(glm::vec3), MaxEntities * EntityVec3::ENDEnitityVec3));
+	EntityVec4Data = new ComputeBuffer(ComputeBufferInfo(sizeof(glm::vec4),MaxEntities * EntityVec4::ENDEnitityVec4));
+	EntityModel_Buffer = new ComputeBuffer(ComputeBufferInfo(sizeof(int), MaxEntities));
 
 	VkAccelerationStructureInstanceKHR null_instance{};
 	null_instance.flags = 0x00;
@@ -46,10 +46,10 @@ VkDeviceAddress EntityManager::GetModelBlasPtr(int model) {
 // Needs to take a command buffer
 
 void EntityManager::UpdateBuffer() {
-	EntityInstance_Buffer->setBufferData(EntityData,    0, EntityCount, context, &context->fence);
+	EntityInstance_Buffer->setBufferData(EntityData,    0, MaxEntities, context, &context->fence);
 	
 	EntityVec3Data->setBufferData(TLS::InterpolatedFrame->PositionBuffer, EntityVec3::Position_Interpolated * MaxEntities, MaxEntities, context);
-	EntityVec4Data->setBufferData(TLS::InterpolatedFrame->PositionBuffer, EntityVec4::Rotation_Interpolated * MaxEntities, MaxEntities, context);
+	EntityVec4Data->setBufferData(TLS::InterpolatedFrame->RotationBuffer, EntityVec4::Rotation_Interpolated * MaxEntities, MaxEntities, context);
 	
 }
 
@@ -59,12 +59,14 @@ void EntityManager::BuildTlas()
 }
 
 void EntityManager::RebuildTLS() {
-	for (size_t i = 0; i < MaxEntities; i++)
+	for (size_t i = 0; i < TLS::NumberOfActiveEntities; i++)
 	{
-		glm::mat4 mat = glm::translate(glm::mat4(1), TLS::InterpolatedFrame->PositionBuffer[i]);
-		mat = mat * glm::toMat4(TLS::InterpolatedFrame->RotationBuffer[i]);
+		int j = TLS::ActiveEntities[i];
+
+		glm::mat4 mat = glm::translate(glm::mat4(1), TLS::InterpolatedFrame->PositionBuffer[j]);
+		mat = mat * glm::toMat4(TLS::InterpolatedFrame->RotationBuffer[j]);
 		//mat = mat * glm::scale(glm::mat4(1), scale);
-		EntityData[i].transform = nvvk::toTransformMatrixKHR(mat);
+		EntityData[j].transform = nvvk::toTransformMatrixKHR(mat);
 	}
 }
 

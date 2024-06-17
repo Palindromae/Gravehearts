@@ -50,7 +50,10 @@ private:
 
 	uint32_t* active_masks{};
 	float* inactive_time;
-
+	
+	
+	int* ActiveEntities = nullptr; // This is for the physics solution to hand over to interpolated data once completed;
+	int ActiveEntitiesNO = 0;
 
 	EntityFrameData PastFrame{};
 	EntityFrameData CurrentFrame{};
@@ -94,6 +97,12 @@ private:
 
 	void main_physics()
 	{
+		#ifdef _WIN32
+				SetThreadDescription(thread.native_handle(), L"Physics Thread");
+		#endif
+		
+		Status_Set(ThreadStatus::Ready);
+		
 		while (true)
 		{
 			if (newPhysicsFrame) {
@@ -164,6 +173,37 @@ private:
 
 		return (active_masks[chunk] >> sub_id) & 1;
 	}
+
+	public:
+		void SetEntityActivity(int id, bool status) {
+			int chunk = id / ENTITYCHUNK_SIZE;
+			int sub_id = id & (ENTITYCHUNK_SIZE - 1);
+
+			int mask = 0;
+			mask |= 1 << sub_id;
+			active_masks[chunk] = (active_masks[chunk] & ~mask) | ((inactive_time[active_masks[chunk]] > IDLETIME) << mask);
+		}
+
+		void SetEntityInactive(int id)
+		{
+			int chunk = id / ENTITYCHUNK_SIZE;
+			int sub_id = id & (ENTITYCHUNK_SIZE - 1);
+
+			int mask = 0;
+			mask |= 1 << sub_id;
+			active_masks[chunk] = (active_masks[chunk] & ~mask);
+		}
+
+		void SetEntityActive(int id)
+		{
+			int chunk = id / ENTITYCHUNK_SIZE;
+			int sub_id = id & (ENTITYCHUNK_SIZE - 1);
+
+			int mask = 0;
+			mask |= 1 << sub_id;
+			active_masks[chunk] |= mask;
+		}
+	private:
 
 	int numberOfSetBits(uint32_t i)
 	{
@@ -382,6 +422,8 @@ public:
 		RayCollisions = new ComputeBuffer(info_collision);
 
 		CollisionsCallback = new CallbackGPUMemory(&RayCollisions->memory, RayCollisions->info.length);
+
+		thread = std::jthread([this]() {main_physics(); });
 	}
 
 	void InitiateNewPhysicsUpdate(bool WaitTilLastPhysicsEnded);

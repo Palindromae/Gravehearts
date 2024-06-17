@@ -219,6 +219,8 @@ int main(int argc, char** argv)
   contextInfo.addDeviceExtension(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);  // Required by ray tracing pipeline
   contextInfo.addDeviceExtension(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);  
   contextInfo.addDeviceExtension(VK_KHR_MAINTENANCE_4_EXTENSION_NAME);  
+  VkPhysicalDeviceRayQueryFeaturesKHR rtQueryfeature{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR };
+  contextInfo.addDeviceExtension(VK_KHR_RAY_QUERY_EXTENSION_NAME, false, &rtQueryfeature);
   // Creating Vulkan base application
   nvvk::Context vkctx{};
   vkctx.initInstance(contextInfo);
@@ -278,7 +280,7 @@ int main(int argc, char** argv)
 
   new PhysicsInterface();
   new ModelManager();
-  new EntityManager(5);
+  new EntityManager();
   Entity* entity2 = new Entity(glm::vec3(0), 0);
   Entity* entity = new Entity(glm::vec3(5), 0);
   Entity* entity3 = new Entity(glm::vec3(1,2,3), 0);
@@ -325,12 +327,13 @@ int main(int argc, char** argv)
 
   auto current = std::chrono::high_resolution_clock::now();
   double accumulatedTime = 0;
-
+  int frame = 0;
   while (!glfwWindowShouldClose(window))
   {
       glfwPollEvents();
       if (helloVk.isMinimized())
           continue;
+      frame++;
 
       // Start the Dear ImGui frame
       ImGui_ImplGlfw_NewFrame();
@@ -356,11 +359,17 @@ int main(int argc, char** argv)
           ImGuiH::Panel::End();
       }
 
+
+      if (frame == 1) {
+          current = std::chrono::high_resolution_clock::now();
+      }
+
       const auto now = std::chrono::high_resolution_clock::now();
-      double frameTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - current).count();
+      double frameTime = std::chrono::duration_cast<std::chrono::seconds>(now - current).count();
 
       current = now;
       accumulatedTime += frameTime;
+
       while (accumulatedTime >= FixedDeltaTime) {
 
           // How long did previous step take?
@@ -368,7 +377,7 @@ int main(int argc, char** argv)
           // Expect the previous frame to have finished
 
           // Do a physics step
-          PhysicsInterface::Physics->InitiateNewPhysicsUpdate(true);
+          NVEPhysics->InitiateNewPhysicsUpdate(true);
 
           accumulatedTime -= FixedDeltaTime;
           if (accumulatedTime >= FixedDeltaTime)
@@ -379,10 +388,10 @@ int main(int argc, char** argv)
 
 
       // INTERPOLATE between current time and previous time
-      if (interpolate)
-          TLS::InterpolatedFrame->Interpolate(TLS::PreviousInterpolationFrame, PhysicsInterface::Physics->GetCurrentDefinedPhysicsFrame(), accumulatedTime / FixedDeltaTime);
-      else
-          TLS::InterpolatedFrame->Interpolate(TLS::PreviousInterpolationFrame, PhysicsInterface::Physics->GetCurrentDefinedPhysicsFrame(), 1);
+      //if (interpolate)
+      //    TLS::InterpolatedFrame->Interpolate(TLS::PreviousInterpolationFrame, NVEPhysics->GetCurrentDefinedPhysicsFrame(), accumulatedTime / FixedDeltaTime);
+    //  else
+       //   TLS::InterpolatedFrame->Interpolate(TLS::PreviousInterpolationFrame, NVEPhysics->GetCurrentDefinedPhysicsFrame(), 1);
 
       /// GAME LOGIC
 
@@ -396,7 +405,7 @@ int main(int argc, char** argv)
       EntityManager::instance->BuildTlas();
       ChunkInterface::instance->RebuildGPUStructures();
       // Render
-      Render();
+        Render();
   }
 
 
