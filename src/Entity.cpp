@@ -6,20 +6,9 @@ Entity::Entity(glm::vec3 pos, int model, glm::quat rotation, glm::vec3 scale, Ph
 	data = EntityManager::instance->GetID(EntityID);
 	dataptr = EntityManager::instance->GetDataPtr(position,this->rotation,this->model);
 
-	*position = pos;
-	*this->model = model;
-	*this->rotation = rotation;
-	NVEPhysics->AddPhysicsObject(this);
-	NVEPhysics->SetEntityActive(EntityID);
-
-	SetTRS();
-
-	data->instanceCustomIndex = EntityID;
-	data->mask = 0xff;
-	data->accelerationStructureReference = EntityManager::instance->GetModelBlasPtr(model);
-	data->flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-	data->instanceShaderBindingTableRecordOffset = 0;  // We will use the same hit group for all objects
+	NVEPhysics->CreateEntity(EntityID, model, physics_component, pos, rotation);
 }
+
 
 
 
@@ -39,45 +28,36 @@ void Entity::SetTRS() {
 }
 
 // POSITION
-/*
+
 void Entity::Translate(glm::vec3 translate)
 {
-	*position += translate;
-
-	SetTRS();
-
+	NVEPhysics->InstantTranslate(EntityID, translate);
 }
 
 void Entity::SetPosition(glm::vec3 position) {
 
-	*this->position = position;
-
-	SetTRS();
+	NVEPhysics->SetPosition(EntityID, position);
 }
-*/
+
 
 glm::vec3 Entity::Get_Position() {
 	return *position;
 }
 
-/*
-void Entity::Rotate(glm::quat rotate) {
-	*rotation *= rotate;
 
-	SetTRS();
+void Entity::Rotate(glm::quat rotate) {
+	NVEPhysics->InstantRotate(EntityID, rotate);
 }
 
 void Entity::SetRotation(glm::quat rotation) {
-	*this->rotation = rotation;
-
-	SetTRS();
+	NVEPhysics->SetRotation(EntityID, rotation);
 }
-*/
+
 
 glm::quat Entity::Get_Rotation() {
 	return *rotation;
 }
-
+/*
 void Entity::Scale(glm::vec3 scale) {
 	this->scale *= scale;
 
@@ -89,7 +69,7 @@ void Entity::SetScale(glm::vec3 scale) {
 
 	SetTRS();
 }
-
+*/
 glm::vec3 Entity::Get_Scale() {
 	return scale;
 }
@@ -101,12 +81,5 @@ int Entity::ID_Get() {
 Entity::~Entity() {
 	
 	// Remove Physics Object
-	NVEPhysics->RemovePhysicsObject(this);
-	NVEPhysics->SetEntityInactive(EntityID);
-
-	data->mask = 0x00; //Invalidate data
-	data->transform = {};
-	EntityManager::instance->ReturnID(data);
-
-
+	NVEPhysics->DeleteEntity(EntityID);
 }

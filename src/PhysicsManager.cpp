@@ -2,7 +2,6 @@
 #include "CurrentEntityTLSData.h"
 
 void PhysicsManager::PhysicsUpdate() {
-	return;
 	int partitionID = 0;
 	ComputeBuffer* Models;
 	PhysicsPartition* partition = &partitions[partitionID];
@@ -13,6 +12,7 @@ void PhysicsManager::PhysicsUpdate() {
 
 	/// Apply Restraints
 
+	return;
 
 
 	// Find Possible Collisions
@@ -184,28 +184,39 @@ void PhysicsManager::PhysicsUpdate() {
 	free(ActiveEntities);
 }
 
-void PhysicsManager::InitiateNewPhysicsUpdate(bool WaitTilLastPhysicsEnded) {
-
-	while (WaitTilLastPhysicsEnded)
+void PhysicsManager::WaitForEndOfFrame() {
+	while (true)
 	{
-		
+
 		if ((int(Status_Get()) & (int(ThreadStatus::Ready)) | int(ThreadStatus::Processed)) > 0) // if ready or processed
 			break;
 	}
+}
 
-	//SetCurrentFrame.Copy(CurrentFrame);
-
+void PhysicsManager::CopyResultsOutToTLS() {
 	TLS::PreviousInterpolationFrame->Copy(PastFrame);
-	PastFrame.Copy(CurrentFrame);
-
-
+	
 	TLS::NumberOfActiveEntities = ActiveEntitiesNO;
 
 	if (TLS::ActiveEntities != nullptr)
 		free(TLS::ActiveEntities);
 
 	TLS::ActiveEntities = ActiveEntities;
+}
 
+void PhysicsManager::InitiateNewPhysicsUpdate() {
+
+	PastFrame.Copy(CurrentFrame); 
+	
 	newPhysicsFrame = true;
+}
 
+// this should only be done between frames
+void PhysicsManager::AddPhysicsObject(int id, PhysicsComponent component) {
+	const glm::vec3 pos = CurrentFrame.PositionBuffer[id];
+	int partitionID = GetPartition(pos);
+	partitions[partitionID].AddEntity(id, pos);
+
+	PhysicsComponents[id] = component;
+	EntityManager::instance->SetEntityActive(id);
 }

@@ -325,6 +325,8 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <ClInclude Include="src\CurrentEntityTLSData.h" />
     <ClInclude Include="src\EntityFrameData.h" />
     <ClInclude Include="src\InterpolatedFrameData.h" />
+    <ClInclude Include="src\ModelConst.h" />
+    <ClInclude Include="src\PhysicsComponentCommand.h" />
     <ClInclude Include="src\PhysicsInterface.h" />
     <ClInclude Include="src\Physics_Collisions.h" />
     <ClInclude Include="src\ComputeBuffer.h" />
@@ -348,6 +350,8 @@ copy $(ProjectDir)shaders\raycommon.glsl "$(SolutionDir)ShaderWorker\TEMP\"</Com
     <ClInclude Include="src\Physics_Component.h" />
     <ClInclude Include="src\Physics_Partition.h" />
     <ClInclude Include="src\PhysicsManager.h" />
+    <ClInclude Include="src\Physics_RotationCommand.h" />
+    <ClInclude Include="src\Physics_TranslationCommand.h" />
     <ClInclude Include="src\ProductionPackage.h" />
     <ClInclude Include="src\QueueFamilyIndices.h" />
     <ClInclude Include="src\QueueTypes.h" />

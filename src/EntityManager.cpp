@@ -122,6 +122,25 @@ void EntityManager::ReturnGPUData(int data)
 	nextEntityGPUPos.push(data);
 }
 
+void EntityManager::SetModel(int id, int Model)
+{
+	ModelData[id] = Model;
+	EntityData[id].accelerationStructureReference = EntityManager::instance->GetModelBlasPtr(Model);
+}
+
 EntityManager::~EntityManager() {
 	free(EntityData);
+}
+
+void EntityManager::SetEntityActive(int id) {
+	EntityData[id].instanceCustomIndex = id;
+	EntityData[id].mask = 0xff;
+	EntityData[id].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+	EntityData[id].instanceShaderBindingTableRecordOffset = 0;  // We will use the same hit group for all objects
+}
+
+void EntityManager::SetEntityInactive(int id) {
+	EntityData[id].mask = 0x00; //Invalidate data
+	EntityData[id].transform = {};
+	ReturnID(&EntityData[id]);
 }

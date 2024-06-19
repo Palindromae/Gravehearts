@@ -23,6 +23,8 @@
 #include "Physics_Collisions.h"
 #include "MonoidList.h"
 #include "ModelManager.h"
+#include "Physics_TranslationCommand.h"
+#include "Physics_RotationCommand.h"
 
 class PhysicsManager {
 
@@ -37,9 +39,9 @@ private:
 	std::mutex status_mutex{};
 	nve::ProductionPackage* context;
 
-	
+
 	Tlas* ChunkTlas;
-	
+
 	// Diagnostics
 
 	std::chrono::system_clock::time_point CurrentPhysicsFrameStartPoint{};
@@ -50,8 +52,8 @@ private:
 
 	uint32_t* active_masks{};
 	float* inactive_time;
-	
-	
+
+
 	int* ActiveEntities = nullptr; // This is for the physics solution to hand over to interpolated data once completed;
 	int ActiveEntitiesNO = 0;
 
@@ -74,13 +76,13 @@ private:
 	ComputeBuffer* RayCollisions;
 	CallbackGPUMemory* CollisionsCallback;
 	////////
-	
+
 	const int ENTITYCHUNK_SIZE = sizeof(uint32_t);
 	const int MAXENTITY_MASKS = MaxEntities / ENTITYCHUNK_SIZE;
 	const int IDLETIME = 5; //Time Taken to become inactive.
 	const float minVelocity = 0.001;
 
-		// Map in place until we add in space partitioning
+	// Map in place until we add in space partitioning
 	PhysicsPartition partitions[8];
 	bool newPhysicsFrame = false;
 
@@ -97,12 +99,12 @@ private:
 
 	void main_physics()
 	{
-		#ifdef _WIN32
-				SetThreadDescription(thread.native_handle(), L"Physics Thread");
-		#endif
-		
+#ifdef _WIN32
+		SetThreadDescription(thread.native_handle(), L"Physics Thread");
+#endif
+
 		Status_Set(ThreadStatus::Ready);
-		
+
 		while (true)
 		{
 			if (newPhysicsFrame) {
@@ -145,11 +147,11 @@ private:
 		// X+ X-
 		glm::vec2 areaTemp = glm::vec2(PhysicsComponents[ID].dimensions.y * PhysicsComponents[ID].dimensions.z) * dot_x;
 		CollisionArea += areaTemp.x + areaTemp.y;
-		
+
 		// Y+ Y-
 		areaTemp = glm::vec2(PhysicsComponents[ID].dimensions.x * PhysicsComponents[ID].dimensions.z) * dot_y;
 		CollisionArea += areaTemp.x + areaTemp.y;
-			
+
 		// Z+ Z-
 		areaTemp = glm::vec2(PhysicsComponents[ID].dimensions.x * PhysicsComponents[ID].dimensions.y) * dot_z;
 		CollisionArea += areaTemp.x + areaTemp.y;
@@ -174,36 +176,36 @@ private:
 		return (active_masks[chunk] >> sub_id) & 1;
 	}
 
-	public:
-		void SetEntityActivity(int id, bool status) {
-			int chunk = id / ENTITYCHUNK_SIZE;
-			int sub_id = id & (ENTITYCHUNK_SIZE - 1);
+public:
+	void SetEntityActivity(int id, bool status) {
+		int chunk = id / ENTITYCHUNK_SIZE;
+		int sub_id = id & (ENTITYCHUNK_SIZE - 1);
 
-			int mask = 0;
-			mask |= 1 << sub_id;
-			active_masks[chunk] = (active_masks[chunk] & ~mask) | ((inactive_time[active_masks[chunk]] > IDLETIME) << mask);
-		}
+		int mask = 0;
+		mask |= 1 << sub_id;
+		active_masks[chunk] = (active_masks[chunk] & ~mask) | ((inactive_time[active_masks[chunk]] > IDLETIME) << mask);
+	}
 
-		void SetEntityInactive(int id)
-		{
-			int chunk = id / ENTITYCHUNK_SIZE;
-			int sub_id = id & (ENTITYCHUNK_SIZE - 1);
+	void SetEntityInactive(int id)
+	{
+		int chunk = id / ENTITYCHUNK_SIZE;
+		int sub_id = id & (ENTITYCHUNK_SIZE - 1);
 
-			int mask = 0;
-			mask |= 1 << sub_id;
-			active_masks[chunk] = (active_masks[chunk] & ~mask);
-		}
+		int mask = 0;
+		mask |= 1 << sub_id;
+		active_masks[chunk] = (active_masks[chunk] & ~mask);
+	}
 
-		void SetEntityActive(int id)
-		{
-			int chunk = id / ENTITYCHUNK_SIZE;
-			int sub_id = id & (ENTITYCHUNK_SIZE - 1);
+	void SetEntityActive(int id)
+	{
+		int chunk = id / ENTITYCHUNK_SIZE;
+		int sub_id = id & (ENTITYCHUNK_SIZE - 1);
 
-			int mask = 0;
-			mask |= 1 << sub_id;
-			active_masks[chunk] |= mask;
-		}
-	private:
+		int mask = 0;
+		mask |= 1 << sub_id;
+		active_masks[chunk] |= mask;
+	}
+private:
 
 	int numberOfSetBits(uint32_t i)
 	{
@@ -232,7 +234,7 @@ private:
 
 		return SATOptimised(CurrentFrame.PositionBuffer, CurrentFrame.RotationBuffer, objI, PhysicsComponents[objI].dimensions, objJ, PhysicsComponents[objJ].dimensions, collisionInfo, CurrentFrame.VelocityBuffer[objI] - CurrentFrame.VelocityBuffer[objJ]);
 	}
-	 
+
 
 	std::vector<SATCollision> SATCollisionDetection(int partitionID) {
 
@@ -264,8 +266,8 @@ private:
 			}
 
 		}
-	
-		
+
+
 		/// For each entity in adjacent regions
 		glm::ivec3 adjkey[8];
 		int adjpartition[8];
@@ -281,13 +283,13 @@ private:
 				{
 					for (size_t z = 0; z < 2; z++)
 					{
-						adjkey[i] = (key + glm::ivec3(x, y, z)) &2;
+						adjkey[i] = (key + glm::ivec3(x, y, z)) & 2;
 						adjpartition[i] = PartitionUIDToIndex(adjkey[i].x, adjkey[i].y, adjkey[i].z);
 						i++;
 					}
 				}
 			}
-			
+
 			// For each entity within a region
 			for (auto it = val.begin(); it != val.end(); it++)
 			{
@@ -303,7 +305,7 @@ private:
 						SATCollision collision{};
 						if (SATCollisionAB(iobj, id, collision))
 							collisions.push_back(collision);
-					
+
 					}
 				}
 			}
@@ -345,7 +347,8 @@ private:
 		// Calculate Entities to Update
 		//PhysicsCubeTraceInfo* trace_infos = (PhysicsCubeTraceInfo*)malloc(sizeof(PhysicsCubeTraceInfo) * NoActiveEntities);
 		int* activeIDs = (int*)malloc(sizeof(int) * NoActiveEntities);
-
+		const int bits = 8;
+		int l = 0;
 		for (size_t i = 0; i < ActiveChunks.size(); i++)
 		{
 
@@ -353,12 +356,14 @@ private:
 			for (size_t k = 0; k < 32; k++)
 			{
 
-				int EntityOffset = worked_mask & ~(worked_mask - 1); // Get lowest bit
+				int EntityOffset = worked_mask & ~(worked_mask - 1);
 				worked_mask -= EntityOffset; //Remove it from temporary mask
 
-				int ID = ActiveChunks[i] * sizeof(worked_mask) * 8 + EntityOffset;
+				EntityOffset -= 1; // Get lowest bit, -1 to scale it from 32-1 to 31-0
 
-				activeIDs[i] = ID;
+				int ID = ActiveChunks[i] * sizeof(worked_mask) * bits + EntityOffset;
+
+				activeIDs[l++] = ID;
 
 				if (worked_mask == 0) // if empty skip the rest of the chunk
 					break;
@@ -376,6 +381,7 @@ private:
 	}
 
 	void PhysicsUpdate();
+
 
 public:
 
@@ -399,7 +405,7 @@ public:
 
 	PhysicsManager() {
 
-		
+
 
 		context = new nve::ProductionPackage(QueueType::Graphics);
 
@@ -407,14 +413,25 @@ public:
 		inactive_time = (float*)malloc(sizeof(float) * MaxEntities);
 		active_masks = (uint32_t*)malloc(sizeof(uint32_t) * MAXENTITY_MASKS);
 
+		for (size_t i = 0; i < MaxEntities; i++)
+		{
+			inactive_time[i] = 0;
+		}
+
+		for (size_t i = 0; i < MAXENTITY_MASKS; i++)
+		{
+			active_masks[i] = 0;
+		}
+
+
 		PhysicsVec3Data = new ComputeBuffer(ComputeBufferInfo(sizeof(vec3), MaxEntities * PhysicsVec3::ENDPhysicsVec3));
 		PhysicsVec4Data = new ComputeBuffer(ComputeBufferInfo(sizeof(vec4), MaxEntities * PhysicsVec4::ENDPhysicsVec4));
 		EntityActiveMasksBuffer = new ComputeBuffer(ComputeBufferInfo(ENTITYCHUNK_SIZE, MAXENTITY_MASKS));
 
 		auto info = ComputeBufferInfo(sizeof(PhysicsCubeTraceInfo), MaxEntities);
-	//	info.properties |= CallbackGPUMemory::IdealPropertyFlags;
+		//	info.properties |= CallbackGPUMemory::IdealPropertyFlags;
 		Collision_Information = new ComputeBuffer(info);
-		
+
 		auto info_collision = ComputeBufferInfo(sizeof(PhysicsRayCollision), MaxEntities);
 
 		// Create buffers to work on collisions
@@ -426,17 +443,30 @@ public:
 		thread = std::jthread([this]() {main_physics(); });
 	}
 
-	void InitiateNewPhysicsUpdate(bool WaitTilLastPhysicsEnded);
+	void WaitForEndOfFrame();
+	void CopyResultsOutToTLS();
+	void InitiateNewPhysicsUpdate();
 
-	void AddPhysicsObject(Entity* entity){
-		const glm::vec3 pos = entity->Get_Position();
+	void AddPhysicsObject(int id, PhysicsComponent component);
+
+	void RemovePhysicsObject(int id) {
+		const glm::vec3 pos = CurrentFrame.PositionBuffer[id];
 		int partitionID = GetPartition(pos);
-		partitions[partitionID].AddEntity(entity, pos);
+		partitions[partitionID].RemoveEntity(id, pos);
+		EntityManager::instance->SetEntityInactive(id);
 	}
 
-	void RemovePhysicsObject(Entity* entity) {
-		const glm::vec3 pos = entity->Get_Position();
-		int partitionID = GetPartition(entity->Get_Position());
-		partitions[partitionID].RemoveEntity(entity, pos);
+	void TLSAlteration(int id, TranslationCommand& PositionChange, TranslationCommand& VelocityChange, RotationCommand& RotationChange, RotationCommand& AngularVelocityChange) {
+		
+		CurrentFrame.PositionBuffer[id] = (PositionChange.Delta) ? CurrentFrame.PositionBuffer[id] + PositionChange.TranslationVector : PositionChange.TranslationVector;
+		CurrentFrame.VelocityBuffer[id] = (VelocityChange.Delta) ? CurrentFrame.VelocityBuffer[id] + VelocityChange.TranslationVector : VelocityChange.TranslationVector;
+		
+		CurrentFrame.RotationBuffer[id]        = (RotationChange.Delta)        ? CurrentFrame.RotationBuffer[id]        * RotationChange.RotationVector        : RotationChange.RotationVector;
+		CurrentFrame.AngularVelocityBuffer[id] = (AngularVelocityChange.Delta) ? CurrentFrame.AngularVelocityBuffer[id] * AngularVelocityChange.RotationVector : AngularVelocityChange.RotationVector;
+
+		PositionChange.Reset();
+		VelocityChange.Reset();
+		RotationChange.Reset();
+		AngularVelocityChange.Reset();
 	}
 };

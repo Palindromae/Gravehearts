@@ -11,7 +11,6 @@ struct PhysicsComponent
 {
 	
 	
-	
 	// Gravity
 	bool ApplyGravity{};
 	float Gravity = 10;

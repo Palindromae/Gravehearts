@@ -18,7 +18,7 @@ class Entity
 	int EntityID = -1;
 
 public:
-	Entity(glm::vec3 pos, int model, glm::quat rotation = glm::quat(), glm::vec3 scale = glm::vec3(1), PhysicsComponent physics_component = {});
+	Entity(glm::vec3 pos, int model, glm::quat rotation = glm::quat(), glm::vec3 scale = glm::vec3(1), PhysicsComponent physics_component = PhysicsComponent());
 
 	void SetPhysicsComponent(PhysicsComponent component);
 

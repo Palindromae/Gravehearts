@@ -365,7 +365,8 @@ int main(int argc, char** argv)
       }
 
       const auto now = std::chrono::high_resolution_clock::now();
-      double frameTime = std::chrono::duration_cast<std::chrono::seconds>(now - current).count();
+      double frameTime = std::chrono::duration_cast<std::chrono::microseconds>(now - current).count();
+      frameTime *= 0.000001;
 
       current = now;
       accumulatedTime += frameTime;
@@ -377,7 +378,7 @@ int main(int argc, char** argv)
           // Expect the previous frame to have finished
 
           // Do a physics step
-          NVEPhysics->InitiateNewPhysicsUpdate(true);
+          NVEPhysics->InitiateNewPhysicsUpdate();
 
           accumulatedTime -= FixedDeltaTime;
           if (accumulatedTime >= FixedDeltaTime)
@@ -388,10 +389,10 @@ int main(int argc, char** argv)
 
 
       // INTERPOLATE between current time and previous time
-      //if (interpolate)
-      //    TLS::InterpolatedFrame->Interpolate(TLS::PreviousInterpolationFrame, NVEPhysics->GetCurrentDefinedPhysicsFrame(), accumulatedTime / FixedDeltaTime);
-    //  else
-       //   TLS::InterpolatedFrame->Interpolate(TLS::PreviousInterpolationFrame, NVEPhysics->GetCurrentDefinedPhysicsFrame(), 1);
+      if (interpolate)
+          TLS::InterpolatedFrame->Interpolate(TLS::PreviousInterpolationFrame, NVEPhysics->GetCurrentDefinedPhysicsFrame(), accumulatedTime / FixedDeltaTime);
+      else
+          TLS::InterpolatedFrame->Interpolate(TLS::PreviousInterpolationFrame, NVEPhysics->GetCurrentDefinedPhysicsFrame(), 1);
 
       /// GAME LOGIC
 

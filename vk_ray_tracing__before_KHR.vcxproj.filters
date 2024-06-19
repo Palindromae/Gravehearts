@@ -268,6 +268,18 @@
     <ClInclude Include="src\PhysicsInterface.h">
       <Filter>Internal\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="src\Physics_TranslationCommand.h">
+      <Filter>Internal\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics_RotationCommand.h">
+      <Filter>Internal\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ModelConst.h">
+      <Filter>Internal\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PhysicsComponentCommand.h">
+      <Filter>Internal\Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\frag_shader.frag">

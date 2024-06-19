@@ -52,7 +52,11 @@ public:
 	void GetEntityArr(ComputeBuffer*& Models);
 	void ReturnID(VkAccelerationStructureInstanceKHR* id);
 	void ReturnGPUData(int data);
+	void SetModel(int id, int Model);
+	void SetEntityActive(int id);
+	void SetEntityInactive(int id);
 
 	~EntityManager();
+
 
 };

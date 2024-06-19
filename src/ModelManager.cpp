@@ -13,6 +13,7 @@ ModelManager::ModelManager() {
 	// Load in Models from disk
 
 	// Ignoring previous step for now
+	StaticModels.push_back(Model(glm::vec3(0)));
 	StaticModels.push_back(Model(glm::vec3(10)));
 
 	int dataPtr = 0;
