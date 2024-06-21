@@ -93,7 +93,7 @@ private:
 
 	int GetPartition(glm::vec3 position, glm::ivec3& partition_point) {
 		partition_point = floor(position / PhysicsChunkSizeVec3);
-		return PartitionUIDToIndex(int(position.x) & 2, int(position.y) & 2, int(position.z) & 2);
+		return PartitionUIDToIndex(int(position.x) & 1, int(position.y) & 1, int(position.z) & 1);
 	}
 
 	void main_physics()
@@ -187,7 +187,7 @@ private:
 		if (A != B)
 		{
 			partitions[A].RemoveEntity(id, partition_point_Past);
-			partitions[B].RemoveEntity(id, partition_point_Current);
+			partitions[B].AddEntity(id, partition_point_Current);
 			return;
 		}
 
@@ -464,6 +464,7 @@ public:
 
 	void WaitForEndOfFrame();
 	void CopyResultsOutToTLS();
+	void CopyToPastResults();
 	void InitiateNewPhysicsUpdate();
 
 	void AddPhysicsObject(int id, PhysicsComponent component);
@@ -472,6 +473,7 @@ public:
 		const glm::vec3 pos = CurrentFrame.PositionBuffer[id];
 		glm::ivec3 pos_point;
 		int partitionID = GetPartition(pos, pos_point);
+		PhysicsComponents->IsComponentSet = false;
 		partitions[partitionID].RemoveEntity(id, pos_point);
 		EntityManager::instance->SetEntityInactive(id);
 	}
@@ -484,9 +486,6 @@ public:
 		CurrentFrame.RotationBuffer[id]        = (RotationChange.Delta)        ? CurrentFrame.RotationBuffer[id]        * RotationChange.RotationVector        : RotationChange.RotationVector;
 		CurrentFrame.AngularVelocityBuffer[id] = (AngularVelocityChange.Delta) ? CurrentFrame.AngularVelocityBuffer[id] * AngularVelocityChange.RotationVector : AngularVelocityChange.RotationVector;
 
-		// If its a position set or a non-zero position delta 
-		if(!PositionChange.Delta || CurrentFrame.PositionBuffer[id] == glm::vec3(0))
-			TrySwapEntityPartition(id);
 
 		SetEntityActive(id);
 
@@ -494,5 +493,10 @@ public:
 		VelocityChange.Reset();
 		RotationChange.Reset();
 		AngularVelocityChange.Reset();
+	}
+
+	void TLSPartitionChange(int id, TranslationCommand& PositionChange) {
+		if ((!PositionChange.Delta || CurrentFrame.PositionBuffer[id] == glm::vec3(0)) && PhysicsComponents[id].IsComponentSet)
+			TrySwapEntityPartition(id);
 	}
 };

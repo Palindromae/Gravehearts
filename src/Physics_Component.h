@@ -13,7 +13,7 @@ struct PhysicsComponent
 	
 	// Gravity
 	bool ApplyGravity{};
-	float Gravity = 10;
+	glm::vec3 Gravity = glm::vec3(0,-10,0);
 	
 	// Collisions 
 	bool Collisions_BodyBody{};
@@ -23,6 +23,7 @@ struct PhysicsComponent
 
 	// Filters
 	uint32_t mask = 0;
+	bool IsComponentSet = false;
 
 	// Modifiers
 	float SharpnessVector = 0; // 0 is blunt otherwise calculate the direction from bits

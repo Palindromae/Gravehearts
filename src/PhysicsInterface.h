@@ -33,6 +33,7 @@ public:
 private:
 	bool * EntityChanged;
 	bool * TLSChanged;
+	int TotalChanges{};
 
 	// Position Changes
 	TranslationCommand* Translations{};
@@ -68,12 +69,15 @@ public:
 //// ENTITY --- MODEL INTERACTION ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 private:
 	int* Models;
+
+	void SetPartitions();
 	PhysicsComponentCommand** PhysicsComponents;
 public:
 	void SetModelNextFrame(const int id, const uint32_t modelID);
 
 	void CreateEntity(const int id, const uint32_t modelID, const PhysicsComponent component, const glm::vec3 Position, const glm::quat Rotation);
 	void DeleteEntity(int id);
+
 
 	// Apply Alterations
 	void ApplyChangesToNextFrame();

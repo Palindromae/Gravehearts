@@ -69,6 +69,7 @@ void PhysicsInterface::InitiateNewPhysicsUpdate()
 	ApplyChangesToNextFrame();
 
 	// Queue next frame
+
 	Manager->InitiateNewPhysicsUpdate();
 }
 
@@ -89,6 +90,8 @@ void PhysicsInterface::InitiateNewPhysicsUpdate()
 void PhysicsInterface::InstantTranslate(const int id, const glm::vec3 translation)
 {
 	Translations[id].TranslationVector += translation;
+	
+	TotalChanges += !EntityChanged[id];
 	EntityChanged[id] = true;
 	TLSChanged[id] = true;
 }
@@ -97,6 +100,8 @@ void PhysicsInterface::SetPosition(const int id, const glm::vec3 WorldSpacePosit
 {
 	Translations[id].Delta = false;
 	Translations[id].TranslationVector = WorldSpacePosition;
+	
+	TotalChanges += !EntityChanged[id];
 	EntityChanged[id] = true;
 	TLSChanged[id] = true;
 }
@@ -104,6 +109,8 @@ void PhysicsInterface::SetPosition(const int id, const glm::vec3 WorldSpacePosit
 void PhysicsInterface::InstantRotate(const int id, const glm::quat rotation)
 {
 	Rotations[id].RotationVector *= rotation;
+	
+	TotalChanges += !EntityChanged[id];
 	EntityChanged[id] = true;
 	TLSChanged[id] = true;
 }
@@ -112,6 +119,8 @@ void PhysicsInterface::SetRotation(const int id, const  glm::quat rotation)
 {
 	Rotations[id].Delta = false;
 	Rotations[id].RotationVector = rotation;
+	
+	TotalChanges += !EntityChanged[id];
 	EntityChanged[id] = true;
 	TLSChanged[id] = true;
 }
@@ -120,6 +129,8 @@ void PhysicsInterface::SetVelocity(const int id, const glm::vec3 velocity)
 {
 	Velocity[id].Delta = false;
 	Velocity[id].TranslationVector = velocity;
+	
+	TotalChanges += !EntityChanged[id];
 	EntityChanged[id] = true;
 	TLSChanged[id] = true;
 }
@@ -127,6 +138,8 @@ void PhysicsInterface::SetVelocity(const int id, const glm::vec3 velocity)
 void PhysicsInterface::DeltaVelocity(const int id, const glm::vec3 delta_velocity)
 {
 	Velocity[id].TranslationVector += delta_velocity;
+	
+	TotalChanges += !EntityChanged[id];
 	EntityChanged[id] = true;
 	TLSChanged[id] = true;
 }
@@ -134,6 +147,8 @@ void PhysicsInterface::DeltaVelocity(const int id, const glm::vec3 delta_velocit
 void PhysicsInterface::SetAngularVelocity(const int id, const  glm::quat velocity)
 {
 	Rotations[id].Delta = false;
+	
+	TotalChanges += !EntityChanged[id];
 	Rotations[id].RotationVector = velocity;
 	EntityChanged[id] = true;
 	TLSChanged[id] = true;
@@ -142,6 +157,8 @@ void PhysicsInterface::SetAngularVelocity(const int id, const  glm::quat velocit
 void PhysicsInterface::DeltaAngularVelocity(const int id, const glm::quat velocity)
 {
 	Rotations[id].RotationVector *= velocity;
+	
+	TotalChanges += !EntityChanged[id];
 	EntityChanged[id] = true;
 	TLSChanged[id] = true;
 }
@@ -149,6 +166,8 @@ void PhysicsInterface::DeltaAngularVelocity(const int id, const glm::quat veloci
 void PhysicsInterface::SetModelNextFrame(const int id, const uint32_t modelID)
 {
 	Models[id] = modelID;
+	
+	TotalChanges += !EntityChanged[id];
 	EntityChanged[id] = true;
 }
 
@@ -169,10 +188,15 @@ void PhysicsInterface::DeleteEntity(const int id)
 
 void PhysicsInterface::ApplyChangesToNextFrame()
 {
+	int ii = 0;
 	for (size_t id = 0; id < MaxEntities; id++)
 	{
+
 		if (!EntityChanged[id])
 			continue;
+		
+		if (ii++ >= TotalChanges) // Skips if total changes has been exceeded. 
+			return;
 
 		// Check if the entity should be deleted
 		if (Models[id] == DeleteEntityCommand)

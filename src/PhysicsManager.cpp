@@ -221,10 +221,13 @@ void PhysicsManager::InitiateNewPhysicsUpdate() {
 // this should only be done between frames
 void PhysicsManager::AddPhysicsObject(int id, PhysicsComponent component) {
 	const glm::vec3 pos = CurrentFrame.PositionBuffer[id];
+	//PastFrame.PositionBuffer[id] = pos; // This is a safety step that ensures any past is correctly identified MOST LIKELY NOT NEEDED
+
 	glm::ivec3 pos_point;
 	int partitionID = GetPartition(pos, pos_point);
 	partitions[partitionID].AddEntity(id, pos_point);
 
+	component.IsComponentSet = true;
 	PhysicsComponents[id] = component;
 	//SetEntityActive(id); // is this nessary it should already be moved to its origin (An entity should never be spawn in a previous ones place)
 	EntityManager::instance->SetEntityActive(id);
