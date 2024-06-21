@@ -91,9 +91,8 @@ private:
 	}
 
 
-	int GetPartition(glm::vec3 position) {
-		position /= PhysicsChunkSize;
-
+	int GetPartition(glm::vec3 position, glm::ivec3& partition_point) {
+		partition_point = floor(position / PhysicsChunkSizeVec3);
 		return PartitionUIDToIndex(int(position.x) & 2, int(position.y) & 2, int(position.z) & 2);
 	}
 
@@ -174,6 +173,26 @@ private:
 		int sub_id = id & (ENTITYCHUNK_SIZE - 1);
 
 		return (active_masks[chunk] >> sub_id) & 1;
+	}
+
+	void TrySwapEntityPartition(int id) {
+
+		glm::ivec3 partition_point_Past;
+		glm::ivec3 partition_point_Current;
+
+		int A = GetPartition(PastFrame.PositionBuffer[id], partition_point_Past);
+		int B = GetPartition(CurrentFrame.PositionBuffer[id], partition_point_Current);
+
+		// 1. To new partition
+		if (A != B)
+		{
+			partitions[A].RemoveEntity(id, partition_point_Past);
+			partitions[B].RemoveEntity(id, partition_point_Current);
+			return;
+		}
+
+		// 2. To new subpartition within partition
+		partitions[A].AttemptSwap(id, PastFrame.PositionBuffer[id], CurrentFrame.PositionBuffer[id]);
 	}
 
 public:
@@ -451,8 +470,9 @@ public:
 
 	void RemovePhysicsObject(int id) {
 		const glm::vec3 pos = CurrentFrame.PositionBuffer[id];
-		int partitionID = GetPartition(pos);
-		partitions[partitionID].RemoveEntity(id, pos);
+		glm::ivec3 pos_point;
+		int partitionID = GetPartition(pos, pos_point);
+		partitions[partitionID].RemoveEntity(id, pos_point);
 		EntityManager::instance->SetEntityInactive(id);
 	}
 
@@ -464,6 +484,9 @@ public:
 		CurrentFrame.RotationBuffer[id]        = (RotationChange.Delta)        ? CurrentFrame.RotationBuffer[id]        * RotationChange.RotationVector        : RotationChange.RotationVector;
 		CurrentFrame.AngularVelocityBuffer[id] = (AngularVelocityChange.Delta) ? CurrentFrame.AngularVelocityBuffer[id] * AngularVelocityChange.RotationVector : AngularVelocityChange.RotationVector;
 
+		// If its a position set or a non-zero position delta 
+		if(!PositionChange.Delta || CurrentFrame.PositionBuffer[id] == glm::vec3(0))
+			TrySwapEntityPartition(id);
 
 		SetEntityActive(id);
 

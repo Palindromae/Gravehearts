@@ -7,13 +7,13 @@
 struct PhysicsPartition {
 	std::unordered_map<glm::ivec3, std::unordered_map<int,bool>> EntityMap{};
 
-	glm::ivec3 GetIndex(glm::vec3 position) {
+	glm::ivec3 GetIndex(const glm::ivec3 position) {
 
-		return glm::ivec3(position) & PhysicsChunkSize;
+		return glm::ivec3(position) & (PhysicsChunkSize - glm::ivec3(1));
 	}
 
-	void RemoveEntity(int id, glm::vec3 LastFramePosition) {
-		glm::ivec3 index = GetIndex(LastFramePosition);
+	void RemoveEntity(const int id, const glm::ivec3 LastFramePosition_InPhysicsChunkSpace) {
+		glm::ivec3 index = GetIndex(LastFramePosition_InPhysicsChunkSpace);
 		EntityMap[index].erase(id);
 
 		if (EntityMap[index].size() == 0)
@@ -22,9 +22,21 @@ struct PhysicsPartition {
 
 
 
-	void AddEntity(int id, glm::vec3 CurrentFramePosition) {
-
+	void AddEntity(const int id, const glm::ivec3 CurrentFramePosition)
+	{
 		EntityMap[GetIndex(CurrentFramePosition)][id] = true;
+	}
+
+	void AttemptSwap(const int id, const glm::ivec3 PastPosition_InPhysicsChunkSpace, const glm::ivec3 CurrentPosition_InPhysicsChunkSpace) {
+		glm::ivec3 PIndex = GetIndex(PastPosition_InPhysicsChunkSpace);
+		glm::ivec3 CIndex = GetIndex(CurrentPosition_InPhysicsChunkSpace);
+
+		if (PIndex == CIndex)
+			return;
+
+		// Swap
+		EntityMap[PIndex].erase(id);
+		EntityMap[CIndex][id] = true;
 	}
 
 };

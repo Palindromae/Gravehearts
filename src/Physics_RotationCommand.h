@@ -4,8 +4,8 @@
 #include <glm/gtx/quaternion.hpp>
 
 struct RotationCommand {
-	bool Delta;
-	glm::quat RotationVector;
+	bool Delta = true;
+	glm::quat RotationVector = glm::quat();
 
 	void Reset() {
 		Delta = true;

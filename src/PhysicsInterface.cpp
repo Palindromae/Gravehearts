@@ -19,6 +19,22 @@ PhysicsInterface::PhysicsInterface() {
 	Models = new int[MaxEntities];
 	PhysicsComponents = new PhysicsComponentCommand*[MaxEntities];
 
+
+	for (size_t id = 0; id < MaxEntities; id++)
+	{
+		Translations[id] = TranslationCommand();
+		Velocity[id] = TranslationCommand();
+		Rotations[id] = RotationCommand();
+		AngularVelocity[id] = RotationCommand();
+
+		EntityChanged[id] = false;
+		TLSChanged[id] = false;
+		
+		Models[id] = NullModel;
+		PhysicsComponents[id] = nullptr;
+	}
+
+
 	Manager = new PhysicsManager();
 }
 
