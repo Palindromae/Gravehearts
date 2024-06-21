@@ -464,6 +464,9 @@ public:
 		CurrentFrame.RotationBuffer[id]        = (RotationChange.Delta)        ? CurrentFrame.RotationBuffer[id]        * RotationChange.RotationVector        : RotationChange.RotationVector;
 		CurrentFrame.AngularVelocityBuffer[id] = (AngularVelocityChange.Delta) ? CurrentFrame.AngularVelocityBuffer[id] * AngularVelocityChange.RotationVector : AngularVelocityChange.RotationVector;
 
+
+		SetEntityActive(id);
+
 		PositionChange.Reset();
 		VelocityChange.Reset();
 		RotationChange.Reset();

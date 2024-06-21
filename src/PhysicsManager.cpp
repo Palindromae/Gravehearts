@@ -218,5 +218,6 @@ void PhysicsManager::AddPhysicsObject(int id, PhysicsComponent component) {
 	partitions[partitionID].AddEntity(id, pos);
 
 	PhysicsComponents[id] = component;
+	SetEntityActive(id); // is this nessary it should already be moved to its origin
 	EntityManager::instance->SetEntityActive(id);
 }

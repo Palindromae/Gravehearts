@@ -4,7 +4,7 @@
 
 PhysicsInterface::PhysicsInterface() {
 	if (PhysInterface != nullptr)
-		throw new std::exception("you cannot have more than one physics managers running at a time");
+		throw new std::exception("you cannot have more than one physics interfaces running at a time");
 
 	PhysInterface = this;
 
@@ -14,6 +14,7 @@ PhysicsInterface::PhysicsInterface() {
 	AngularVelocity = new RotationCommand[MaxEntities];
 
 	EntityChanged = new bool[MaxEntities];
+	TLSChanged = new bool[MaxEntities];
 
 	Models = new int[MaxEntities];
 	PhysicsComponents = new PhysicsComponentCommand*[MaxEntities];
@@ -73,6 +74,7 @@ void PhysicsInterface::InstantTranslate(const int id, const glm::vec3 translatio
 {
 	Translations[id].TranslationVector += translation;
 	EntityChanged[id] = true;
+	TLSChanged[id] = true;
 }
 
 void PhysicsInterface::SetPosition(const int id, const glm::vec3 WorldSpacePosition)
@@ -80,12 +82,14 @@ void PhysicsInterface::SetPosition(const int id, const glm::vec3 WorldSpacePosit
 	Translations[id].Delta = false;
 	Translations[id].TranslationVector = WorldSpacePosition;
 	EntityChanged[id] = true;
+	TLSChanged[id] = true;
 }
 
 void PhysicsInterface::InstantRotate(const int id, const glm::quat rotation)
 {
 	Rotations[id].RotationVector *= rotation;
 	EntityChanged[id] = true;
+	TLSChanged[id] = true;
 }
 
 void PhysicsInterface::SetRotation(const int id, const  glm::quat rotation)
@@ -93,6 +97,7 @@ void PhysicsInterface::SetRotation(const int id, const  glm::quat rotation)
 	Rotations[id].Delta = false;
 	Rotations[id].RotationVector = rotation;
 	EntityChanged[id] = true;
+	TLSChanged[id] = true;
 }
 
 void PhysicsInterface::SetVelocity(const int id, const glm::vec3 velocity)
@@ -100,12 +105,14 @@ void PhysicsInterface::SetVelocity(const int id, const glm::vec3 velocity)
 	Velocity[id].Delta = false;
 	Velocity[id].TranslationVector = velocity;
 	EntityChanged[id] = true;
+	TLSChanged[id] = true;
 }
 
 void PhysicsInterface::DeltaVelocity(const int id, const glm::vec3 delta_velocity)
 {
 	Velocity[id].TranslationVector += delta_velocity;
 	EntityChanged[id] = true;
+	TLSChanged[id] = true;
 }
 
 void PhysicsInterface::SetAngularVelocity(const int id, const  glm::quat velocity)
@@ -113,12 +120,14 @@ void PhysicsInterface::SetAngularVelocity(const int id, const  glm::quat velocit
 	Rotations[id].Delta = false;
 	Rotations[id].RotationVector = velocity;
 	EntityChanged[id] = true;
+	TLSChanged[id] = true;
 }
 
 void PhysicsInterface::DeltaAngularVelocity(const int id, const glm::quat velocity)
 {
 	Rotations[id].RotationVector *= velocity;
 	EntityChanged[id] = true;
+	TLSChanged[id] = true;
 }
 
 void PhysicsInterface::SetModelNextFrame(const int id, const uint32_t modelID)
@@ -159,11 +168,17 @@ void PhysicsInterface::ApplyChangesToNextFrame()
 		}
 
 		// Set Model
-		if(Models[id] != NullModel)
+		if (Models[id] != NullModel) {
 			EntityManager::instance->SetModel(id, Models[id]);
+			Models[id] = NullModel;
+		}
 
 		// Set TLS data
-		Manager->TLSAlteration(id, Translations[id], Velocity[id], Rotations[id], AngularVelocity[id]);
+		if (TLSChanged[id]) {
+			Manager->TLSAlteration(id, Translations[id], Velocity[id], Rotations[id], AngularVelocity[id]);
+			TLSChanged[id] = false;
+		}
+		
 		EntityChanged[id] = false;
 
 		// Set Physics Components
@@ -172,7 +187,7 @@ void PhysicsInterface::ApplyChangesToNextFrame()
 			//if (PhysicsComponents[id]->Destroy) 
 			//	Manager->RemovePhysicsObject(id);
 			//else 
-			// Should be impossible to delete the
+			// Should be impossible to delete the physics object without deleting the entity
 			Manager->AddPhysicsObject(id, PhysicsComponents[id]->component);
 
 			delete PhysicsComponents[id];
