@@ -365,7 +365,7 @@ private:
 
 		// Calculate Entities to Update
 		//PhysicsCubeTraceInfo* trace_infos = (PhysicsCubeTraceInfo*)malloc(sizeof(PhysicsCubeTraceInfo) * NoActiveEntities);
-		int* activeIDs = (int*)malloc(sizeof(int) * NoActiveEntities);
+		ActiveEntities = (int*)malloc(sizeof(int) * NoActiveEntities);
 		const int bits = 8;
 		int l = 0;
 		for (size_t i = 0; i < ActiveChunks.size(); i++)
@@ -382,7 +382,7 @@ private:
 
 				int ID = ActiveChunks[i] * sizeof(worked_mask) * bits + EntityOffset;
 
-				activeIDs[l++] = ID;
+				ActiveEntities[l++] = ID;
 
 				if (worked_mask == 0) // if empty skip the rest of the chunk
 					break;
@@ -393,9 +393,9 @@ private:
 		// Initiate Velocities -- Apply Forces, Apply Current Velocities
 		for (size_t i = 0; i < NoActiveEntities; i++)
 		{
-			ApplyGravity(FixedDeltaTime, activeIDs[i]);
-			ApplyVelocity(FixedDeltaTime, activeIDs[i]);
-			ApplyAngularVelocity(FixedDeltaTime, activeIDs[i]);
+			ApplyGravity(FixedDeltaTime, ActiveEntities[i]);
+			ApplyVelocity(FixedDeltaTime, ActiveEntities[i]);
+			ApplyAngularVelocity(FixedDeltaTime, ActiveEntities[i]);
 		}
 	}
 

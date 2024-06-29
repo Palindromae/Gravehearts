@@ -24,9 +24,8 @@
 
 #include "raycommon.glsl"
 #include "wavefront.glsl"
-#include "Helpers/Rays.glsl"
 
-layout(location = 0) rayPayloadInEXT RayResponse prd;
+layout(location = 0) rayPayloadInEXT hitPayload prd;
 
 layout(push_constant) uniform _PushConstantRay
 {
@@ -35,5 +34,5 @@ layout(push_constant) uniform _PushConstantRay
 
 void main()
 {
-  prd.albedo = pcRay.clearColor.xyz;
+  prd.hitValue = pcRay.clearColor.xyz;
 }

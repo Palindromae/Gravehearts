@@ -11,6 +11,10 @@ nve::ManualRenderPass::ManualRenderPass(nve::ProductionPackage* context) : conte
 	vkBeginCommandBuffer(*context->primaryCommandBuffer, &begin);
 }
 
+VkCommandBuffer* nve::ManualRenderPass::GetCommandBuffer() {
+	return context->primaryCommandBuffer;
+}
+
 // VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT STAGE MASK
 // VK_ACCESS_INDIRECT_COMMAND_READ_BIT ACCESS MASK
 void nve::ManualRenderPass::InsertMemoryBarrier(VkPipelineStageFlags srcStage, VkPipelineStageFlags dstStage, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask)

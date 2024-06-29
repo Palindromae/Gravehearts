@@ -59,7 +59,7 @@ layout(set = 1, binding = eModels, scalar) buffer allModel_
 }
 allModels;
 
-hitAttributeEXT vec3 attribs;
+hitAttributeEXT vec4 attribs;
 
 
 
@@ -100,7 +100,7 @@ return;
     sphere.center = allEntitiesVec3.i[gl_InstanceCustomIndexEXT + MaxEntities * Position_Interpolated];
     // Sphere intersection
    float tHit = hitSphere(sphere, ray);
-  attribs = vec3(sphere.center/20.0);
-  if(tHit>0)
+  attribs = vec4(sphere.center/20.0,tHit);
+  //if(tHit>0)
     reportIntersectionEXT(tHit,1);
 }

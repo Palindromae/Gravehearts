@@ -281,10 +281,14 @@ int main(int argc, char** argv)
   new PhysicsInterface();
   new ModelManager();
   new EntityManager();
-  Entity* entity2 = new Entity(glm::vec3(0), 0);
-  Entity* entity = new Entity(glm::vec3(5), 0);
-  Entity* entity3 = new Entity(glm::vec3(1,2,3), 0);
-  Entity* entity4 = new Entity(glm::vec3(5,-3,1), 0);
+
+  PhysicsComponent comp = PhysicsComponent();
+  comp.Gravity = glm::vec3(0);
+
+  Entity* entity2 = new Entity(1, glm::vec3(0), glm::quat(), glm::vec3(1), comp);
+  //Entity* entity = new Entity(glm::vec3(5), 0, glm::quat(), glm::vec3(1), comp);
+ // Entity* entity3 = new Entity(glm::vec3(1,2,3), 1, glm::quat(), glm::vec3(1), comp);
+  //Entity* entity4 = new Entity(glm::vec3(5,-3,1), 1, glm::quat(), glm::vec3(1), comp);
 
   ChunkVolume* chunkVolume = ChunkInterface::instance->CreateChunk(ChunkID(0));
   ChunkVolume* chunkVolumeB = ChunkInterface::instance->CreateChunk(ChunkID(NoChunksPerAxii,0, NoChunksPerAxii));
@@ -335,7 +339,7 @@ int main(int argc, char** argv)
           continue;
       frame++;
 
-      // Start the Dear ImGui frame
+      // Start the Dear ImGui frameW
       ImGui_ImplGlfw_NewFrame();
       ImGui::NewFrame();
 

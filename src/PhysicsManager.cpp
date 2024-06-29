@@ -188,7 +188,6 @@ void PhysicsManager::PhysicsUpdate() {
 
 	// Wipe Collisions data
 
-	free(ActiveEntities);
 }
 
 void PhysicsManager::WaitForEndOfFrame() {

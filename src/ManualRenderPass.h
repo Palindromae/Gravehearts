@@ -12,6 +12,7 @@ namespace nve {
 
 	public:
 		ManualRenderPass(nve::ProductionPackage* context);
+		VkCommandBuffer* GetCommandBuffer();
 		void execute();
 		~ManualRenderPass();
 		void InsertMemoryBarrier(VkPipelineStageFlags srcStage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, VkPipelineStageFlags dstStage = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, VkAccessFlags srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT, VkAccessFlags dstAccessMask = VK_ACCESS_MEMORY_READ_BIT);

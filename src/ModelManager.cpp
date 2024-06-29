@@ -1,4 +1,5 @@
 #include "ModelManager.h"
+#include "ManualRenderPass.h"
 
 ModelManager::ModelManager() {
 
@@ -39,6 +40,9 @@ VkDeviceAddress ModelManager::GetModelBlasPtr(int model) {
 	return BlasPtr[model];
 }
 
+int SetSize(int size) {
+	return std::ceil(size / 256.0) * 256;
+}
 
 void ModelManager::BuildModelBLAS()
 {
@@ -80,7 +84,7 @@ void ModelManager::BuildModelBLAS()
 		ScratchBuildSize = std::max(info.buildScratchSize, ScratchBuildSize);
 
 
-		BufferSize += info.accelerationStructureSize;
+		BufferSize += SetSize(info.accelerationStructureSize);
 
 		BLASCreateInfos.push_back(blasCreateInfo);
 		BLASSize.push_back(info.accelerationStructureSize);
@@ -112,7 +116,7 @@ void ModelManager::BuildModelBLAS()
 		createInfo.offset = offset;
 		createInfo.buffer = BlasBuffer.buffer;
 
-		offset += createInfo.size;
+		offset += SetSize(createInfo.size);
 
 		VkAccelerationStructureKHR ModelBlas{};
 		CommandDispatcher->CreateAccelerationStructure(&createInfo, ModelBlas);
@@ -124,7 +128,7 @@ void ModelManager::BuildModelBLAS()
 		VkBufferDeviceAddressInfo info{ VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO, nullptr, ScrapBuffer.buffer };
 		BLASCreateInfos[i].scratchData.deviceAddress = CommandDispatcher->GetBufferDeviceAddress(info);
 
-		ranges.primitiveOffset = sizeof(VkAccelerationStructureBuildRangeInfoKHR) * i;
+		ranges.primitiveOffset = sizeof(Model) * i;
 		buildRanges.push_back(new VkAccelerationStructureBuildRangeInfoKHR(ranges));
 
 		VkAccelerationStructureDeviceAddressInfoKHR addressInfo{ VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR };
@@ -133,11 +137,21 @@ void ModelManager::BuildModelBLAS()
 
 	}
 
-	auto cmd = CommandDispatcher->beginSingleTimeCommands(context);
 
-	CommandDispatcher->Handle_vkCmdBuildAccelerationStructuresKHR(cmd, StaticModels.size(), BLASCreateInfos.data(), buildRanges.data());
+	nve::ManualRenderPass renderpass = nve::ManualRenderPass(context);
 
-	CommandDispatcher->endSingleTimeCommands(context, cmd, true);
+	//auto cmd = CommandDispatcher->beginSingleTimeCommands(context);
+
+	for (size_t i = 0; i < StaticModels.size(); i++)
+	//for (int i = StaticModels.size() - 1; i >= 0; i--)
+	{
+		//int i = 1;
+		CommandDispatcher->Handle_vkCmdBuildAccelerationStructuresKHR(*renderpass.GetCommandBuffer(), 1, &BLASCreateInfos[i], &buildRanges[i]);
+
+		if(i+1 != StaticModels.size())
+			renderpass.InsertMemoryBarrier(VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR, VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR);
+	}
+	renderpass.execute();
 
 	CommandDispatcher->m_alloc->finalizeAndReleaseStaging();
 

@@ -11,6 +11,13 @@ struct RayHit{
 	vec3 dir;
 };
 
+struct RayResponse{
+	RayHit hit;
+    vec3 albedo;
+};
+
+
+
 struct TracingPackage{
     vec3 s_dir;
     vec3 inv_dir;

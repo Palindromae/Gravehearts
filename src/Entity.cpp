@@ -2,7 +2,7 @@
 #include "PhysicsInterface.h"
 #include <algorithm>
 
-Entity::Entity(glm::vec3 pos, int model, glm::quat rotation, glm::vec3 scale, PhysicsComponent physics_component) : scale(scale) {
+Entity::Entity(int model, glm::vec3 pos, glm::quat rotation, glm::vec3 scale, PhysicsComponent physics_component) : scale(scale) {
 	data = EntityManager::instance->GetID(EntityID);
 	dataptr = EntityManager::instance->GetDataPtr(position,this->rotation,this->model);
 

@@ -109,7 +109,7 @@ namespace Shaders{
 		//loadShader("VoxelOctreeAllForOneWithSafetyMips.comp.spv",  Shaders::VoxelOctreeAllForOneWithSafetyMips,  sizeof(OctreeConstants), VoxelOctree, device);
 
 		// Physics
-		loadShader("ObjectWorldCollisionDetection.comp.spv", Shaders::ObjectWorldCollisionDetection, sizeof(int), ObjectWorldDetection, device);
+		//loadShader("ObjectWorldCollisionDetection.comp.spv", Shaders::ObjectWorldCollisionDetection, sizeof(int), ObjectWorldDetection, device);
 
 
 		// Utility

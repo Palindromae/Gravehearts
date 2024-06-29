@@ -36,7 +36,7 @@
 #include "Helpers/Rays.glsl"
 #include "Helpers/RayMasks.glsl"
 
-hitAttributeEXT vec3 attribs;
+hitAttributeEXT RayHit attribs;
 
 layout(set = 0, binding = eChunkHeaders, scalar) buffer Headers_ { ChunkHeader ChunkHeaders[]; };
 layout(set = 0, binding = eChunkMemory,  scalar) buffer GPUMemory_ { VoxelBrick GPUMemory[]; };
@@ -611,7 +611,7 @@ void main()
 		
 		if(Raytrace(ray,info, gl_InstanceCustomIndexEXT, index, hit)) {
 			reportIntersectionEXT(hit._distance,1);
-			attribs = hit.position/vec3(256);
+			attribs = hit;
 			return;
 		} 
 	/*
@@ -628,7 +628,9 @@ void main()
 		
 	}
 
-	attribs = position/vec3(256);
-	attribs = vec3(1,0,0);
+	//attribs = position/vec3(256);
+	hit.blockID = 0;
+	hit._distance = 10000.0;
+	attribs = hit;
 	reportIntersectionEXT(1,1);
 }
